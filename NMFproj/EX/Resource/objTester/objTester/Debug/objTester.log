@@ -1,0 +1,28 @@
+﻿Build started 2015-12-28 오후 5:08:11.
+     1>Project "C:\Users\hyo\Desktop\NMFproj\NMF\Resource\objTester\objTester\objTester.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt objTester.cpp
+         objTester.cpp
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(18): warning C4091: 'typedef ' : ignored on left of 'obj_face' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(27): warning C4091: 'typedef ' : ignored on left of 'obj_sphere' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(36): warning C4091: 'typedef ' : ignored on left of 'obj_plane' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(41): warning C4091: 'typedef ' : ignored on left of 'obj_vector' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(56): warning C4091: 'typedef ' : ignored on left of 'obj_material' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(63): warning C4091: 'typedef ' : ignored on left of 'obj_camera' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(69): warning C4091: 'typedef ' : ignored on left of 'obj_light_point' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(76): warning C4091: 'typedef ' : ignored on left of 'obj_light_disc' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(82): warning C4091: 'typedef ' : ignored on left of 'obj_light_quad' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(105): warning C4091: 'typedef ' : ignored on left of 'obj_growable_scene_data' when no variable is declared
+     1>c:\users\hyo\desktop\nmfproj\nmf\resource\objtester\objtester\obj_parser.h(138): warning C4091: 'typedef ' : ignored on left of 'obj_scene_data' when no variable is declared
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\hyo\Desktop\NMFproj\NMF\Resource\objTester\Debug\objTester.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\hyo\Desktop\NMFproj\NMF\Resource\objTester\Debug\objTester.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\hyo\Desktop\NMFproj\NMF\Resource\objTester\Debug\objTester.lib" /MACHINE:X86 /SAFESEH Debug\list.obj
+         Debug\objLoader.obj
+         Debug\objTester.obj
+         Debug\obj_parser.obj
+         Debug\string_extra.obj
+         objTester.vcxproj -> C:\Users\hyo\Desktop\NMFproj\NMF\Resource\objTester\Debug\objTester.exe
+     1>Done Building Project "C:\Users\hyo\Desktop\NMFproj\NMF\Resource\objTester\objTester\objTester.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.32
