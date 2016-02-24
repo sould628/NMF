@@ -1,0 +1,1 @@
+extern const float BPexp = 10.0f;

@@ -90,6 +90,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="globalVariables.h" />
     <ClInclude Include="GLSLProgram.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\FreeImage.h" />

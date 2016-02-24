@@ -19,16 +19,15 @@
 #include "FreeImage.h"
 #include "objLoader.h"
 
+#include "globalVariables.h"
+
 
 #include "GLSLProgram.h"
-
-
-
 #include "Camera.h"
 
 #define sysPause system("pause>nul");
 
-#define MAXITERATION 100
+#define MAXITERATION 10
 
 float modelviewMatrix[16] = { 0 };
 float projectionMatrix[16] = { 0 };
@@ -55,8 +54,8 @@ GLfloat click_pos[2];
 
 float t;
 
-GLuint VAO;
-GLuint NMbuffer;
+GLuint VAO, TexCoordArray;
+GLuint NMbuffer, vMFvertex, vMFtex;
 GLuint NormalMap;
 
 GLuint SHmap0, SHmap1, SHmap2, SHmap3, SHmap4, SHmap5, SHmap6;
@@ -290,6 +289,7 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 	
 
 	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glGenTextures(1, &vMFmap0);	glGenTextures(1, &vMFmap1);	glGenTextures(1, &vMFmap2);	glGenTextures(1, &vMFmap3); glGenTextures(1, &vMFmap4);
 	float* dataBuffer;
 	dataBuffer = new float[NMwidth*NMheight * 4];
@@ -299,7 +299,7 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 	{
 
 	}
-	case 5:
+	case 5:			//주석처리 했을 때 안했을 때 결과가 달라짐?
 	{
 		for (int j = 0; j < NMheight; j++)
 		{
@@ -318,6 +318,8 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		GLenum glError = glGetError();
 		checkTextureError(glError);
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	case 4:
 	{
@@ -326,7 +328,7 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 			for (int i = 0; i < NMwidth; i++)
 			{
 				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[3];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = aux[3][0];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = aux	[3][0];
 				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = aux[3][1];
 				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = aux[3][2];
 			}
@@ -338,6 +340,8 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		GLenum glError = glGetError();
 		checkTextureError(glError);
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	case 3:
 	{
@@ -358,6 +362,8 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		GLenum glError = glGetError();
 		checkTextureError(glError);
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	case 2:
 	{
@@ -378,6 +384,8 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		GLenum glError = glGetError();
 		checkTextureError(glError);
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	case 1:
 	{
@@ -398,6 +406,8 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		GLenum glError = glGetError();
 		checkTextureError(glError);
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	default:
 		break;
@@ -621,16 +631,12 @@ void drawCube2(){
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, NormalMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
 
 	GLenum glError = glGetError();
-
+	
 	checkTextureError(glError);
 	glBegin(GL_POLYGON);
-	glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, -0.5, 0.5); 
+	glTexCoord2f(0.0, 1.0); glVertex3f(-0.5, -0.5, 0.5);
 	glTexCoord2f(1.0, 1.0);	 glVertex3f(0.5f, -0.5f, 0.5f);
 	glTexCoord2f(1.0, 0.0); glVertex3f(0.5f, 0.5f, 0.5f);
 	glTexCoord2f(0.0, 0.0); glVertex3f(-0.5f, 0.5f, 0.5f);
@@ -670,6 +676,7 @@ void drawCube2(){
 	glTexCoord2f(1.0, 0.0); glVertex3f(-0.5f, 0.5f, 0.5f);
 	glTexCoord2f(0.0, 0.0); glVertex3f(-0.5f, 0.5f, -0.5f);
 	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 }
 
@@ -747,7 +754,7 @@ void createProgram() {
 void initBuffers() {
 	glEnable(GL_TEXTURE_2D);
 	glCreateVertexArrays(1, &VAO);
-
+	glCreateVertexArrays(1, &TexCoordArray);
 	textureData = FreeImage_GetBits(NMTdata);
 
 	glGenTextures(1, &NormalMap);
@@ -834,6 +841,14 @@ void initBuffers() {
 //	delete[] aux;
 	
 	generatevMFmap(numLobes, alpha, aux);
+
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, NormalMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glDisable(GL_TEXTURE_2D);
 
 }
 
@@ -925,56 +940,6 @@ void displayCB(){
 	}
 	case 2://vMF
 	{
-//		glMatrixMode(GL_MODELVIEW);
-////		glLoadIdentity();
-////		gluLookAt(0, 0, 3, 0, 0, 0, 0, 1, 0);
-//		float max = 0.f;
-//
-//		for (int j = 0; j < height; j++)
-//		{
-//			for (int i = 0; i < width; i++)
-//			{
-//				float currentXY[3] = { 0 };
-//				currentXY[0] = ((float)i / (float)(width / 2)) - 1.f;
-//				currentXY[1] = ((float)j / (float)(height / 2)) - 1.f;
-//				if (1.f >= ((currentXY[0] * currentXY[0]) + (currentXY[1] * currentXY[1])))
-//				{
-//					currentXY[2] = sqrt(1 - ((currentXY[0] * currentXY[0]) + (currentXY[1] * currentXY[1])));
-//					float prob = 0.f;
-//					for (int k = 0; k < numLobes; k++)
-//					{
-//						prob += alpha[k] * vMF(currentXY, mu[k], kappa[k]);
-//					}
-//
-//					//							glColor3f(prob/max, prob/max, prob/max);
-//					glBegin(GL_POINT);
-//					glVertex3f(currentXY[0], currentXY[1], currentXY[2]);
-//					glEnd();
-////					glPushAttrib(GL_)
-//					//glColor3f(1.f, 0.f, 0.f);
-////					glBegin(GL_POINT);
-//
-//					glVertex3f(0.f, 0.f, 0.f);
-//					glEnd();
-//				}
-//				else {}
-//			}
-//		}
-
-		//test
-//		mu[0][0] = 0.f;		mu[0][1] = -0.7f;	mu[0][2] = sqrt(1 - ((mu[0][0] * mu[0][0]) + (mu[0][1] * mu[0][1])));;
-//		mu[1][0] = 0.7f;	mu[1][1] = 0.f;		mu[1][2] = sqrt(1 - ((mu[1][0] * mu[1][0]) + (mu[1][1] * mu[1][1])));
-//		mu[2][0] = -0.7f;	mu[2][1] = 0.f;		mu[2][2] = sqrt(1 - ((mu[2][0] * mu[2][0]) + (mu[2][1] * mu[2][1])));;
-//		mu[3][0] = 0.f;		mu[3][1] = 0.7f;	mu[3][2] = sqrt(1 - ((mu[3][0] * mu[3][0]) + (mu[3][1] * mu[3][1])));;
-//		mu[4][0] = 0.0f;	mu[4][1] = 0.0f;	mu[4][2] = sqrt(1 - ((mu[4][0] * mu[4][0]) + (mu[4][1] * mu[4][1])));;
-//		for (int j = 0; j < numLobes; j++)
-//		{
-//			alpha[j] = 1.f / (float)numLobes;
-//			kappa[j] = 30.f;
-//	
-//			normalize(mu[j], mu[j]);
-//		}
-		//test
 		float maxtest=0.f;
 
 		for(int j = 0; j < numLobes; j++)
@@ -1016,18 +981,6 @@ void displayCB(){
 					}
 					sum += prob;
 
-//
-//					//							glColor3f(prob/max, prob/max, prob/max);
-//					glBegin(GL_POINT);
-//					glVertex3f(currentXY[0], currentXY[1], currentXY[2]);
-//					glEnd();
-//					glPushAttrib(GL_)
-//						//glColor3f(1.f, 0.f, 0.f);
-//						glBegin(GL_POINT);
-//
-//					glVertex3f(0.f, 0.f, 0.f);
-//					glEnd();
-
 					NMFpixels[j*height * 3 + i * 3 + 0] = std::min(255, (int)(prob * 255));
 					NMFpixels[j*height * 3 + i * 3 + 1] = std::min(255, (int)(prob * 255));
 					NMFpixels[j*height * 3 + i * 3 + 2] = std::min(255, (int)(prob * 255));
@@ -1049,8 +1002,30 @@ void displayCB(){
 	}
 	case 3:
 	{
+		GLfloat texCoord[] = {
+			0.0, 0.0,
+			1.0, 0.0,
+			1.0, 1.0,
+			0.0, 1.0
+		};
 		//GLSLvMF
 		NMFvMF->enable();
+		NMFvMF->SetUniformMatrix4fv("mv_matrix", modelviewMatrix, false);
+		NMFvMF->SetUniformMatrix4fv("proj_matrix", projectionMatrix, false);
+		NMFvMF->setUniform1i("numLobes", numLobes);
+		NMFvMF->setUniform1f("BPexp", BPexp);
+		glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayAttribFormat(VAO, 0, 4, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(VAO, 1, 4, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(VAO, 0);
+		glEnableVertexArrayAttrib(VAO, 1);
+//		glVertexArrayVertexBuffer(TexCoordArray, 0, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+//		glVertexArrayAttribFormat(TexCoordArray, 0, 4, GL_FLOAT, GL_FALSE, 0);
+//		glEnableVertexArrayAttrib(TexCoordArray, 0);
+
+		glDrawArrays(GL_QUADS, 0, 4);
+
 		NMFvMF->disable();
 		break;
 	}
@@ -1208,7 +1183,7 @@ void initGLUT(int argc, char** argv){
 
 	int RenderMenu = glutCreateMenu(renderMenu);
 	glutAddMenuEntry("GLSL", 0);
-	glutAddMenuEntry("Render Scene", 3);
+	glutAddMenuEntry("Render Scene(vMF)", 3);
 	glutAddMenuEntry("Texture", 1);
 	glutAddMenuEntry("vMF", 2);
 	glutAddMenuEntry("Original NDF", 4);

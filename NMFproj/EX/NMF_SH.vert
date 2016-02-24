@@ -3,7 +3,7 @@
 layout (location=10) in vec4 offset;
 layout (location=11) in vec4 color;
 
-layout (location=0)
+//layout (location=0)
 
 //passed to frag.shader
 
@@ -19,6 +19,7 @@ void main(void)
 
 	const vec4 vertices[4] = vec4[](vec4(0.2, -0.2, 0.5, 1.0), vec4(-0.2, -0.2, 0.5, 1.0), vec4(-0.2, 0.2, 0.5, 1.0), vec4(0.2, 0.2, 0.5, 1.0));
 	vec2 texCoord[4]=vec2[](vec2(0.0, 0.0),vec2(0.0, 1.0),vec2(1.0, 1.0),vec2(0.0, 0.0));
+
 	for(i=0; i<4; i++)
 	{
 	 vs_out.texCoord[i]=texCoord[i];
