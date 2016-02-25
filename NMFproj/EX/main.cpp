@@ -29,11 +29,8 @@
 
 #define MAXITERATION 10
 
-float modelviewMatrix[16] = { 0 };
-float projectionMatrix[16] = { 0 };
 
 
-int renderMode = 4;
 
 
 
@@ -45,6 +42,8 @@ int NMwidth, NMheight;
 
 objLoader *objData;
 const char* NMT = "./2.jpg";
+//const char* NMT = "./bricks_normal_map.jpg";
+
 FIBITMAP* NMTdata;
 GLubyte* textureData;
 
@@ -55,8 +54,8 @@ GLfloat click_pos[2];
 float t;
 
 GLuint VAO, TexCoordArray;
-GLuint NMbuffer, vMFvertex, vMFtex;
-GLuint NormalMap;
+GLuint NMbuffer, vMFvertex, vMFtex, vMFnormal, vMFtangent;
+GLuint NormalMap, NormalMipMap;
 
 GLuint SHmap0, SHmap1, SHmap2, SHmap3, SHmap4, SHmap5, SHmap6;
 
@@ -64,7 +63,7 @@ GLuint vMFmap0, vMFmap1, vMFmap2, vMFmap3, vMFmap4;
 
 
 
-GLSLProgram *NMF, *NMFvMF;
+GLSLProgram *NMF, *NMFvMF, *NMForiginal;
 
 
 time_t sysTime, currentTime;
@@ -306,14 +305,15 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 			for (int i = 0; i < NMwidth; i++)
 			{
 				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[4];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = aux[4][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = aux[4][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = aux[4][2];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[4]*aux[4][0];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[4]*aux[4][1];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[4]*aux[4][2];
 			}
 		}
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, vMFmap4);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//		gluBuild2DMipmaps(GL_TEXTURE_2D, 5, NMwidth, NMheight, GL_RGBA, GL_FLOAT, dataBuffer);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		GLenum glError = glGetError();
@@ -328,9 +328,9 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 			for (int i = 0; i < NMwidth; i++)
 			{
 				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[3];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = aux	[3][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = aux[3][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = aux[3][2];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[3]*aux[3][0];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[3]*aux[3][1];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[3]*aux[3][2];
 			}
 		}
 		glActiveTexture(GL_TEXTURE4);
@@ -350,9 +350,9 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 			for (int i = 0; i < NMwidth; i++)
 			{
 				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[2];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = aux[2][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = aux[2][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = aux[2][2];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[2]*aux[2][0];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[2]*aux[2][1];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[2]*aux[2][2];
 			}
 		}
 		glActiveTexture(GL_TEXTURE3);
@@ -372,10 +372,10 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 			for (int i = 0; i < NMwidth; i++)
 			{
 				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = aux[1][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = aux[1][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = aux[1][2];
-			}
+				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[1]*aux[1][0];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[1]*aux[1][1];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[1]*aux[1][2];
+			}												  
 		}
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, vMFmap1);
@@ -394,9 +394,9 @@ void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
 			for (int i = 0; i < NMwidth; i++)
 			{
 				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = aux[0][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = aux[0][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = aux[0][2];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[0]*aux[0][0];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[0]*aux[0][1];
+				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[0]*aux[0][2];
 			}
 		}
 		glActiveTexture(GL_TEXTURE1);
@@ -750,15 +750,16 @@ void checkTextureError(GLenum glError){
 void createProgram() {
 	NMF = new GLSLProgram("NMF_SH.vert", "NMF_SH.frag");
 	NMFvMF = new GLSLProgram("NMF_vMF.vert", "NMF_vMF.frag");
+	NMForiginal = new GLSLProgram("NMF_original.vert", "NMF_original.frag");
 }
 void initBuffers() {
 	glEnable(GL_TEXTURE_2D);
 	glCreateVertexArrays(1, &VAO);
-	glCreateVertexArrays(1, &TexCoordArray);
+//	glCreateVertexArrays(1, &TexCoordArray);
 	textureData = FreeImage_GetBits(NMTdata);
 
 	glGenTextures(1, &NormalMap);
-
+	glGenTextures(1, &NormalMipMap);
 
 	glDisable(GL_TEXTURE_2D);
 	RGBQUAD pixel;
@@ -844,10 +845,24 @@ void initBuffers() {
 
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
+
 	glBindTexture(GL_TEXTURE_2D, NormalMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+//	gluBuild2DMipmaps(GL_TEXTURE_2D, 4, NMwidth, NMheight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE9);
+	glBindTexture(GL_TEXTURE_2D, NormalMipMap);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, NMwidth, NMheight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
 
 }
@@ -897,6 +912,7 @@ void drawTexture(){
 	glTexCoord2f(0.0, 0.0);
 	glVertex3f(0.0, 0.0, -0.1);
 	glEnd();
+	
 }
 
 void displayCB(){
@@ -909,8 +925,20 @@ void displayCB(){
 
 	cam->glRender();
 
+	float eyePos[3] = { 0 };
+
+	cam->getPosition(eyePos);
+
+//	std::cout << "eyePos: " << eyePos[0] << " " << eyePos[1] << " " << eyePos[2] << "\n";
+
 	glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix);
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelviewMatrix);
+	
+
+	normalMatrix[0] = modelviewMatrix[0]; normalMatrix[3] = modelviewMatrix[4]; normalMatrix[6] = modelviewMatrix[8];
+	normalMatrix[1] = modelviewMatrix[1]; normalMatrix[4] = modelviewMatrix[5]; normalMatrix[7] = modelviewMatrix[9];
+	normalMatrix[2] = modelviewMatrix[2]; normalMatrix[5] = modelviewMatrix[6]; normalMatrix[8] = modelviewMatrix[10];
+
 
 
 	switch (renderMode){
@@ -944,6 +972,7 @@ void displayCB(){
 
 		for(int j = 0; j < numLobes; j++)
 		{
+			
 			std::cout << "mu[" << j << "] = (" 
 				<< mu[j][0] << ", " 
 				<< mu[j][1] << ", " 
@@ -1002,24 +1031,30 @@ void displayCB(){
 	}
 	case 3:
 	{
-		GLfloat texCoord[] = {
-			0.0, 0.0,
-			1.0, 0.0,
-			1.0, 1.0,
-			0.0, 1.0
-		};
+
 		//GLSLvMF
 		NMFvMF->enable();
 		NMFvMF->SetUniformMatrix4fv("mv_matrix", modelviewMatrix, false);
 		NMFvMF->SetUniformMatrix4fv("proj_matrix", projectionMatrix, false);
+		NMFvMF->SetUniformMatrix3fv("normal_matrix", normalMatrix, false);
 		NMFvMF->setUniform1i("numLobes", numLobes);
 		NMFvMF->setUniform1f("BPexp", BPexp);
+		NMFvMF->setUniform1i("renderScene", renderScene);
+		NMFvMF->setUniform1i("MipMapped", MipMapped);
+//		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
 		glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
 		glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayVertexBuffer(VAO, 2, vMFnormal, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayVertexBuffer(VAO, 3, vMFtangent, 0, (GLsizei)(sizeof(float) * 4));
 		glVertexArrayAttribFormat(VAO, 0, 4, GL_FLOAT, GL_FALSE, 0);
 		glVertexArrayAttribFormat(VAO, 1, 4, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(VAO, 2, 4, GL_FLOAT, GL_TRUE, 0);
+		glVertexArrayAttribFormat(VAO, 3, 4, GL_FLOAT, GL_TRUE, 0);
 		glEnableVertexArrayAttrib(VAO, 0);
 		glEnableVertexArrayAttrib(VAO, 1);
+		glEnableVertexArrayAttrib(VAO, 2);
+		glEnableVertexArrayAttrib(VAO, 3);
+
 //		glVertexArrayVertexBuffer(TexCoordArray, 0, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
 //		glVertexArrayAttribFormat(TexCoordArray, 0, 4, GL_FLOAT, GL_FALSE, 0);
 //		glEnableVertexArrayAttrib(TexCoordArray, 0);
@@ -1027,6 +1062,40 @@ void displayCB(){
 		glDrawArrays(GL_QUADS, 0, 4);
 
 		NMFvMF->disable();
+		break;
+	}
+	case 5:
+	{
+		NMForiginal->enable();
+		NMForiginal->SetUniformMatrix4fv("mv_matrix", modelviewMatrix, false);
+		NMForiginal->SetUniformMatrix4fv("proj_matrix", projectionMatrix, false);
+		NMForiginal->SetUniformMatrix3fv("normal_matrix", normalMatrix, false);
+		NMForiginal->setUniform1i("numLobes", numLobes);
+		NMForiginal->setUniform1f("BPexp", BPexp);
+		NMForiginal->setUniform1i("renderScene", renderScene);
+		NMForiginal->setUniform1i("MipMapped", MipMapped);
+//		NMForiginal->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
+		glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayVertexBuffer(VAO, 2, vMFnormal, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayVertexBuffer(VAO, 3, vMFtangent, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayAttribFormat(VAO, 0, 4, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(VAO, 1, 4, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(VAO, 2, 4, GL_FLOAT, GL_TRUE, 0);
+		glVertexArrayAttribFormat(VAO, 3, 4, GL_FLOAT, GL_TRUE, 0);
+		glEnableVertexArrayAttrib(VAO, 0);
+		glEnableVertexArrayAttrib(VAO, 1);
+		glEnableVertexArrayAttrib(VAO, 2);
+		glEnableVertexArrayAttrib(VAO, 3);
+
+		//		glVertexArrayVertexBuffer(TexCoordArray, 0, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+		//		glVertexArrayAttribFormat(TexCoordArray, 0, 4, GL_FLOAT, GL_FALSE, 0);
+		//		glEnableVertexArrayAttrib(TexCoordArray, 0);
+
+		glDrawArrays(GL_QUADS, 0, 4);
+
+		NMForiginal->disable();
+
 		break;
 	}
 	case 4://Original NMF
@@ -1098,6 +1167,19 @@ void mouseCB(int button, int state, int x, int y){
 
 }
 void keyboardCB(unsigned char key, int x, int y){
+	if (renderMode == 3)
+	{
+		switch (key){
+		case 's':
+			renderScene == 0 ? (renderScene = 1) : (renderScene = 0);
+			break;
+		case 'm':
+			(MipMapped == 0) ? (MipMapped = 1) : (MipMapped = 0);
+//			if (MipMapped == 0) { std::cout << "NotMipMapped\n"; } else { std::cout << "MipMapped\n"; }
+			(MipMapped == 0) ? (std::cout << "NotMipMapped\n") : (std::cout << "MipMapped\n");
+			break;
+		}
+	}
 	glutPostRedisplay();
 }
 void motionCB(int x, int y){

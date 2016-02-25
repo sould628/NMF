@@ -123,7 +123,7 @@ private:
 public:
 	Camera();
 	void glRender();
-
+	void getPosition(float* pos);
 	void setPosition(float x, float y, float z);
 	void setLookat(float x, float y, float z);
 	void setUp(float x, float y, float z);
@@ -141,6 +141,12 @@ private:
 	float zNear, zFar;
 
 };
+void Camera::getPosition(float* pos){
+	pos[0] = position[0];
+	pos[1] = position[1];
+	pos[2] = position[2];
+
+}
 Camera::Camera(){
 	ori_vec[0] = 0;
 	ori_vec[1] = 0;

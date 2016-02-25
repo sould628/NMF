@@ -118,6 +118,11 @@ public:
 		glUniformMatrix4fv(loc, 1, transpose, m);
 	}
 
+	void SetUniformMatrix3fv(const GLchar *name, GLfloat *m, bool transpose) {
+		GLint loc = glGetUniformLocation(program, name);
+		glUniformMatrix3fv(loc, 1, transpose, m);
+	}
+
 	void bindTexture(const char *name, GLuint tex, GLenum target, GLint unit) {
 		glActiveTexture(GL_TEXTURE0_ARB + unit);
 		glBindTexture(target, tex);

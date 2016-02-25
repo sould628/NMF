@@ -101,10 +101,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="NMF_original.frag" />
     <None Include="NMF_SH.frag" />
     <None Include="NMF_SH.vert" />
     <None Include="NMF_vMF.frag" />
     <None Include="NMF_vMF.vert" />
+    <None Include="NMF_original.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
