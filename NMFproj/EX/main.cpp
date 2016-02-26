@@ -41,7 +41,7 @@ int NMwidth, NMheight;
 
 
 objLoader *objData;
-const char* NMT = "./2.jpg";
+
 //const char* NMT = "./bricks_normal_map.jpg";
 
 FIBITMAP* NMTdata;
@@ -1118,9 +1118,9 @@ void displayCB(){
 				pixelIndex[0] = (int)((float)nn[0] * (float)(width-1) / 255.f);
 				pixelIndex[1] = (int)((float)nn[1] * (float)(width-1) / 255.f);;
 
-				NMFpixels[pixelIndex[1] * width * 3 + pixelIndex[0] * 3 + 0] += 1.f / (float)(NMheight*NMwidth);
-				NMFpixels[pixelIndex[1] * width * 3 + pixelIndex[0] * 3 + 1] += 1.f / (float)(NMheight*NMwidth);
-				NMFpixels[pixelIndex[1] * width * 3 + pixelIndex[0] * 3 + 2] += 1.f / (float)(NMheight*NMwidth);
+				NMFpixels[pixelIndex[1] * width * 3 + pixelIndex[0] * 3 + 0] += 1.1f / (float)(NMheight*NMwidth);
+				NMFpixels[pixelIndex[1] * width * 3 + pixelIndex[0] * 3 + 1] += 1.1f / (float)(NMheight*NMwidth);
+				NMFpixels[pixelIndex[1] * width * 3 + pixelIndex[0] * 3 + 2] += 1.1f / (float)(NMheight*NMwidth);
 
 
 			}

@@ -1,8 +1,12 @@
+extern const char* NMT = "./2.jpg";
+
+
+
 extern int renderMode = 3;
 extern int renderScene = 0;
 extern int MipMapped = 1;
 
-extern const float BPexp = 100.0f;
+extern const float BPexp = 50.0f;
 
 
 

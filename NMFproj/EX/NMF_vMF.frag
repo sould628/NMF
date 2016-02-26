@@ -34,10 +34,11 @@ in VS_OUT{
 out vec4 color;
 
 
-vec4 lightIntensity=vec4(10.0f, 10.f, 10.f, 1.0f);
+vec4 lightIntensity=vec4(1.0f, 1.0f, 1.f, 1.0f);
 
-vec4 Kd=vec4(0.4f,0.4f,0.4f,1.0f);
+vec4 Kd=vec4(0.2f,0.2f,0.2f,1.0f);
 vec4 Ks=vec4(0.3f,0.3f,0.3f,1.0f);
+vec4 Ka=vec4(0.1f,0.1f,0.1f,1.0f);
 
 void main(void)
 {
@@ -64,9 +65,16 @@ void main(void)
 
 	eyeDir=normalize(v);
 
+	//diriectional (lightPos =(x,x,x,0.0) in vert shader)
 	v.x=dot(fs_in.lightPos.xyz, fs_in.t);
 	v.y=dot(fs_in.lightPos.xyz, fs_in.b);
 	v.z=dot(fs_in.lightPos.xyz, fs_in.n);
+
+	//point (lightPos = (x,x,x,1.0) in vert shader)
+//	v.x=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.t);
+//	v.y=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.b);
+//	v.z=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.n);
+
 
 	lightDir=normalize(v);
 
@@ -90,32 +98,35 @@ void main(void)
 		float Bs=0.0;
 		vec3 halfVec=vec3(0.0,0.0,0.0);
 		float r=0.0;
-//		alpha=theta.x;
-//		aux=theta.yzw/alpha;
-//		kappa=((3*length(aux))+(length(aux)*length(aux)*length(aux)));
-//		mu=normalize(aux);
-//
-//		sPrime=(kappa*BPexp)/(kappa+BPexp);
-//		float HdotMu=dot(h,mu);
-//		Bs=((sPrime+1)/(2*PI))*pow(HdotMu, sPrime);
-//
-//		effBRDF+=effBRDF+(alpha*(Ks*Bs+Kd)*(dot(lightAngle,mu)));
+
 
 		alpha=coeffs[i].x;
-		mu=2.0*coeffs[i].yzw-1.0;
-		mu/=alpha;
-		r=length(mu);
-		mu=normalize(mu);
-		kappa=(3.0*r-r*r*r)/(1.0-r*r);
+		aux=coeffs[i].yzw/alpha;
+		r=length(aux);
+		kappa=((3*r)-(r*r*r))/(1.0-(r*r));
+		mu=normalize(aux);
 
-		sPrime=kappa*BPexp/(kappa+BPexp);
-		float norm=(sPrime+1.0)/(2.0*PI);
-		Bs=dot(h,mu);
-		Bs=pow(Bs,sPrime);
-		Bs*=norm;
-		float LdotMu=max(dot(lightDir,mu), 0.0);
+		sPrime=(kappa*BPexp)/(kappa+BPexp);
+		float HdotMu=dot(h,mu);
+		Bs=((sPrime+1.0)/(2.0*PI))*pow(HdotMu, sPrime);
+		float LdotMu=max(dot(lightDir,mu),0.0);
+		effBRDF+=effBRDF+(alpha*(Ks*Bs+Kd*LdotMu));
 
-		effBRDF.xyz+=effBRDF.xyz+alpha*((Ks.xyz*Bs)+(Kd.xyz*LdotMu));
+//		alpha=coeffs[i].x;
+//		mu=2.0*coeffs[i].yzw-1.0;
+//		mu/=alpha;
+//		r=length(mu);
+//		mu=normalize(mu);
+//		kappa=(3.0*r-r*r*r)/(1.0-r*r);
+//
+//		sPrime=kappa*BPexp/(kappa+BPexp);
+//		float norm=(sPrime+1.0)/(2.0*PI);
+//		Bs=dot(h,mu);
+//		Bs=pow(Bs,sPrime);
+//		Bs*=norm;
+//		float LdotMu=max(dot(lightDir,mu), 0.0);
+//
+//		effBRDF.xyz+=effBRDF.xyz+alpha*((Ks.xyz*Bs+Kd.xyz)*LdotMu);
 //		color+=vec4(LdotMu,LdotMu,LdotMu,0);
 	}
 
@@ -123,6 +134,8 @@ void main(void)
 		case 0:
 		{
 			color=(lightIntensity*effBRDF);
+			color+=(lightIntensity*Ka);
+//			color=(lightIntensity*Ka);
 			break;
 		}
 		case 1:
@@ -142,8 +155,9 @@ void main(void)
 			}
 		}
 	}
+	color=vec4(1.0*effBRDF.x, -1.0*effBRDF.x, -1.5, 1.0);
 
-
+//	color=vec4(10.1,1.1,1.1,1.0);
 //	color=vec4(h,0.0);
 
 //	color+=vec4(h,0.0);
