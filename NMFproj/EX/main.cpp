@@ -27,7 +27,6 @@
 
 #define sysPause system("pause>nul");
 
-#define MAXITERATION 10
 
 
 
@@ -70,10 +69,8 @@ time_t sysTime, currentTime;
 
 //vMF
 float* alpha;
-float** mu;
-float* kappa;
 float** aux;
-const int numLobes = 5;
+
 
 
 static const float exampleData[] =
@@ -91,11 +88,11 @@ static const float exampleData[] =
 void displayCB();
 void drawTexture();
 void generateSHmap(GLubyte* TextureData);
-void generatevMFmap(int numLobes, float* alpha, float* aux[3]);
+void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux[3], float alignCtrl);
 
 float calculateSHcoeffDelta(int l, int m, float x, float y, float z);
 void checkTextureError(GLenum glError);
-int vMFparam(GLubyte* TextureData, float* alpha, float** mu, float* kappa, float* aux[3], int numLobes);
+int vMFparam(float* data[3], float* prev[3], float* tAlpha, float* tAux[3], int numLobes, int mipmapLevel, int maxIteration, float alignCtrl);
 float vMF(float normal[3], float mu[3], float kappa);
 float norm(float vector[3]);
 void normalize(float* source, float* destination);
@@ -132,65 +129,33 @@ float vMF(float normal[3], float mu[3], float kappa) {
 	
 }
 
-int vMFparam(GLubyte* TextureData, float* alpha, float** mu, float* kappa, float* aux[3],  int numLobes) {
+int vMFparam(float* data[3], float* prev[3], float* tAlpha, float* tAux[3], int numLobes, int mipmapLevel, int maxIteration, float alignCtrl) { //data=normalized float
 	bool bConvergence = false;
-	float* normalData;
-	normalData = new float[NMwidth*NMheight * 3];
-	float nn[3] = { 0 };
 
+	float** mu;
+	float* kappa;
 	float** z;
+	mu = new float*[numLobes];
+	kappa = new float[numLobes];
 	z = new float*[numLobes];
-	for (int i = 0; i < numLobes; i++)
-	{
-		z[i] = new float[NMwidth*NMheight];
+	
+	int numData = 1;
+	for (int i = 0; i < mipmapLevel; i++){
+		numData *= 4;
 	}
 
-	//NormalData
-	for (int j = 0; j < NMheight; j++) 
+	for (int i = 0; i < numLobes; i++)
 	{
-		for (int i = 0; i < NMwidth; i++) 
-		{
-			nn[0] = (float)TextureData[j*NMwidth * 4 + i * 4 + 2];
-			nn[1] = (float)TextureData[j*NMwidth * 4 + i * 4 + 1];
-			nn[2] = (float)TextureData[j*NMwidth * 4 + i * 4 + 0];
+		z[i] = new float[numData];
+		mu[i] = new float[3];
+	}
 
-			nn[0] = (nn[0] - (255.f / 2.f)) / (255.f / 2.f);
-			nn[1] = (nn[1] - (255.f / 2.f)) / (255.f / 2.f);
-			nn[2] = (nn[2] - (255.f / 2.f)) / (255.f / 2.f);
-			if ((nn[1] * nn[1] + (nn[2] * nn[2]) + (nn[0] * nn[0])) > 1.f)
-			{
-				normalize(nn, nn);
-			}
-			if ((nn[1] * nn[1] + (nn[2] * nn[2]) + (nn[0] * nn[0])) > 1.00001f)
-			{
-				std::cout << "normal value error\n" << std::endl;
-				sysPause;
-			}
 
-//			else
-//			{
-//				if (nn[2] == 1)
-//				{
-//					nn[0] = 0.f; nn[1] = 0.f;
-//				}
-//				else if (nn[0] == 1)
-//				{
-//					nn[1] = 0.f; nn[2] = 0.f;
-//				}
-//				else {
-//					while ((nn[2] * nn[2] + nn[0] * nn[0]) > 1)
-//					{
-//						nn[2] = nn[2] * 0.99; nn[0] * 0.99;
-//					}
-//					nn[1] = sqrt(1 - (nn[2] * nn[2] + nn[0] * nn[0]));
-//				}
-//			}
-			normalData[j*NMwidth * 3 + i * 3] = nn[0];
-			normalData[j*NMwidth * 3 + i * 3 + 1] = nn[1];
-			normalData[j*NMwidth * 3 + i * 3 + 2] = nn[2];
-		}//i
-	}//j
-	//NormalData
+
+	//Initial Guess Stage (mu, kappa)
+
+
+	//Initial Guess End
 
 	int iteration = 0;
 	//EM
@@ -198,13 +163,13 @@ int vMFparam(GLubyte* TextureData, float* alpha, float** mu, float* kappa, float
 	{
 		//E-STEP
 		float* vMFij = new float[numLobes];
-		for (int i = 0; i < NMwidth*NMheight; i++)
+		for (int i = 0; i < numData; i++)
 		{
 
 			float vMFsum = 0.f;
 			for (int j = 0; j < numLobes; j++)
 			{
-				vMFij[j] = vMF(&normalData[(i / NMheight)*NMheight * 3 + (i%NMheight) * 3], mu[j], kappa[j]);
+				vMFij[j] = vMF(data[i], mu[j], kappa[j]);
 				vMFsum += vMFij[j];
 			}
 			for (int j = 0; j < numLobes; j++)
@@ -227,13 +192,13 @@ int vMFparam(GLubyte* TextureData, float* alpha, float** mu, float* kappa, float
 			expectedNormal[jj][0] = 0;
 			expectedNormal[jj][1] = 0;
 			expectedNormal[jj][2] = 0;
-			for (int ii = 0; ii < NMwidth*NMheight; ii++)
+			for (int ii = 0; ii < numData; ii++)
 			{
 				zsum[jj] += z[jj][ii];
 
-				expectedNormal[jj][0] += z[jj][ii] * normalData[(ii / NMheight)*NMheight * 3 + ii%NMheight * 3];
-				expectedNormal[jj][1] += z[jj][ii] * normalData[(ii / NMheight)*NMheight * 3 + ii%NMheight * 3 + 1];
-				expectedNormal[jj][2] += z[jj][ii] * normalData[(ii / NMheight)*NMheight * 3 + ii%NMheight * 3 + 2];
+				expectedNormal[jj][0] += z[jj][ii] * data[ii][0];
+				expectedNormal[jj][1] += z[jj][ii] * data[ii][1];
+				expectedNormal[jj][2] += z[jj][ii] * data[ii][2];
 			}
 		}
 		//M-STEP
@@ -275,145 +240,493 @@ int vMFparam(GLubyte* TextureData, float* alpha, float** mu, float* kappa, float
 			bConvergence = true;
 		}
 	}//EM END
-	delete[] normalData;
+
 	for (int i = 0; i < numLobes; i++)
 	{
 		delete[] z[i];
+		delete[] mu[i];
 	}
+	delete[] mu;
 	delete[] z;
 	return -1;
 }
 
-void generatevMFmap(int numLobes, float* alpha, float* aux[3]){
+void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux[3], float alignCtrl){
 	
-
+	float *normalData;
+	normalData = new float[NMwidth*NMheight * 3];
+	float *prevMu;
+	prevMu = new float[NMwidth*NMheight * numLobes * 4];
+	float nn[3] = { 0 };
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glGenTextures(1, &vMFmap0);	glGenTextures(1, &vMFmap1);	glGenTextures(1, &vMFmap2);	glGenTextures(1, &vMFmap3); glGenTextures(1, &vMFmap4);
-	float* dataBuffer;
-	dataBuffer = new float[NMwidth*NMheight * 4];
-	switch (numLobes)
+	
+	//NormalData
+	for (int j = 0; j < NMheight; j++)
 	{
-	case 6:
-	{
+		for (int i = 0; i < NMwidth; i++)
+		{
+			nn[0] = (float)TextureData[j*NMwidth * 4 + i * 4 + 2];
+			nn[1] = (float)TextureData[j*NMwidth * 4 + i * 4 + 1];
+			nn[2] = (float)TextureData[j*NMwidth * 4 + i * 4 + 0];
 
-	}
-	case 5:			//주석처리 했을 때 안했을 때 결과가 달라짐?
+			nn[0] = (nn[0] - (255.f / 2.f)) / (255.f / 2.f);
+			nn[1] = (nn[1] - (255.f / 2.f)) / (255.f / 2.f);
+			nn[2] = (nn[2] - (255.f / 2.f)) / (255.f / 2.f);
+//			if ((nn[1] * nn[1] + (nn[2] * nn[2]) + (nn[0] * nn[0])) > 1.f)
+//			{
+//				normalize(nn, nn);
+//			}
+//			if ((nn[1] * nn[1] + (nn[2] * nn[2]) + (nn[0] * nn[0])) > 1.00001f)
+//			{
+//				std::cout << "normal value error\n" << std::endl;
+//				sysPause;
+//			}
+			normalData[j*NMwidth * 3 + i * 3 + 0] = nn[0];
+			normalData[j*NMwidth * 3 + i * 3 + 1] = nn[1];
+			normalData[j*NMwidth * 3 + i * 3 + 2] = nn[2];
+		}//i
+	}//j
+	//NormalData
+	
+	
+	for (int ii = 0; ii < MipMapLevel; ii++)
 	{
-		for (int j = 0; j < NMheight; j++)
+		switch (ii)
 		{
-			for (int i = 0; i < NMwidth; i++)
-			{
-				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[4];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[4]*aux[4][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[4]*aux[4][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[4]*aux[4][2];
-			}
-		}
-		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, vMFmap4);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
-//		gluBuild2DMipmaps(GL_TEXTURE_2D, 5, NMwidth, NMheight, GL_RGBA, GL_FLOAT, dataBuffer);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		GLenum glError = glGetError();
-		checkTextureError(glError);
-		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-	case 4:
-	{
-		for (int j = 0; j < NMheight; j++)
+		case 0://MIPMAP Level0
 		{
-			for (int i = 0; i < NMwidth; i++)
+			float* dataBuffer;
+			dataBuffer = new float[NMwidth*NMheight * 4];
+
+
+			for (int jj = 0; jj < numLobes; jj++)
 			{
-				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[3];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[3]*aux[3][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[3]*aux[3][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[3]*aux[3][2];
-			}
-		}
-		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, vMFmap3);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		GLenum glError = glGetError();
-		checkTextureError(glError);
-		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-	case 3:
-	{
-		for (int j = 0; j < NMheight; j++)
+				switch (jj)//numLobes
+				{
+				case 0:
+				{
+					glActiveTexture(GL_TEXTURE1);
+					for (int j = 0; j < NMheight; j++)//j
+					{
+						for (int i = 0; i < NMwidth; i++)//i
+						{
+							dataBuffer[j*NMwidth * 4 + i * 4 + 0] = 1.0;
+							dataBuffer[j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 0] = 1.0;
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+						}//i
+					}//j
+					glBindTexture(GL_TEXTURE_2D, vMFmap0);
+					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 10);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+					GLenum glError = glGetError();
+					checkTextureError(glError);
+					glActiveTexture(GL_TEXTURE10);
+					glBindTexture(GL_TEXTURE_2D, 0);
+					break;
+				}//jj case 0
+				case 1:
+				{
+					glActiveTexture(GL_TEXTURE2);
+					for (int j = 0; j < NMheight; j++)//j
+					{
+						for (int i = 0; i < NMwidth; i++)//i
+						{
+							dataBuffer[j*NMwidth * 4 + i * 4 + 0] = 0.0;
+							dataBuffer[j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 0] = 0.0;
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+						}//i
+					}//j
+					glBindTexture(GL_TEXTURE_2D, vMFmap1);
+					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, MipMapLevel);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+					GLenum glError = glGetError();
+					checkTextureError(glError);
+					glActiveTexture(GL_TEXTURE10);
+					glBindTexture(GL_TEXTURE_2D, 0);
+					break;
+				}//jj case 1
+				case 2:
+				{
+					glActiveTexture(GL_TEXTURE3);
+					for (int j = 0; j < NMheight; j++)//j
+					{
+						for (int i = 0; i < NMwidth; i++)//i
+						{
+							dataBuffer[j*NMwidth * 4 + i * 4 + 0] = 0.0;
+							dataBuffer[j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 0] = 0.0;
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+						}//i
+					}//j
+					glBindTexture(GL_TEXTURE_2D, vMFmap2);
+					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, MipMapLevel);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+					GLenum glError = glGetError();
+					checkTextureError(glError);
+					glActiveTexture(GL_TEXTURE10);
+					glBindTexture(GL_TEXTURE_2D, 0);
+					break;
+				}//jj case 2
+				case 3:
+				{
+					glActiveTexture(GL_TEXTURE4);
+					for (int j = 0; j < NMheight; j++)//j
+					{
+						for (int i = 0; i < NMwidth; i++)//i
+						{
+							dataBuffer[j*NMwidth * 4 + i * 4 + 0] = 0.0;
+							dataBuffer[j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 0] = 0.0;
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+						}//i
+					}//j
+					glBindTexture(GL_TEXTURE_2D, vMFmap3);
+					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, MipMapLevel);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+					GLenum glError = glGetError();
+					checkTextureError(glError);
+					glActiveTexture(GL_TEXTURE10);
+					glBindTexture(GL_TEXTURE_2D, 0);
+					break;
+				}//jj case 3
+				case 4:
+				{
+					glActiveTexture(GL_TEXTURE5);
+					for (int j = 0; j < NMheight; j++)//j
+					{
+						for (int i = 0; i < NMwidth; i++)//i
+						{
+							dataBuffer[j*NMwidth * 4 + i * 4 + 0] = 0.0;
+							dataBuffer[j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 0] = 0.0;
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+						}//i
+					}//j
+					glBindTexture(GL_TEXTURE_2D, vMFmap4);
+					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+					//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+					//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, MipMapLevel);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+					GLenum glError = glGetError();
+					checkTextureError(glError);
+					glActiveTexture(GL_TEXTURE10);
+					glBindTexture(GL_TEXTURE_2D, 0);
+					break;
+				}//jj case 4
+
+				}//switch jj
+			}//for jj (numLobes)
+
+			delete[] dataBuffer;
+			break;
+		}//ii case 0
+
+		//////////////////////////////////////
+		default://ii >0
 		{
-			for (int i = 0; i < NMwidth; i++)
-			{
-				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[2];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[2]*aux[2][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[2]*aux[2][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[2]*aux[2][2];
-			}
-		}
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, vMFmap2);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		GLenum glError = glGetError();
-		checkTextureError(glError);
-		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-	case 2:
-	{
-		for (int j = 0; j < NMheight; j++)
-		{
-			for (int i = 0; i < NMwidth; i++)
-			{
-				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[1]*aux[1][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[1]*aux[1][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[1]*aux[1][2];
-			}												  
-		}
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, vMFmap1);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		GLenum glError = glGetError();
-		checkTextureError(glError);
-		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-	case 1:
-	{
-		for (int j = 0; j < NMheight; j++)
-		{
-			for (int i = 0; i < NMwidth; i++)
-			{
-				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[0]*aux[0][0];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[0]*aux[0][1];
-				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[0]*aux[0][2];
-			}
-		}
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, vMFmap0);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		GLenum glError = glGetError();
-		checkTextureError(glError);
-		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-	default:
-		break;
-	}
+//			int numNeighbors = 1;
+//			for (int qqq = 0; qqq < ii; qqq++){
+//				numNeighbors *= 2;
+//			}
+//			float* dataBuffer;
+//			int mipmapWidth = NMwidth / numNeighbors; int mipmapHeight = NMheight / numNeighbors;
+//			dataBuffer = new float[mipmapWidth*mipmapHeight * 4];
+//			for (int jj = 0; jj < numLobes; jj++)
+//			{
+//				switch (jj)//numLobes
+//				{
+//				case 0:
+//				{
+//					glActiveTexture(GL_TEXTURE1);
+//					for (int j = 0; j < mipmapHeight; j++)//j
+//					{
+//						for (int i = 0; i < mipmapWidth; i++)//i
+//						{
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 0] = 1.0;
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+////							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 0] = 1.0;
+////							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+////							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+////							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+//						}//i
+//					}//j
+//					glBindTexture(GL_TEXTURE_2D, vMFmap0);
+//					glTexImage2D(GL_TEXTURE_2D, ii, GL_RGBA, mipmapWidth, mipmapHeight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//					GLenum glError = glGetError();
+//					checkTextureError(glError);
+//					glActiveTexture(GL_TEXTURE10);
+//					glBindTexture(GL_TEXTURE_2D, 0);
+//					break;
+//				}//jj case 0
+//				case 1:
+//				{
+//					glActiveTexture(GL_TEXTURE2);
+//					for (int j = 0; j < mipmapHeight; j++)//j
+//					{
+//						for (int i = 0; i < mipmapWidth; i++)//i
+//						{
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 0] = 0.0;
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 1] = normalData[j*mipmapWidth * 3 + i * 3 + 0];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 2] = normalData[j*mipmapWidth * 3 + i * 3 + 1];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 3] = normalData[j*mipmapWidth * 3 + i * 3 + 2];
+//
+//						}//i
+//					}//j
+//					glBindTexture(GL_TEXTURE_2D, vMFmap1);
+//					glTexImage2D(GL_TEXTURE_2D, ii, GL_RGBA, mipmapWidth, mipmapHeight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//					GLenum glError = glGetError();
+//					checkTextureError(glError);
+//					glActiveTexture(GL_TEXTURE10);
+//					glBindTexture(GL_TEXTURE_2D, 0);
+//					break;
+//				}//jj case 1
+//				case 2:
+//				{
+//					glActiveTexture(GL_TEXTURE3);
+//					for (int j = 0; j < mipmapHeight; j++)//j
+//					{
+//						for (int i = 0; i < mipmapWidth; i++)//i
+//						{
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 0] = 0.0;
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+//						}//i
+//					}//j
+//					glBindTexture(GL_TEXTURE_2D, vMFmap2);
+//					glTexImage2D(GL_TEXTURE_2D, ii, GL_RGBA, mipmapWidth, mipmapHeight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//					GLenum glError = glGetError();
+//					checkTextureError(glError);
+//					glActiveTexture(GL_TEXTURE10);
+//					glBindTexture(GL_TEXTURE_2D, 0);
+//					break;
+//				}//jj case 2
+//				case 3:
+//				{
+//					glActiveTexture(GL_TEXTURE4);
+//					for (int j = 0; j < mipmapHeight; j++)//j
+//					{
+//						for (int i = 0; i < mipmapWidth; i++)//i
+//						{
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 0] = 0.0;
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+//						}//i
+//					}//j
+//					glBindTexture(GL_TEXTURE_2D, vMFmap3);
+//					glTexImage2D(GL_TEXTURE_2D, ii, GL_RGBA, mipmapWidth, mipmapHeight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//					GLenum glError = glGetError();
+//					checkTextureError(glError);
+//					glActiveTexture(GL_TEXTURE10);
+//					glBindTexture(GL_TEXTURE_2D, 0);
+//					break;
+//				}//jj case 3
+//				case 4:
+//				{
+//					glActiveTexture(GL_TEXTURE5);
+//					for (int j = 0; j < mipmapHeight; j++)//j
+//					{
+//						for (int i = 0; i < mipmapWidth; i++)//i
+//						{
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 0] = 0.0;
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
+//							dataBuffer[j*mipmapWidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+//						}//i
+//					}//j
+//					glBindTexture(GL_TEXTURE_2D, vMFmap4);
+//					glTexImage2D(GL_TEXTURE_2D, ii, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//					GLenum glError = glGetError();
+//					checkTextureError(glError);
+//					glActiveTexture(GL_TEXTURE10);
+//					glBindTexture(GL_TEXTURE_2D, 0);
+//					break;
+//				}//jj case 4
+//
+//				}//switch jj
+//			}//for jj (numLobes)
+//			delete[] dataBuffer;
+//			break;
+		}//ii case1
+//
+//		
+		}//switch ii (MipMap
+
+	}//for ii
+
+	delete[] prevMu;
+//	glEnable(GL_TEXTURE_2D);
+//	glBindTexture(GL_TEXTURE_2D, 0);
+//	glGenTextures(1, &vMFmap0);	glGenTextures(1, &vMFmap1);	glGenTextures(1, &vMFmap2);	glGenTextures(1, &vMFmap3); glGenTextures(1, &vMFmap4);
+//	float* dataBuffer;
+//	dataBuffer = new float[NMwidth*NMheight * 4];
+//	switch (numLobes)
+//	{
+//	case 6:
+//	{
+//
+//	}
+//	case 5:			//주석처리 했을 때 안했을 때 결과가 달라짐?
+//	{
+//		for (int j = 0; j < NMheight; j++)
+//		{
+//			for (int i = 0; i < NMwidth; i++)
+//			{
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[4];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[4]*aux[4][0];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[4]*aux[4][1];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[4]*aux[4][2];
+//			}
+//		}
+//		glActiveTexture(GL_TEXTURE5);
+//		glBindTexture(GL_TEXTURE_2D, vMFmap4);
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+////		gluBuild2DMipmaps(GL_TEXTURE_2D, 5, NMwidth, NMheight, GL_RGBA, GL_FLOAT, dataBuffer);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//		GLenum glError = glGetError();
+//		checkTextureError(glError);
+//		glActiveTexture(GL_TEXTURE10);
+//		glBindTexture(GL_TEXTURE_2D, 0);
+//	}
+//	case 4:
+//	{
+//		for (int j = 0; j < NMheight; j++)
+//		{
+//			for (int i = 0; i < NMwidth; i++)
+//			{
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[3];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[3]*aux[3][0];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[3]*aux[3][1];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[3]*aux[3][2];
+//			}
+//		}
+//		glActiveTexture(GL_TEXTURE4);
+//		glBindTexture(GL_TEXTURE_2D, vMFmap3);
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//		GLenum glError = glGetError();
+//		checkTextureError(glError);
+//		glActiveTexture(GL_TEXTURE10);
+//		glBindTexture(GL_TEXTURE_2D, 0);
+//	}
+//	case 3:
+//	{
+//		for (int j = 0; j < NMheight; j++)
+//		{
+//			for (int i = 0; i < NMwidth; i++)
+//			{
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[2];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[2]*aux[2][0];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[2]*aux[2][1];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[2]*aux[2][2];
+//			}
+//		}
+//		glActiveTexture(GL_TEXTURE3);
+//		glBindTexture(GL_TEXTURE_2D, vMFmap2);
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//		GLenum glError = glGetError();
+//		checkTextureError(glError);
+//		glActiveTexture(GL_TEXTURE10);
+//		glBindTexture(GL_TEXTURE_2D, 0);
+//	}
+//	case 2:
+//	{
+//		for (int j = 0; j < NMheight; j++)
+//		{
+//			for (int i = 0; i < NMwidth; i++)
+//			{
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[1];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[1]*aux[1][0];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[1]*aux[1][1];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[1]*aux[1][2];
+//			}												  
+//		}
+//		glActiveTexture(GL_TEXTURE2);
+//		glBindTexture(GL_TEXTURE_2D, vMFmap1);
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//		GLenum glError = glGetError();
+//		checkTextureError(glError);
+//		glActiveTexture(GL_TEXTURE10);
+//		glBindTexture(GL_TEXTURE_2D, 0);
+//	}
+//	case 1:
+//	{
+//		for (int j = 0; j < NMheight; j++)
+//		{
+//			for (int i = 0; i < NMwidth; i++)
+//			{
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 0] = alpha[0];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 1] = alpha[0]*aux[0][0];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 2] = alpha[0]*aux[0][1];
+//				dataBuffer[j*NMwidth * 4 + i * 4 + 3] = alpha[0]*aux[0][2];
+//			}
+//		}
+//		glActiveTexture(GL_TEXTURE1);
+//		glBindTexture(GL_TEXTURE_2D, vMFmap0);
+//		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//		GLenum glError = glGetError();
+//		checkTextureError(glError);
+//		glActiveTexture(GL_TEXTURE10);
+//		glBindTexture(GL_TEXTURE_2D, 0);
+//	}
+//	default:
+//		break;
+//	}
 	glDisable(GL_TEXTURE_2D);
-	delete[] dataBuffer;
+
 }
 
 
@@ -784,64 +1097,10 @@ void initBuffers() {
 	generateSHmap(textureData);
 	//vMFparameter
 	alpha = new float[numLobes];
-	mu = new float*[numLobes];
-	kappa = new float[numLobes];
 	aux = new float*[numLobes];
-	for (int i = 0; i < numLobes; i++) 
-	{
-		mu[i] = new float[3];
-		aux[i] = new float[3];
-//		mu[i][0] = 0.5-(float)((int)(i / 2));
-//		mu[i][1] = 0.5-(float)((int)(i % 2));
-//		mu[i][2] = sqrt(1 - ((mu[i][0] * mu[i][0]) + (mu[i][1] * mu[i][1])));
-		aux[i][0] = 0.f;
-		aux[i][1] = 0.f;
-		aux[i][2] = 0.f;
-		alpha[i] = 1.f / (float)numLobes;
-		kappa[i] = 30.f;
-	}
-	if (numLobes < 5)
-	{
-		for (int i = 0; i < numLobes; i++)
-		{
-//			mu[i][0] = 0.5 - (float)((int)(i / 2));
-//			mu[i][1] = 0.5 - (float)((int)(i % 2));
-//			mu[i][2] = sqrt(1 - ((mu[i][0] * mu[i][0]) + (mu[i][1] * mu[i][1])));
-			mu[0][0] = 0.f;		mu[0][1] = -0.7f;	mu[0][2] = sqrt(1 - ((mu[0][0] * mu[0][0]) + (mu[0][1] * mu[0][1])));;
-			mu[1][0] = 0.7f;	mu[1][1] = 0.f;		mu[1][2] = sqrt(1 - ((mu[1][0] * mu[1][0]) + (mu[1][1] * mu[1][1])));
-			mu[2][0] = -0.7f;	mu[2][1] = 0.f;		mu[2][2] = sqrt(1 - ((mu[2][0] * mu[2][0]) + (mu[2][1] * mu[2][1])));;
-			mu[3][0] = 0.f;		mu[3][1] = 0.7f;	mu[3][2] = sqrt(1 - ((mu[3][0] * mu[3][0]) + (mu[3][1] * mu[3][1])));;
 
-		}
-	}
-	else if (numLobes == 5)
-	{
-
-			mu[0][0] = 0.f;		mu[0][1] = -0.7f;	mu[0][2] = sqrt(1 - ((mu[0][0] * mu[0][0]) + (mu[0][1] * mu[0][1])));;
-			mu[1][0] = 0.7f;	mu[1][1] = 0.f;		mu[1][2] = sqrt(1 - ((mu[1][0] * mu[1][0]) + (mu[1][1] * mu[1][1])));
-			mu[2][0] = -0.7f;	mu[2][1] = 0.f;		mu[2][2] = sqrt(1 - ((mu[2][0] * mu[2][0]) + (mu[2][1] * mu[2][1])));;
-			mu[3][0] = 0.f;		mu[3][1] = 0.7f;	mu[3][2] = sqrt(1 - ((mu[3][0] * mu[3][0]) + (mu[3][1] * mu[3][1])));;
-			mu[4][0] = 0.0f;	mu[4][1] = 0.0f;	mu[4][2] = sqrt(1 - ((mu[4][0] * mu[4][0]) + (mu[4][1] * mu[4][1])));;
-	}
-	for (int i = 0; i < numLobes; i++)
-	{
-		normalize(mu[i], mu[i]);
-	}
-
-	vMFparam(textureData, alpha, mu, kappa, aux, numLobes);
-
-//	delete[] kappa;
-//	delete[] alpha;
-//	for (int i = 0; i < numLobes; i++)
-//	{
-//		delete[] aux[i];
-//		delete[] mu[i];
-//
-//	}
-//	delete[] mu;
-//	delete[] aux;
 	
-	generatevMFmap(numLobes, alpha, aux);
+	generatevMFmap(textureData, numLobes, alpha, aux, alignCtrl);
 
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
@@ -859,8 +1118,11 @@ void initBuffers() {
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE9);
 	glBindTexture(GL_TEXTURE_2D, NormalMipMap);
-//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, NMwidth, NMheight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
@@ -968,64 +1230,64 @@ void displayCB(){
 	}
 	case 2://vMF
 	{
-		float maxtest=0.f;
-
-		for(int j = 0; j < numLobes; j++)
-		{
-			
-			std::cout << "mu[" << j << "] = (" 
-				<< mu[j][0] << ", " 
-				<< mu[j][1] << ", " 
-				<< mu[j][2] << ")" << std::endl;
-			std::cout << "kappa[" << j << "] = "
-				<< kappa[j] << std::endl;
-			std::cout << "alpha[" << j << "] = "
-				<< alpha[j] << std::endl << std::endl;
-		}
-		BYTE *NMFpixels = (BYTE*)malloc(width*height * 3);
-		float sum = 0.f;
-		float alphasum = 0.f;
-		for (int j = 0; j < numLobes; j++)
-		{
-			alphasum += alpha[j];
-		}
-		std::cout << "alpha sum=" << alphasum << std::endl;
-		for (int j = 0; j < height; j++)
-		{
-			for (int i = 0; i < width; i++)
-			{
-				float currentXY[3] = { 0 };
-				currentXY[0] = ((float)i / (float)(width / 2)) - 1.f;
-				currentXY[1] = ((float)j / (float)(height / 2)) - 1.f;
-				NMFpixels[j*height * 3 + i * 3 + 0] = 255;
-				if (1.f >= ((currentXY[0] * currentXY[0]) + (currentXY[1] * currentXY[1])))
-				{
-					currentXY[2] = sqrt(1 - ((currentXY[0] * currentXY[0]) + (currentXY[1] * currentXY[1])));
-					float prob = 0.f;
-					for (int k = 0; k < numLobes; k++)
-					{
-						if (maxtest < vMF(currentXY, mu[k], kappa[k]))
-							maxtest = vMF(currentXY, mu[k], kappa[k]);
-						prob += alpha[k] * vMF(currentXY, mu[k], kappa[k]);
-					}
-					sum += prob;
-
-					NMFpixels[j*height * 3 + i * 3 + 0] = std::min(255, (int)(prob * 255));
-					NMFpixels[j*height * 3 + i * 3 + 1] = std::min(255, (int)(prob * 255));
-					NMFpixels[j*height * 3 + i * 3 + 2] = std::min(255, (int)(prob * 255));
-				}
-				else
-				{
-					NMFpixels[j*height * 3 + i * 3 + 0] = 0;
-					NMFpixels[j*height * 3 + i * 3 + 1] = 0;
-					NMFpixels[j*height * 3 + i * 3 + 2] = 200;
-				}
-			}
-		}
-		std::cout << "sinh(30)=" << std::sinh(30) << std::endl;
-		std::cout << "MAX of prob="<<maxtest<<std::endl;
-		glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, NMFpixels);
-		free(NMFpixels);
+	//	float maxtest=0.f;
+	//
+	//	for(int j = 0; j < numLobes; j++)
+	//	{
+	//		
+	//		std::cout << "mu[" << j << "] = (" 
+	//			<< mu[j][0] << ", " 
+	//			<< mu[j][1] << ", " 
+	//			<< mu[j][2] << ")" << std::endl;
+	//		std::cout << "kappa[" << j << "] = "
+	//			<< kappa[j] << std::endl;
+	//		std::cout << "alpha[" << j << "] = "
+	//			<< alpha[j] << std::endl << std::endl;
+	//	}
+	//	BYTE *NMFpixels = (BYTE*)malloc(width*height * 3);
+	//	float sum = 0.f;
+	//	float alphasum = 0.f;
+	//	for (int j = 0; j < numLobes; j++)
+	//	{
+	//		alphasum += alpha[j];
+	//	}
+	//	std::cout << "alpha sum=" << alphasum << std::endl;
+	//	for (int j = 0; j < height; j++)
+	//	{
+	//		for (int i = 0; i < width; i++)
+	//		{
+	//			float currentXY[3] = { 0 };
+	//			currentXY[0] = ((float)i / (float)(width / 2)) - 1.f;
+	//			currentXY[1] = ((float)j / (float)(height / 2)) - 1.f;
+	//			NMFpixels[j*height * 3 + i * 3 + 0] = 255;
+	//			if (1.f >= ((currentXY[0] * currentXY[0]) + (currentXY[1] * currentXY[1])))
+	//			{
+	//				currentXY[2] = sqrt(1 - ((currentXY[0] * currentXY[0]) + (currentXY[1] * currentXY[1])));
+	//				float prob = 0.f;
+	//				for (int k = 0; k < numLobes; k++)
+	//				{
+	//					if (maxtest < vMF(currentXY, mu[k], kappa[k]))
+	//						maxtest = vMF(currentXY, mu[k], kappa[k]);
+	//					prob += alpha[k] * vMF(currentXY, mu[k], kappa[k]);
+	//				}
+	//				sum += prob;
+	//
+	//				NMFpixels[j*height * 3 + i * 3 + 0] = std::min(255, (int)(prob * 255));
+	//				NMFpixels[j*height * 3 + i * 3 + 1] = std::min(255, (int)(prob * 255));
+	//				NMFpixels[j*height * 3 + i * 3 + 2] = std::min(255, (int)(prob * 255));
+	//			}
+	//			else
+	//			{
+	//				NMFpixels[j*height * 3 + i * 3 + 0] = 0;
+	//				NMFpixels[j*height * 3 + i * 3 + 1] = 0;
+	//				NMFpixels[j*height * 3 + i * 3 + 2] = 200;
+	//			}
+	//		}
+	//	}
+	//	std::cout << "sinh(30)=" << std::sinh(30) << std::endl;
+	//	std::cout << "MAX of prob="<<maxtest<<std::endl;
+	//	glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, NMFpixels);
+	//	free(NMFpixels);
 
 		break;
 	}
@@ -1217,15 +1479,12 @@ void mainMenu(int op) {
 	switch (op) {
 	case 0:
 	{
-		delete[] kappa;
 		delete[] alpha;
 		for (int i = 0; i < numLobes; i++)
 		{
 			delete[] aux[i];
-			delete[] mu[i];
 
 		}
-		delete[] mu;
 		delete[] aux;
 		exit(0);
 	}

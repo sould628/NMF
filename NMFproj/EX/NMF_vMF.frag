@@ -36,7 +36,7 @@ out vec4 color;
 
 vec4 lightIntensity=vec4(1.0f, 1.0f, 1.f, 1.0f);
 
-vec4 Kd=vec4(0.2f,0.2f,0.2f,1.0f);
+vec4 Kd=vec4(0.2f,0.2f,0.0f,1.0f);
 vec4 Ks=vec4(0.3f,0.3f,0.3f,1.0f);
 vec4 Ka=vec4(0.1f,0.1f,0.1f,1.0f);
 
@@ -87,7 +87,7 @@ void main(void)
 	coeffs[3]=texture2D(vMFmap4, fs_in.texCoord.xy);
 	coeffs[4]=texture2D(vMFmap5, fs_in.texCoord.xy);
 
-	for(int i=0; i<numLobes; i++)
+	for(int i=0; i<2; i++)
 	{
 
 		float alpha=0.0;
@@ -101,7 +101,7 @@ void main(void)
 
 
 		alpha=coeffs[i].x;
-		aux=coeffs[i].yzw/alpha;
+		aux=coeffs[i].yzw/max(alpha,0.0001);
 		r=length(aux);
 		kappa=((3*r)-(r*r*r))/(1.0-(r*r));
 		mu=normalize(aux);
@@ -110,7 +110,7 @@ void main(void)
 		float HdotMu=dot(h,mu);
 		Bs=((sPrime+1.0)/(2.0*PI))*pow(HdotMu, sPrime);
 		float LdotMu=max(dot(lightDir,mu),0.0);
-		effBRDF+=effBRDF+(alpha*(Ks*Bs+Kd*LdotMu));
+		effBRDF+=(alpha*(Ks*Bs+Kd*LdotMu));
 
 //		alpha=coeffs[i].x;
 //		mu=2.0*coeffs[i].yzw-1.0;
@@ -126,7 +126,7 @@ void main(void)
 //		Bs*=norm;
 //		float LdotMu=max(dot(lightDir,mu), 0.0);
 //
-//		effBRDF.xyz+=effBRDF.xyz+alpha*((Ks.xyz*Bs+Kd.xyz)*LdotMu);
+//		effBRDF.xyz+=alpha*((Ks.xyz*Bs+Kd.xyz)*LdotMu);
 //		color+=vec4(LdotMu,LdotMu,LdotMu,0);
 	}
 
@@ -134,8 +134,10 @@ void main(void)
 		case 0:
 		{
 			color=(lightIntensity*effBRDF);
-			color+=(lightIntensity*Ka);
+//			color+=(lightIntensity*Ka);
 //			color=(lightIntensity*Ka);
+//			color.rgb=texture2D(vMFmap1, fs_in.texCoord.xy).yzw;
+
 			break;
 		}
 		case 1:
@@ -155,7 +157,9 @@ void main(void)
 			}
 		}
 	}
-	color=vec4(1.0*effBRDF.x, -1.0*effBRDF.x, -1.5, 1.0);
+
+
+//	color=vec4(1.0*effBRDF.x, -1.0*effBRDF.x, -1.5, 1.0);
 
 //	color=vec4(10.1,1.1,1.1,1.0);
 //	color=vec4(h,0.0);

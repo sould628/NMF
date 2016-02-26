@@ -31,7 +31,7 @@ void main(void)
 	const vec4 vertices[4] = vec4[](vec4(0.5, 0.5, 0.5, 1.0), vec4(-0.5, 0.5, 0.5, 1.0), vec4(-0.5, -0.5, 0.5, 1.0), vec4(0.5, -0.5, 0.5, 1.0));
 
 	const vec4 normalVector[4] = vec4[](vec4(0.0, 0.0, 1.0, 0.0), vec4(0.0, 0.0, 1.0, 0.0),vec4(0.0, 0.0, 1.0, 0.0),vec4(0.0, 0.0, 1.0, 0.0)); 
-	const vec4 texCoord[4] = vec4[](vec4(0.0, 0.0, 0.0, 0.0), vec4(0.0, 5.0, 0.0, 0.0), vec4(5.0, 5.0, 0.0, 0.0), vec4(5.0, 0.0, 0.0, 0.0));
+	const vec4 texCoord[4] = vec4[](vec4(0.0, 0.0, 0.0, 0.0), vec4(0.0, 100.0, 0.0, 0.0), vec4(100.0, 100.0, 0.0, 0.0), vec4(100.0, 0.0, 0.0, 0.0));
 	const vec4 tangent[4]= vec4[](vec4(1.0, 0.0, 0.0, 1.0),vec4(1.0, 0.0, 0.0, 1.0),vec4(1.0, 0.0, 0.0, 1.0),vec4(1.0, 0.0, 0.0, 1.0));
 	//gl_VertexID: indicated by "glDrawArrays(GL_TRIANGLES, 0, 3);" in c++ with gl_VertexID from 0 to 4
 	
