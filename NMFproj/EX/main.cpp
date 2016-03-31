@@ -131,9 +131,10 @@ float vMF(float normal[3], float mu[3], float kappa) {
 	
 }
 
-int vMFparam2(float* data, float*** target, float* tAlpha, float* tAux[3], int numLobes, int mipmapLevel, int maxIteration, float alignCtrl) { //data=normalized float
+//To do:
+//mu, kappa initial value should be given
+int vMFparam2(float** data, float*** target, int curWidth, int curHeight, int curMipmapWidth, int curMipmapHeight, float* tAlpha, float* tAux[3], int numLobes, int mipmapLevel, int maxIteration, float alignCtrl) { //data=normalized float
 	bool bConvergence = false;
-
 
 
 	float** mu;
@@ -142,6 +143,9 @@ int vMFparam2(float* data, float*** target, float* tAlpha, float* tAux[3], int n
 	mu = new float*[numLobes];
 	kappa = new float[numLobes];
 	z = new float*[numLobes];
+
+
+
 
 	int numData = 1;
 	for (int i = 0; i < mipmapLevel; i++){
@@ -154,7 +158,12 @@ int vMFparam2(float* data, float*** target, float* tAlpha, float* tAux[3], int n
 		mu[i] = new float[3];
 	}
 
-
+	for (int i = 0; i < numLobes; i++)
+	{
+		mu[i][0] = target[mipmapLevel - 1][(curHeight * curMipmapHeight + curWidth)*2][1];
+		mu[i][1] = target[mipmapLevel - 1][(curHeight * curMipmapHeight + curWidth) * 2][2];
+		mu[i][2] = target[mipmapLevel - 1][(curHeight * curMipmapHeight + curWidth) * 2][3];
+	}
 
 	//Initial Guess Stage (mu, kappa)
 
@@ -211,15 +220,15 @@ int vMFparam2(float* data, float*** target, float* tAlpha, float* tAux[3], int n
 		{
 			int jj = 0;
 
-			alpha[j] = zsum[j] / (NMwidth*NMheight);
+			tAlpha[j] = zsum[j] / (NMwidth*NMheight);
 
-			aux[j][0] = expectedNormal[j][0] / zsum[j];
-			aux[j][1] = expectedNormal[j][1] / zsum[j];
-			aux[j][2] = expectedNormal[j][2] / zsum[j];
+			tAux[j][0] = expectedNormal[j][0] / zsum[j];
+			tAux[j][1] = expectedNormal[j][1] / zsum[j];
+			tAux[j][2] = expectedNormal[j][2] / zsum[j];
 
-			kappa[j] = (3 * norm(aux[j]) - ((norm(aux[j]))*(norm(aux[j]))*(norm(aux[j])))) / (1 - (norm(aux[j]))*(norm(aux[j])));
+			kappa[j] = (3 * norm(tAux[j]) - ((norm(tAux[j]))*(norm(tAux[j]))*(norm(tAux[j])))) / (1 - (norm(tAux[j]))*(norm(tAux[j])));
 
-			normalize(aux[j], mu[j]);
+			normalize(tAux[j], mu[j]);
 
 
 		}//M-Step End
@@ -270,7 +279,7 @@ int vMFparam(float* data[3], float* prev[3], float* tAlpha, float* tAux[3], int 
 	for (int i = 0; i < mipmapLevel; i++){
 		numData *= 4;
 	}
-
+	
 	for (int i = 0; i < numLobes; i++)
 	{
 		z[i] = new float[numData];
@@ -379,10 +388,15 @@ int vMFparam(float* data[3], float* prev[3], float* tAlpha, float* tAux[3], int 
 }
 
 
-void generatevMFmap2(GLubyte* TextureData, int numLobes, float* alpha, float* aux[3], float alignCtrl){
+void generatevMFmap2(GLubyte* TextureData, int numLobes, float alignCtrl){
+	int maxMipmapLevel = 0;
 
-	float *normalData;
-	normalData = new float[NMwidth*NMheight * 3];
+	float **normalData;
+	normalData = new float*[NMwidth*NMheight];
+	for (int i = 0; i < NMwidth*NMheight; i++)
+	{
+		normalData[i] = new float[3];
+	}
 	float *prevMu;
 	int mipmapWidth = NMwidth;
 	int mipmapHeight = NMheight;
@@ -393,6 +407,15 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float* alpha, float* au
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glGenTextures(1, &vMFmaps[0]); glGenTextures(1, &vMFmaps[1]); glGenTextures(1, &vMFmaps[2]); glGenTextures(1, &vMFmaps[3]); glGenTextures(1, &vMFmaps[4]);
 //	glGenTextures(1, &vMFmap0);	glGenTextures(1, &vMFmap1);	glGenTextures(1, &vMFmap2);	glGenTextures(1, &vMFmap3); glGenTextures(1, &vMFmap4);
+	int tw=NMwidth, th=NMheight;
+	while ((tw > 1) || (th > 1))
+	{
+		if (tw > 1)
+			tw /= 2;
+		if (th > 1)
+			th /= 2;
+		maxMipmapLevel++;
+	}
 
 	//NormalData
 	for (int j = 0; j < NMheight; j++)
@@ -406,37 +429,44 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float* alpha, float* au
 			nn[0] = (nn[0] - (255.f / 2.f)) / (255.f / 2.f);
 			nn[1] = (nn[1] - (255.f / 2.f)) / (255.f / 2.f);
 			nn[2] = (nn[2] - (255.f / 2.f)) / (255.f / 2.f);
-			//			if ((nn[1] * nn[1] + (nn[2] * nn[2]) + (nn[0] * nn[0])) > 1.f)
-			//			{
-			//				normalize(nn, nn);
-			//			}
-			//			if ((nn[1] * nn[1] + (nn[2] * nn[2]) + (nn[0] * nn[0])) > 1.00001f)
-			//			{
-			//				std::cout << "normal value error\n" << std::endl;
-			//				sysPause;
-			//			}
-			normalData[j*NMwidth * 3 + i * 3 + 0] = nn[0];
-			normalData[j*NMwidth * 3 + i * 3 + 1] = nn[1];
-			normalData[j*NMwidth * 3 + i * 3 + 2] = nn[2];
+						if ((nn[1] * nn[1] + (nn[2] * nn[2]) + (nn[0] * nn[0])) > 1.f)
+						{
+							normalize(nn, nn);
+						}
+						if ((nn[1] * nn[1] + (nn[2] * nn[2]) + (nn[0] * nn[0])) > 1.00001f)
+						{
+							std::cout << "normal value error\n" << std::endl;
+							sysPause;
+						}
+			normalData[j*NMwidth + i][0] = nn[0];
+			normalData[j*NMwidth + i][1] = nn[1];
+			normalData[j*NMwidth + i][2] = nn[2];
 		}//i
 	}//j
 	//NormalData
 
 	float*** dataBuffer;
-	dataBuffer = new float**[MipMapLevel];
-	for (int ii = 0; ii < MipMapLevel; ii++)
+	dataBuffer = new float**[maxMipmapLevel];
+	for (int i = 0; i < maxMipmapLevel; i++)
+	{
+		dataBuffer[i] = new float*[numLobes];
+		int tWidth, tHeight;
+		tWidth = NMwidth; tHeight = NMheight;
+		for (int j = 0; j < numLobes; j++)
+		{
+			dataBuffer[i][j] = new float[tHeight*tWidth * 4];
+		}
+		if (tHeight>1)tHeight /= 2;
+		if (tWidth>1)tWidth /= 2;
+	}
+
+
+	for (int ii = 0; ii < maxMipmapLevel; ii++)
 	{
 		switch (ii)
 		{
 		case 0://MIPMAP Level0
 		{
-
-			dataBuffer[ii] = new float*[numLobes];
-			for (int jj = 0; jj < numLobes; jj++){
-				dataBuffer[ii][jj] = new float[NMheight*NMwidth * 4];
-			}
-
-
 			for (int jj = 0; jj < numLobes; jj++)
 			{
 				switch (jj)//numLobes
@@ -449,19 +479,14 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float* alpha, float* au
 						for (int i = 0; i < NMwidth; i++)//i
 						{
 							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 0] = 1.0;
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
-							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 0] = 1.0;
-							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
-							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
-							prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
-						}//i
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth + i][0];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth + i][1];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth + i][2];						}//i
 					}//j
 					glBindTexture(GL_TEXTURE_2D, vMFmaps[jj]);
 					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-					//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-					//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 10);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, maxMipmapLevel);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer[ii][jj]);
@@ -493,9 +518,9 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float* alpha, float* au
 						for (int i = 0; i < NMwidth; i++)//i
 						{
 							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 0] = 0.0;
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth + i][0];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth + i][1];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth + i][2];
 							//prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 0] = 0.0;
 							//prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
 							//prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
@@ -503,12 +528,12 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float* alpha, float* au
 						}//i
 					}//j
 					glBindTexture(GL_TEXTURE_2D, vMFmaps[jj]);
-					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+//					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 					//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 					//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, MipMapLevel);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer);
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer[ii][jj]);
 					GLenum glError = glGetError();
 					checkTextureError(glError);
 					glActiveTexture(GL_TEXTURE10);
@@ -520,93 +545,79 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float* alpha, float* au
 				}//switch jj-1
 			}//for jj (numLobes)
 
-
 			break;
 		}//ii case 0
 
 		//////////////////////////////////////
 		default://ii >0
 		{
-			if (!bminWidth || !bminHeight)
+			if (mipmapHeight>1)
+				mipmapHeight /= 2;
+			if (mipmapWidth>1)
+				mipmapWidth /= 2;
+			std::cout << "\nmipmap " << ii << " (w,h) = (" << mipmapWidth << ", " << mipmapHeight << ")" << std::endl;
+
+
+			float* tAlpha, **tAux;
+			tAlpha = new float[numLobes];
+			tAux = new float*[numLobes];
+			for (int zz = 0; zz < numLobes; zz++)
 			{
-				if (!bminWidth || (mipmapWidth > 1))
-					mipmapWidth /= 2;
-				else
-					bminWidth = true;
-				if (!bminHeight && (mipmapHeight > 1))
-					mipmapHeight /= 2;
-				else
-					bminHeight = true;
-				std::cout << "\nmipmap "<<ii<<" (w,h) = (" << mipmapWidth << ", " << mipmapHeight << ")" << std::endl;
+				tAux[zz] = new float[3];
+			}
 
-
-
-
-
-
-
-				vMFparam2(normalData, dataBuffer, alpha, aux, numLobes, ii, MAXITERATION, alignCtrl);
-
-				for (int jj = 0; jj < numLobes; jj++)
+			for (int jj = 0; jj < numLobes; jj++)
+			{
+				switch (jj)//numLobes
 				{
-					switch (jj)//numLobes
-					{
-					case 0:
-						glActiveTexture(GL_TEXTURE1);
-						break;
-					case 1:
-						glActiveTexture(GL_TEXTURE2);
-						break;
-					case 2:
-						glActiveTexture(GL_TEXTURE3);
-						break;
-					case 3:
-						glActiveTexture(GL_TEXTURE4);
-						break;
-					case 4:
-						glActiveTexture(GL_TEXTURE5);
-						break;
-					}
-
-					dataBuffer[ii][jj] = new float[mipmapWidth*mipmapHeight * 4];
-					for (int j = 0; j < mipmapWidth; j++)//j
-					{
-						for (int i = 0; i < mipmapHeight; i++)//i
-						{
-							dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 0] = alpha[jj];
-							dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 2] = aux[jj][0];
-							dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 3] = aux[jj][1];
-							dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 1] = aux[jj][2];
-							//prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 0] = 1.0;
-							//prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
-							//prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
-							//prevMu[jj*(NMwidth*NMheight * 3) + j*NMwidth * 3 + i * 3 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
-						}//i
-					}//j
-					glBindTexture(GL_TEXTURE_2D, vMFmaps[jj]);
-					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-					//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-					//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 10);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer[ii][jj]);
-					GLenum glError = glGetError();
-					checkTextureError(glError);
-					glActiveTexture(GL_TEXTURE10);
-					glBindTexture(GL_TEXTURE_2D, 0);
-
-					delete[] dataBuffer;
+				case 0:
+					glActiveTexture(GL_TEXTURE1);
 					break;
+				case 1:
+					glActiveTexture(GL_TEXTURE2);
+					break;
+				case 2:
+					glActiveTexture(GL_TEXTURE3);
+					break;
+				case 3:
+					glActiveTexture(GL_TEXTURE4);
+					break;
+				case 4:
+					glActiveTexture(GL_TEXTURE5);
+					break;
+				}
+				for (int j = 0; j < mipmapWidth; j++)//j
+				{
+					for (int i = 0; i < mipmapHeight; i++)//i
+					{
+						vMFparam2(normalData, dataBuffer, j, i, mipmapWidth, mipmapHeight, tAlpha, tAux, numLobes, ii, MAXITERATION, alignCtrl);
 
-				}//switch jj-1
-			}//for jj (numLobes)
-			else
-				std::cout << "\nMIPMAP finished before user-defined level\n" << std::endl;
+						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 0] = tAlpha[jj];
+						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 2] = tAux[jj][0];
+						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 3] = tAux[jj][1];
+						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 1] = tAux[jj][2];
+					}//i
+				}//j
+				glBindTexture(GL_TEXTURE_2D, vMFmaps[jj]);
+//				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+				//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+				//					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 10);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer[ii][jj]);
+				GLenum glError = glGetError();
+				checkTextureError(glError);
+				glActiveTexture(GL_TEXTURE10);
+				glBindTexture(GL_TEXTURE_2D, 0);
 
-			break;
+
+				break;
+
+			}//switch jj-1
+		}//for jj (numLobes)
 		}
 
-		}//switch ii case
+		//switch ii case
 
 	}//for ii
 	delete[] dataBuffer;
@@ -1464,10 +1475,14 @@ void initBuffers() {
 	//vMFparameter
 	alpha = new float[numLobes];
 	aux = new float*[numLobes];
+	for (int i = 0; i < numLobes; i++)
+	{
+		aux[i] = new float[3];
+	}
 
 	
 //	generatevMFmap(textureData, numLobes, alpha, aux, alignCtrl);
-	generatevMFmap2(textureData, numLobes, alpha, aux, alignCtrl);
+	generatevMFmap2(textureData, numLobes, alignCtrl);
 
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
