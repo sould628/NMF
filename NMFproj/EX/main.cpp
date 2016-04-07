@@ -131,6 +131,12 @@ float vMF(float normal[3], float mu[3], float kappa) {
 	
 }
 
+inline float calculateKappa(float* aux)
+{
+	float kappa;
+	kappa = ((3 * norm(aux)) - (norm(aux)*norm(aux)* norm(aux))) / (1 - (norm(aux)*norm(aux)));
+	return kappa;
+}
 //To do:
 //mu, kappa initial value should be given
 int vMFparam2(float** data, float*** target, int curWidth, int curHeight, int curMipmapWidth, int curMipmapHeight, float* tAlpha, float* tAux[3], int numLobes, int mipmapLevel, int maxIteration, float alignCtrl) { //data=normalized float
@@ -144,7 +150,7 @@ int vMFparam2(float** data, float*** target, int curWidth, int curHeight, int cu
 	kappa = new float[numLobes];
 	z = new float*[numLobes];
 
-
+	float** taux;
 
 
 	int numData = 1;
@@ -156,14 +162,19 @@ int vMFparam2(float** data, float*** target, int curWidth, int curHeight, int cu
 	{
 		z[i] = new float[numData];
 		mu[i] = new float[3];
+		taux[i] = new float[3];
 	}
 
 	for (int i = 0; i < numLobes; i++)
 	{
-		mu[i][0] = target[mipmapLevel - 1][(curHeight * curMipmapHeight + curWidth)*2][1];
-		mu[i][1] = target[mipmapLevel - 1][(curHeight * curMipmapHeight + curWidth) * 2][2];
-		mu[i][2] = target[mipmapLevel - 1][(curHeight * curMipmapHeight + curWidth) * 2][3];
+		taux[i][0] = target[mipmapLevel - 1][(curHeight * curMipmapHeight + curWidth) * 2][1];
+		taux[i][1] = target[mipmapLevel - 1][(curHeight * curMipmapHeight + curWidth) * 2][2];
+		taux[i][2] = target[mipmapLevel - 1][(curHeight * curMipmapHeight + curWidth) * 2][3];
+		normalize(mu[i], taux[i]);
+		kappa[i] = calculateKappa(taux[i]);
 	}
+
+
 
 	//Initial Guess Stage (mu, kappa)
 
