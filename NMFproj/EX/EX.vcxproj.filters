@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="include\list.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="include\obj_parser.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="include\string_extra.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="include\objLoader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="generatevMF.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Camera.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FreeImage.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="globalVariables.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GLSLProgram.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\list.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\obj_parser.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\objLoader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\string_extra.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="generatevMF.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+    <None Include="NMF_original.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="NMF_original.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="NMF_SH.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="NMF_SH.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="NMF_vMF.frag">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="NMF_vMF.vert">
+      <Filter>GLSL</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{2fff3cbd-5b02-44d4-90fe-b9da71eb4be1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{7bb6f780-3de9-4d9b-ad7e-c23d7e7ae9ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL">
+      <UniqueIdentifier>{2d982733-2479-4d8c-9b72-0ccf8b7569a9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
