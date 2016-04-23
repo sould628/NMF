@@ -24,7 +24,7 @@
 
 #include "GLSLProgram.h"
 #include "Camera.h"
-
+#include "vMFtexture.h"
 #define sysPause system("pause>nul");
 
 
@@ -1801,6 +1801,8 @@ int main(int argc, char** argv){
 
 	objData = new objLoader();
 	objData->load("./cube.obj");
+
+	vMFtexture vMFtex(NMT);
 
 	NMTdata=LoadImage(NMT, NMwidth, NMheight);
 

@@ -19,6 +19,9 @@
     <ClCompile Include="generatevMF.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="vMFtexture.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Camera.h">
@@ -46,6 +49,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="generatevMF.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="vMFtexture.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
