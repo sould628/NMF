@@ -20,16 +20,13 @@
 #include "objLoader.h"
 
 #include "globalVariables.h"
-
-
 #include "GLSLProgram.h"
 #include "Camera.h"
 #include "vMFtexture.h"
+
+
+
 #define sysPause system("pause>nul");
-
-
-
-
 
 
 
@@ -46,7 +43,7 @@ objLoader *objData;
 FIBITMAP* NMTdata;
 GLubyte* textureData;
 
-Camera *cam;
+
 GLint button_id;
 GLfloat click_pos[2];
 
@@ -95,7 +92,6 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 float calculateSHcoeffDelta(int l, int m, float x, float y, float z);
 void checkTextureError(GLenum glError);
 int vMFparam(float* data[3], float* prev[3], float* tAlpha, float* tAux[3], int numLobes, int mipmapLevel, int maxIteration, float alignCtrl);
-float vMF(float normal[3], float mu[3], float kappa);
 float norm(float vector[3]);
 void normalize(float* source, float* destination);
 
@@ -120,23 +116,7 @@ void normalize(float* source, float* destination) {
 	destination[2] = value[2];
 }
 
-float vMF(float normal[3], float mu[3], float kappa) {
-	double NdotMu = (mu[0] * normal[0]) + (mu[1] * normal[1]) + (mu[2] * normal[2]);
-//	double Kappa = (kappa > 85 ? 85 : kappa);
-	double Kappa = kappa;
-	double result = (Kappa / (4 * PI*sinh(Kappa)))*exp(Kappa*(NdotMu));
-//	result = (Kappa / (4 * PI*sinh(Kappa)))*exp(Kappa);
 
-	//if (result >= 1)
-	//{
-	//	std::cout << "Error vMF value detected\n";
-	//	sysPause;
-	//}
-
-
-	return result;
-	
-}
 
 inline float calculateKappa(float* aux)
 {
@@ -197,7 +177,6 @@ int vMFparam2(float** data, float*** target, int curWidth, int curHeight, int cu
 	}
 
 
-
 	//Initial Guess Stage (mu, kappa)
 
 
@@ -227,7 +206,7 @@ int vMFparam2(float** data, float*** target, int curWidth, int curHeight, int cu
 			float vMFsum = 0.f;
 			for (int j = 0; j < numLobes; j++)
 			{
-				vMFij[j] = vMF(targetNormal[i], mu[j], kappa[j]);
+				vMFij[j] = vMFfunc::vMF(targetNormal[i], mu[j], kappa[j]);
 				vMFsum += vMFij[j];
 			}
 			for (int j = 0; j < numLobes; j++)
@@ -374,7 +353,7 @@ int vMFparam(float* data[3], float* prev[3], float* tAlpha, float* tAux[3], int 
 			float vMFsum = 0.f;
 			for (int j = 0; j < numLobes; j++)
 			{
-				vMFij[j] = vMF(data[i], mu[j], kappa[j]);
+				vMFij[j] = vMFfunc::vMF(data[i], mu[j], kappa[j]);
 				vMFsum += vMFij[j];
 			}
 			for (int j = 0; j < numLobes; j++)

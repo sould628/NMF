@@ -27,6 +27,13 @@ cv::Mat vMFfunc::cvLoadImage(const char* filename, int &imageWidth, int &imageHe
 	imageWidth = load.cols; imageHeight = load.rows;
 	return floatScale;
 }
+float vMFfunc::vMF(float normal[3], float mu[3], float kappa) {
+	double NdotMu = (mu[0] * normal[0]) + (mu[1] * normal[1]) + (mu[2] * normal[2]);
+	double Kappa = kappa;
+	double result = (Kappa / (4 * vmfPI*sinh(Kappa)))*exp(Kappa*(NdotMu));
+
+	return (float)result;
+}
 FIBITMAP* vMFfunc::LoadImage(const char* filename, int &imageWidth, int &imageHeight) {
 	FREE_IMAGE_FORMAT format = FreeImage_GetFileType(filename);
 	RGBQUAD pixel;

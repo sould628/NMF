@@ -1,3 +1,5 @@
+#include "Camera.h"
+
 #define MAXITERATION 10
 
 
@@ -8,7 +10,7 @@ extern int MipMapLevel = 3;
 extern float alignCtrl = 2.0;
 
 
-
+Camera *cam;
 extern int renderMode = 3;
 extern int renderScene = 0;
 extern int MipMapped = 1;
