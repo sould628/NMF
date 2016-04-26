@@ -5,24 +5,28 @@
 #include <cstdlib>
 #include <opencv2/opencv.hpp>
 #include "FreeImage.h"
+#include "cvCtrl.h"
 
 #define vmfPI 3.141592653589793f
 
 class vMFtexture {
 private:
-	float *originalNormals;
+	cv::Mat originalNormals[2];
+	
 	int oWidth, oHeight;
-	float ***vMFdata;
-	int **vWidth, vHeight;
+	float *****vMFdata;
+	int *vWidth, *vHeight;
 	int numLobes;
 	int mipmapLevel;
 	int *vMFmaps; //glGenerate
-	cv::Mat cvOriginalNormals;
+
 
 
 public:
 	vMFtexture();
 	vMFtexture(const char* filename, int numLobes = 4, int mipmapLevel = -1);
+	~vMFtexture();
+	void showOriginalImage(int channel = -1) const;
 };
 
 

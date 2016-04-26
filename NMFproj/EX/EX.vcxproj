@@ -96,6 +96,7 @@
     <ClInclude Include="globalVariables.h" />
     <ClInclude Include="GLSLProgram.h" />
     <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\cvCtrl.h" />
     <ClInclude Include="include\FreeImage.h" />
     <ClInclude Include="include\list.h" />
     <ClInclude Include="include\objLoader.h" />

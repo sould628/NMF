@@ -70,7 +70,7 @@ time_t sysTime, currentTime;
 float* alpha;
 float** aux;
 
-
+vMFtexture cVMFtex(NMT);
 
 static const float exampleData[] =
 {
@@ -85,7 +85,7 @@ static const float exampleData[] =
 
 
 void displayCB();
-void drawTexture();
+
 void generateSHmap(GLubyte* TextureData);
 void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux[3], float alignCtrl);
 
@@ -570,19 +570,19 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float alignCtrl){
 						for (int i = 0; i < NMwidth; i++)//i
 						{
 							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 0] = 0.f;
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth + i][0];
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth + i][1];
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth + i][2];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = 0.f;
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = 0.f;
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = 0.f;
 						}//i
 					}//j
 					glBindTexture(GL_TEXTURE_2D, vMFmaps[jj]);
-//					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 //					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 //					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, maxMipmapLevel);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//					glTexImage2D(GL_TEXTURE_2D, ii, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer[ii][jj]);
-					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer[ii][jj]);
+//					//glTexImage2D(GL_TEXTURE_2D, ii, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer[ii][jj]);
+//					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_RGBA, GL_FLOAT, dataBuffer[ii][jj]);
 					GLenum glError = glGetError();
 					checkTextureError(glError);
 					glActiveTexture(GL_TEXTURE10);
@@ -642,9 +642,9 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float alignCtrl){
 						vMFparam2(normalData, dataBuffer, i, j, mipmapWidth, mipmapHeight, NMwidth, NMheight, tAlpha, tAux, numLobes, ii, MAXITERATION);
 
 						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 0] = tAlpha[jj];
-						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 1] = tAux[jj][0];
-						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 2] = tAux[jj][1];
-						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 3] = tAux[jj][2];
+						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 1] = tAlpha[jj]*tAux[jj][0];
+						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 2] = tAlpha[jj]*tAux[jj][1];
+						dataBuffer[ii][jj][j*mipmapWidth * 4 + i * 4 + 3] = tAlpha[jj]*tAux[jj][2];
 					}//i
 				}//j
 				glBindTexture(GL_TEXTURE_2D, vMFmaps[jj]);
@@ -1041,7 +1041,7 @@ void generateSHmap(GLubyte* TextureData){
 						else{
 							while ((nn[2] * nn[2] + nn[0] * nn[0]) > 1)
 							{
-								nn[2] = nn[2] * 0.99; nn[0] * 0.99;
+								nn[2] = nn[2] * 0.99; nn[0]=nn[0] * 0.99;
 							}
 							nn[1] = sqrt(1 - (nn[2] * nn[2] + nn[0] * nn[0]));
 						}
@@ -1324,22 +1324,7 @@ void drawObj(objLoader *data){
 }
 
 
-void drawTexture(){
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0, 1.0);
-	glVertex3f(0.0, height, -0.1);
-	glTexCoord2f(1.0, 1.0);
-	glVertex3f(width, height, -0.1);
-	glTexCoord2f(1.0, 0.0);
-	glVertex3f(width, 0.0, -0.1);
-	glTexCoord2f(0.0, 0.0);
-	glVertex3f(0.0, 0.0, -0.1);
-	glEnd();
-	
-}
-
 void displayCB(){
-	GLfloat attrib[4];
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.f, 0.f, 0.0f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -1781,7 +1766,7 @@ int main(int argc, char** argv){
 	objData = new objLoader();
 	objData->load("./cube.obj");
 
-	vMFtexture vMFtex(NMT);
+	cVMFtex.showOriginalImage(1);
 
 	NMTdata=LoadImage(NMT, NMwidth, NMheight);
 
