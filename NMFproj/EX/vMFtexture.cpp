@@ -13,12 +13,11 @@ vMFtexture::vMFtexture(const char* filename, int numLobes, int mipmapLevel)
 
 	this->originalNormals[0] = vMFfunc::cvLoadImage(filename, this->oWidth, this->oHeight);
 	this->originalNormals[1] = this->originalNormals[0].clone();
-	originalNormals[1] *= 2;
-	originalNormals[1] -= 1;
-//	std::vector < cv::Mat >spl; cv::split(this->originalNormals[1], spl);
-//	zyx[1] *= 2; zyx[2] *= 2;
-//	zyx[1] -= 1; zyx[2] -= 1;
-//	cv::merge(zyx, originalNormals[1]);
+	std::vector<cv::Mat> spl(3); cv::split(this->originalNormals[1], spl);
+	spl[1] *= 2; spl[2] *= 2;
+	spl[1] -= 1; spl[2] -= 1;
+	cv::merge(spl, this->originalNormals[1]);
+
 
 
 	if (mipmapLevel == -1)
@@ -95,10 +94,10 @@ void vMFtexture::showOriginalImage(int channel) const
 {
 	cv::namedWindow("originalImage"); cv::namedWindow("originalImage", CV_WINDOW_NORMAL);
 	char key = 0;
-	std::vector<cv::Mat> zyx0;
-	std::vector<cv::Mat> zyx1;
-	cv::split(this->originalNormals[0], zyx0);
-	cv::split(this->originalNormals[1], zyx1);
+	std::vector<cv::Mat> zyx0(3);
+	std::vector<cv::Mat> zyx1(3);
+	cv::split(this->originalNormals[0].clone(), zyx0);
+	cv::split(this->originalNormals[1].clone(), zyx1);
 
 	int ver = 0;
 	while (key != myESC)
@@ -122,9 +121,13 @@ void vMFtexture::showOriginalImage(int channel) const
 		else
 		{
 			if (ver == 0)
+			{
 				cv::imshow("originalImage", zyx0[channel]);
+			}
 			else
+			{
 				cv::imshow("originalImage", zyx1[channel]);
+			}
 			key = cv::waitKey();
 			switch (key)
 			{
@@ -142,11 +145,17 @@ void vMFtexture::showOriginalImage(int channel) const
 			default:
 				break;
 			}
+			if ((key == 'v') || (key == 'V'))
+			{
+				ver == 0 ? ver = 1 : ver = 0;
+			}
 		}
 	}
 
 
 	cv::destroyWindow("originalImage");
+
+	return;
 }
 
 

@@ -1,89 +1,56 @@
-﻿  main.cpp
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(18): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_face' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(27): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_sphere' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(36): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_plane' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(41): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_vector' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(57): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_material' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(64): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_camera' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(70): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_point' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(77): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_disc' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(83): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_quad' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(106): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_growable_scene_data' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(139): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_scene_data' 왼쪽은 무시됩니다.
-  string_extra.cpp
-  obj_parser.cpp
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(18): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_face' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(27): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_sphere' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(36): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_plane' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(41): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_vector' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(57): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_material' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(64): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_camera' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(70): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_point' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(77): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_disc' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(83): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_quad' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(106): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_growable_scene_data' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(139): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_scene_data' 왼쪽은 무시됩니다.
-  objLoader.cpp
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(18): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_face' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(27): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_sphere' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(36): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_plane' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(41): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_vector' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(57): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_material' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(64): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_camera' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(70): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_point' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(77): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_disc' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(83): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_quad' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(106): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_growable_scene_data' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(139): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_scene_data' 왼쪽은 무시됩니다.
-  list.cpp
-  C/C++ 코드 분석을 실행하고 있습니다...
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(18): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_face' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(27): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_sphere' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(36): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_plane' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(41): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_vector' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(57): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_material' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(64): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_camera' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(70): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_light_point' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(77): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_light_disc' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(83): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_light_quad' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(106): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_growable_scene_data' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(139): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_scene_data' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(18): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_face' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(27): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_sphere' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(36): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_plane' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(41): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_vector' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(57): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_material' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(64): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_camera' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(70): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_light_point' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(77): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_light_disc' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(83): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_light_quad' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(106): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_growable_scene_data' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(139): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_scene_data' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(18): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_face' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(27): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_sphere' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(36): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_plane' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(41): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_vector' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(57): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_material' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(64): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_camera' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(70): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_light_point' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(77): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_light_disc' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(83): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_light_quad' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(106): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_growable_scene_data' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.h(139): warning C4091: 'typedef __declspec' : 변수를 선언하지 않으면 'obj_scene_data' 왼쪽은 무시됩니다.
-  코드를 생성하고 있습니다...
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\glslprogram.h(29): warning C4715: 'GLSLProgram::readFromFile' : 모든 제어 경로에서 값을 반환하지는 않습니다.
-  NMF.vcxproj -> C:\Users\hyo\Documents\GitHub\NMF\NMFproj\NMF\./bin/NMF.exe
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\list.cpp(60): warning C6387: 'new_name'이(가) '0'일 수 있습니다.  이 경우 'strncpy' 함수의 사양과 일치하지 않습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\list.cpp(171): warning C6001: 초기화되지 않은 메모리 '*listo->names'을(를) 사용하고 있습니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(78): warning C6011: NULL 포인터 'texture_index'을(를) 역참조하고 있습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(83): warning C6011: NULL 포인터 'normal_index'을(를) 역참조하고 있습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(98): warning C6011: NULL 포인터 'face'을(를) 역참조하고 있습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(112): warning C6011: NULL 포인터 'obj'을(를) 역참조하고 있습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(126): warning C6011: NULL 포인터 'obj'을(를) 역참조하고 있습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(138): warning C6011: NULL 포인터 'o'을(를) 역참조하고 있습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(145): warning C6011: NULL 포인터 'o'을(를) 역참조하고 있습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(157): warning C6011: NULL 포인터 'obj'을(를) 역참조하고 있습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(166): warning C6011: NULL 포인터 'v'을(를) 역참조하고 있습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\include\obj_parser.cpp(478): warning C6001: 초기화되지 않은 메모리 '*data_out'을(를) 사용하고 있습니다.
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\glslprogram.h(24): warning C6387: 'text'이(가) '0'일 수 있습니다.  이 경우 'fread' 함수의 사양과 일치하지 않습니다. 
-c:\users\hyo\documents\github\nmf\nmfproj\nmf\glslprogram.h(25): warning C6011: NULL 포인터 'text'을(를) 역참조하고 있습니다. 이 오류가 발생할 수 있는 이전 위치는 줄 24을(를) 참조하십시오.
+﻿Build started 2016-04-27 오전 12:12:06.
+     1>Project "E:\Hyo\Github\NMF\NMFproj\NMF\NMF.vcxproj" on node 3 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I./include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt include\list.cpp include\objLoader.cpp include\obj_parser.cpp include\string_extra.cpp main.cpp
+         main.cpp
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(18): warning C4091: 'typedef ' : ignored on left of 'obj_face' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(27): warning C4091: 'typedef ' : ignored on left of 'obj_sphere' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(36): warning C4091: 'typedef ' : ignored on left of 'obj_plane' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(41): warning C4091: 'typedef ' : ignored on left of 'obj_vector' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(57): warning C4091: 'typedef ' : ignored on left of 'obj_material' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(64): warning C4091: 'typedef ' : ignored on left of 'obj_camera' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(70): warning C4091: 'typedef ' : ignored on left of 'obj_light_point' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(77): warning C4091: 'typedef ' : ignored on left of 'obj_light_disc' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(83): warning C4091: 'typedef ' : ignored on left of 'obj_light_quad' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(106): warning C4091: 'typedef ' : ignored on left of 'obj_growable_scene_data' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(139): warning C4091: 'typedef ' : ignored on left of 'obj_scene_data' when no variable is declared
+         string_extra.cpp
+         obj_parser.cpp
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(18): warning C4091: 'typedef ' : ignored on left of 'obj_face' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(27): warning C4091: 'typedef ' : ignored on left of 'obj_sphere' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(36): warning C4091: 'typedef ' : ignored on left of 'obj_plane' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(41): warning C4091: 'typedef ' : ignored on left of 'obj_vector' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(57): warning C4091: 'typedef ' : ignored on left of 'obj_material' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(64): warning C4091: 'typedef ' : ignored on left of 'obj_camera' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(70): warning C4091: 'typedef ' : ignored on left of 'obj_light_point' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(77): warning C4091: 'typedef ' : ignored on left of 'obj_light_disc' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(83): warning C4091: 'typedef ' : ignored on left of 'obj_light_quad' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(106): warning C4091: 'typedef ' : ignored on left of 'obj_growable_scene_data' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(139): warning C4091: 'typedef ' : ignored on left of 'obj_scene_data' when no variable is declared
+         objLoader.cpp
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(18): warning C4091: 'typedef ' : ignored on left of 'obj_face' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(27): warning C4091: 'typedef ' : ignored on left of 'obj_sphere' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(36): warning C4091: 'typedef ' : ignored on left of 'obj_plane' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(41): warning C4091: 'typedef ' : ignored on left of 'obj_vector' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(57): warning C4091: 'typedef ' : ignored on left of 'obj_material' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(64): warning C4091: 'typedef ' : ignored on left of 'obj_camera' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(70): warning C4091: 'typedef ' : ignored on left of 'obj_light_point' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(77): warning C4091: 'typedef ' : ignored on left of 'obj_light_disc' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(83): warning C4091: 'typedef ' : ignored on left of 'obj_light_quad' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(106): warning C4091: 'typedef ' : ignored on left of 'obj_growable_scene_data' when no variable is declared
+     1>e:\hyo\github\nmf\nmfproj\nmf\include\obj_parser.h(139): warning C4091: 'typedef ' : ignored on left of 'obj_scene_data' when no variable is declared
+         list.cpp
+         Generating Code...
+     1>e:\hyo\github\nmf\nmfproj\nmf\glslprogram.h(29): warning C4715: 'GLSLProgram::readFromFile' : not all control paths return a value
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"./bin/NMF.exe" /INCREMENTAL /NOLOGO /LIBPATH:./lib FreeImage.lib glut32.lib glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"./bin/NMF.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"./bin/NMF.lib" /MACHINE:X86 Debug\list.obj
+         Debug\objLoader.obj
+         Debug\obj_parser.obj
+         Debug\string_extra.obj
+         Debug\main.obj
+         NMF.vcxproj -> E:\Hyo\Github\NMF\NMFproj\NMF\./bin/NMF.exe
+     1>Done Building Project "E:\Hyo\Github\NMF\NMFproj\NMF\NMF.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.29

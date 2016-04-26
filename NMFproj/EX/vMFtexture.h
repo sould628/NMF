@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include<math.h>
 #include <iostream>
 #include <cstdlib>
@@ -34,4 +35,11 @@ namespace vMFfunc {
 	extern FIBITMAP* LoadImage(const char* filename, int &imageWidth, int &imageHeight);
 	extern cv::Mat cvLoadImage(const char* filename, int &imageWidth, int &imageHeight);
 	extern float vMF(float normal[3], float mu[3], float kappa);
+}
+
+namespace vectorFunc
+{
+	void normalize();
+
+
 }
