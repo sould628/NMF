@@ -66,7 +66,7 @@ vMFtexture::vMFtexture(const char* filename, int numLobes, int mipmapLevel)
 vMFtexture::~vMFtexture()
 {
 	delete[] vMFmaps;
-	for (int m = 0; m <= this->mipmapLevel; m++)
+	for (int m = 0; m < this->mipmapLevel; m++)
 	{
 		delete[] this->vMFdata[m];
 	}
@@ -153,7 +153,7 @@ void vMFtexture::generatevMFmaps()
 	delete[] aux; delete[] alpha;
 }
 
-void vMFtexture::computeParameters(float alpha, float aux[3], int m, int l, cv::Mat targetRegion, float prevData[4][4])
+void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][4])
 {
 	
 }

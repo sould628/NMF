@@ -529,10 +529,11 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float alignCtrl){
 					{
 						for (int i = 0; i < NMwidth; i++)//i
 						{
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 0] = 1.f;
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth + i][0];
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth + i][1];
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth + i][2];						}//i
+							float aaalpha = 1.f / (float)numLobes;
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 0] = aaalpha;
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = aaalpha*normalData[j*NMwidth + i][0];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = aaalpha*normalData[j*NMwidth + i][1];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = aaalpha*normalData[j*NMwidth + i][2];						}//i
 					}//j
 					glBindTexture(GL_TEXTURE_2D, vMFmaps[jj]);
 					glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
@@ -569,10 +570,14 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float alignCtrl){
 					{
 						for (int i = 0; i < NMwidth; i++)//i
 						{
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 0] = 0.f;
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = 0.f;
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = 0.f;
-							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = 0.f;
+							float aaalpha = 1.f / (float)numLobes;
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 0] = aaalpha;
+//							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth + i][0];
+//							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth + i][1];
+//							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth + i][2];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 1] = aaalpha*normalData[j*NMwidth + i][0];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 2] = aaalpha*normalData[j*NMwidth + i][1];
+							dataBuffer[ii][jj][j*NMwidth * 4 + i * 4 + 3] = aaalpha*normalData[j*NMwidth + i][2];
 						}//i
 					}//j
 					glBindTexture(GL_TEXTURE_2D, vMFmaps[jj]);
@@ -725,8 +730,6 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 		{
 			float* dataBuffer;
 			dataBuffer = new float[NMwidth*NMheight * 4];
-
-
 			for (int jj = 0; jj < numLobes; jj++)
 			{
 				switch (jj)//numLobes
@@ -738,10 +741,12 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 					{
 						for (int i = 0; i < NMwidth; i++)//i
 						{
-							dataBuffer[j*NMwidth * 4 + i * 4 + 0] = 1.0;
-							dataBuffer[j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
-							dataBuffer[j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
-							dataBuffer[j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+							float aaalpha = 1.f / (float)numLobes;
+							//dataBuffer[j*NMwidth * 4 + i * 4 + 0] = 1.0;
+							dataBuffer[j*NMwidth * 4 + i * 4 + 0] = aaalpha;
+							dataBuffer[j*NMwidth * 4 + i * 4 + 1] = aaalpha*normalData[j*NMwidth * 3 + i * 3 + 0];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 2] = aaalpha*normalData[j*NMwidth * 3 + i * 3 + 1];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 3] = aaalpha*normalData[j*NMwidth * 3 + i * 3 + 2];
 						}//i
 					}//j
 					glBindTexture(GL_TEXTURE_2D, vMFmap0);
@@ -765,10 +770,15 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 					{
 						for (int i = 0; i < NMwidth; i++)//i
 						{
-							dataBuffer[j*NMwidth * 4 + i * 4 + 0] = 0.0;
-							dataBuffer[j*NMwidth * 4 + i * 4 + 1] = normalData[j*NMwidth * 3 + i * 3 + 0];
-							dataBuffer[j*NMwidth * 4 + i * 4 + 2] = normalData[j*NMwidth * 3 + i * 3 + 1];
-							dataBuffer[j*NMwidth * 4 + i * 4 + 3] = normalData[j*NMwidth * 3 + i * 3 + 2];
+							float aaalpha = 1.f / (float)numLobes;
+							dataBuffer[j*NMwidth * 4 + i * 4 + 0] = aaalpha;
+							dataBuffer[j*NMwidth * 4 + i * 4 + 1] = aaalpha*normalData[j*NMwidth * 3 + i * 3 + 0];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 2] = aaalpha*normalData[j*NMwidth * 3 + i * 3 + 1];
+							dataBuffer[j*NMwidth * 4 + i * 4 + 3] = aaalpha*normalData[j*NMwidth * 3 + i * 3 + 2];
+							//dataBuffer[j*NMwidth * 4 + i * 4 + 1] = 0.f;
+							//dataBuffer[j*NMwidth * 4 + i * 4 + 2] = 0.f;
+							//dataBuffer[j*NMwidth * 4 + i * 4 + 3] = 0.f;
+						
 						}//i
 					}//j
 					glBindTexture(GL_TEXTURE_2D, vMFmap1);

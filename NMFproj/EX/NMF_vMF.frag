@@ -101,7 +101,7 @@ void main(void)
 
 
 		alpha=coeffs[i].x;
-		aux=coeffs[i].yzw/max(alpha,0.0001);
+		aux=coeffs[i].yzw/max(alpha,0.001);
 		r=length(aux);
 		kappa=((3*r)-(r*r*r))/(1.0-(r*r));
 		mu=normalize(aux);

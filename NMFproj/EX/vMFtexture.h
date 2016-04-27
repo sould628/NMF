@@ -21,7 +21,7 @@ private:
 	int mipmapLevel;
 	int *vMFmaps; //glGenerate
 
-	void computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][4];);
+	void computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][4]);
 
 
 public:
