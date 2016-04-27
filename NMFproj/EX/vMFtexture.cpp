@@ -11,18 +11,27 @@ vMFtexture::vMFtexture(const char* filename, int numLobes, int mipmapLevel)
 
 	this->numLobes = numLobes;
 
-	this->originalNormals[0] = vMFfunc::cvLoadImage(filename, this->oWidth, this->oHeight);
-	this->originalNormals[1] = this->originalNormals[0].clone();
-	std::vector<cv::Mat> spl(3); cv::split(this->originalNormals[1], spl);
-	spl[1] *= 2; spl[2] *= 2;
-	spl[1] -= 1; spl[2] -= 1;
-	cv::merge(spl, this->originalNormals[1]);
+	this->originalNormals[1] = vMFfunc::cvLoadImage(filename, this->oWidth, this->oHeight);
+	std::vector<cv::Mat> change(3); cv::split(this->originalNormals[1], change);
+	cv::Mat temp = change[0].clone();
+	change[0] = change[2].clone();
+	change[2] = temp.clone();
+
+	merge(change, this->originalNormals[1]);
+
+	this->originalNormals[0] = this->originalNormals[1].clone();
+	std::vector<cv::Mat> spl(3); cv::split(this->originalNormals[0], spl);
+	cv::normalize(spl[0], spl[0], 1.0, -1.0, cv::NORM_MINMAX);
+	cv::normalize(spl[1], spl[1], 1.0, -1.0, cv::NORM_MINMAX);
+	cv::normalize(spl[2], spl[2], 1.0, 0.0, cv::NORM_MINMAX);
+
+	cv::merge(spl, this->originalNormals[0]);
 
 
 
 	if (mipmapLevel == -1)
 	{
-		int wLevel = 0, hLevel = 0;
+		int wLevel = 1, hLevel = 1;
 		int w = this->oWidth; int h = this->oHeight;
 		while (w > 1)
 		{
@@ -42,22 +51,14 @@ vMFtexture::vMFtexture(const char* filename, int numLobes, int mipmapLevel)
 
 	this->vWidth = new int[this->mipmapLevel]; this->vHeight = new int[this->mipmapLevel];
 	int w = this->oWidth; int h = this->oHeight;
-	this->vMFdata = new float****[this->mipmapLevel+1];
-	for (int m = 0; m <= this->mipmapLevel; m++)
+	this->vMFdata = new cv::Mat*[this->mipmapLevel];
+	for (int m = 0; m < this->mipmapLevel; m++)
 	{
-		vMFdata[m] = new float***[numLobes];
+		vMFdata[m] = new cv::Mat[numLobes];
 		vWidth[m] = w; vHeight[m] = h;
 		for (int l = 0; l < numLobes; l++)
 		{
-			vMFdata[m][l] = new float**[w];
-			for (int i = 0; i < w; i++)
-			{
-				vMFdata[m][l][w] = new float*[h];
-				for (int j = 0; j < h; j++)
-				{
-					vMFdata[m][l][w][h] = new float[4];
-				}
-			}
+			vMFdata[m][l] = cv::Mat(h, w, CV_32FC4);
 		}
 		if (w > 1) w /= 2; if (h > 1) h /= 2;
 	}
@@ -67,18 +68,6 @@ vMFtexture::~vMFtexture()
 	delete[] vMFmaps;
 	for (int m = 0; m <= this->mipmapLevel; m++)
 	{
-		for (int l = 0; l < this->numLobes; l++)
-		{
-			for (int i = 0; i < this->vWidth[m]; i++)
-			{
-				for (int j = 0; j < this->vHeight[m]; j++)
-				{
-					delete[] this->vMFdata[m][l][i][j];
-				}
-				delete[] this->vMFdata[m][l][i];
-			}
-			delete[] this->vMFdata[m][l];
-		}
 		delete[] this->vMFdata[m];
 	}
 	delete[] this->vMFdata;
@@ -87,7 +76,87 @@ vMFtexture::~vMFtexture()
 
 
 //Parameter Functions
+void vMFtexture::generatevMFmaps()
+{
+	cv::Mat rawData = this->originalNormals[0].clone();
+	cv::Mat **vMFdata = this->vMFdata;
+	int mipmapLevel = this->mipmapLevel;
+	int numLobes = this->numLobes;
+	int width = this->oWidth; int height = this->oHeight;
 
+	float **aux= new float*[numLobes];
+	float *alpha = new float[numLobes];
+	for (int l = 0; l < numLobes; l++)
+	{
+		aux[l] = new float[3];
+	}
+
+	//Seed Level
+
+	for (int i = 0; i < width; i++)
+	{
+		for (int j = 0; j < height; j++)
+		{
+			cv::Vec4f temp;
+			temp[0] = 1;
+			temp[1] = rawData.at<cv::Vec3f>(j, i)[0];
+			temp[2] = rawData.at<cv::Vec3f>(j, i)[1];
+			temp[3] = rawData.at<cv::Vec3f>(j, i)[2];
+			vMFdata[0][0].at<cv::Vec4f>(j, i) = temp;
+		}
+	}
+	for (int l = 1; l < numLobes; l++)
+	{
+		for (int i = 0; i < width; i++)
+		{
+			for (int j = 0; j < height; j++)
+			{
+				cv::Vec4f temp;
+				temp[0] = 0;
+				temp[1] = 0;
+				temp[2] = 0;
+				temp[3] = 0;
+				vMFdata[0][l].at<cv::Vec4f>(j, i) = temp;
+			}
+		}
+	}
+
+	for (int m = 1; m < mipmapLevel; m++)
+	{
+		width = this->vWidth[m]; height = this->vHeight[m];
+		int side = pow(2, m);
+		for (int w = 0; w < width; w++)
+		{
+			for (int h = 0; h < height; h++)
+			{
+				cv::Rect ROI(w*side, h*side, side, side);
+				cv::Mat targetRegion; float prevData[4][4];
+				targetRegion = originalNormals[0](ROI).clone();
+
+				//prevData for mu initialization
+				this->computeParameters(alpha, aux, targetRegion, prevData);
+
+				//alignment between neighboring pixels of same mipmap level
+
+				for (int l = 0; l < numLobes; l++)
+				{
+				}
+			}
+		}
+	}
+
+
+	for (int l = 0; l < numLobes; l++)
+	{
+		delete[] aux[l];
+	}
+	delete[] aux; delete[] alpha;
+}
+
+void vMFtexture::computeParameters(float alpha, float aux[3], int m, int l, cv::Mat targetRegion, float prevData[4][4])
+{
+	
+}
 
 //display Functions
 void vMFtexture::showOriginalImage(int channel) const
@@ -225,4 +294,26 @@ FIBITMAP* vMFfunc::LoadImage(const char* filename, int &imageWidth, int &imageHe
 
 	return bitmap32;
 
+}
+
+//vectorFunc
+void vectorFunc::normalize(float input[3])
+{
+	int counter = 0;
+	float norm = vectorFunc::norm(input);
+	while ((vectorFunc::norm(input) > 1.f)||(counter++>=4))
+	{
+		input[0] /= norm;
+		input[1] /= norm;
+		input[2] /= norm;
+		norm = vectorFunc::norm(input);
+	}
+	if (vectorFunc::norm(input)>1.f)
+	{
+		std::cout << "\nWarning! Normalized vector is larger than 1\n";
+	}
+}
+float vectorFunc::norm(float input[3])
+{
+	return sqrt((input[0] * input[0]) + (input[1] * input[1]) + (input[2] * input[2]));
 }

@@ -111,33 +111,12 @@ void main(void)
 		Bs=((sPrime+1.0)/(2.0*PI))*pow(HdotMu, sPrime);
 		float LdotMu=max(dot(lightDir,mu),0.0);
 		effBRDF+=(alpha*(Ks*Bs+Kd*LdotMu));
-
-//		alpha=coeffs[i].x;
-//		mu=2.0*coeffs[i].yzw-1.0;
-//		mu/=alpha;
-//		r=length(mu);
-//		mu=normalize(mu);
-//		kappa=(3.0*r-r*r*r)/(1.0-r*r);
-//
-//		sPrime=kappa*BPexp/(kappa+BPexp);
-//		float norm=(sPrime+1.0)/(2.0*PI);
-//		Bs=dot(h,mu);
-//		Bs=pow(Bs,sPrime);
-//		Bs*=norm;
-//		float LdotMu=max(dot(lightDir,mu), 0.0);
-//
-//		effBRDF.xyz+=alpha*((Ks.xyz*Bs+Kd.xyz)*LdotMu);
-//		color+=vec4(LdotMu,LdotMu,LdotMu,0);
 	}
 
 	switch(renderScene){
 		case 0:
 		{
 			color=(lightIntensity*effBRDF);
-//			color+=(lightIntensity*Ka);
-//			color=(lightIntensity*Ka);
-//			color.rgb=texture2D(vMFmap1, fs_in.texCoord.xy).yzw;
-
 			break;
 		}
 		case 1:
@@ -158,14 +137,4 @@ void main(void)
 		}
 	}
 
-
-//	color=vec4(1.0*effBRDF.x, -1.0*effBRDF.x, -1.5, 1.0);
-
-//	color=vec4(10.1,1.1,1.1,1.0);
-//	color=vec4(h,0.0);
-
-//	color+=vec4(h,0.0);
-
-//	color=vec4(lightDir, 0.0);
-//	color=vec4(numLobes/, 0, 0, 0);
 }

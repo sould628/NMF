@@ -15,12 +15,13 @@ private:
 	cv::Mat originalNormals[2];
 	
 	int oWidth, oHeight;
-	float *****vMFdata;
+	cv::Mat **vMFdata;
 	int *vWidth, *vHeight;
 	int numLobes;
 	int mipmapLevel;
 	int *vMFmaps; //glGenerate
 
+	void computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][4];);
 
 
 public:
@@ -28,6 +29,7 @@ public:
 	vMFtexture(const char* filename, int numLobes = 4, int mipmapLevel = -1);
 	~vMFtexture();
 	void showOriginalImage(int channel = -1) const;
+	void generatevMFmaps();
 };
 
 
@@ -39,7 +41,7 @@ namespace vMFfunc {
 
 namespace vectorFunc
 {
-	void normalize();
-
+	void normalize(float input[3]);
+	float norm(float input[3]);
 
 }

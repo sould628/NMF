@@ -1713,7 +1713,8 @@ int main(int argc, char** argv){
 	objData = new objLoader();
 	objData->load("./cube.obj");
 
-	cVMFtex.showOriginalImage(1);
+	cVMFtex.showOriginalImage(0);
+	cVMFtex.generatevMFmaps();
 
 	
 	NMTdata = vMFfunc::LoadImage(NMT, NMwidth, NMheight);

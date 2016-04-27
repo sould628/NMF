@@ -17,7 +17,7 @@ namespace {
 		namespace destroy { enum Type { yes, no }; };
 	}
 
-	void displayImage(const char *windowName, cv::Mat imgToshow, int skip = 0, int flag = 0)
+	void displayImage(const char *windowName, cv::Mat imgToshow, int skip = 1, int flag = 0)
 	{
 
 		char key = 0;
