@@ -34,7 +34,7 @@ in VS_OUT{
 out vec4 color;
 
 
-vec4 lightIntensity=vec4(1.0f, 1.0f, 1.f, 1.0f);
+vec4 lightIntensity=vec4(4.0f, 4.0f, 4.f, 1.0f);
 
 vec4 Kd=vec4(0.2f,0.2f,0.2f,1.0f);
 vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
@@ -103,7 +103,7 @@ void main(void)
 		alpha=coeffs[i].x;
 		aux=coeffs[i].yzw/max(alpha,0.001);
 		r=length(aux);
-		kappa=((3*r)-(r*r*r))/(1.0-(r*r));
+		kappa=((3*r)-(r*r*r))/max(0.01, (1.0-(r*r)));
 		mu=normalize(aux);
 
 		sPrime=(kappa*BPexp)/(kappa+BPexp);
@@ -136,5 +136,8 @@ void main(void)
 			}
 		}
 	}
-
+//	color.rgb=texture2D(vMFmap1, fs_in.texCoord.xy).gba;
+//	color.a=1;
+//	color.rgb=textureLod(vMFmap1, fs_in.texCoord.xy, 2).gba;
+//	color.a=1;
 }
