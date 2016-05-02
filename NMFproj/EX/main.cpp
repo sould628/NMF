@@ -70,7 +70,7 @@ time_t sysTime, currentTime;
 float* alpha;
 float** aux;
 
-vMFtexture cVMFtex(NMT);
+vMFtexture cVMFtex(NMT, 5);
 
 static const float exampleData[] =
 {
@@ -170,12 +170,13 @@ int vMFparam2(float** data, float*** target, int curWidth, int curHeight, int cu
 		for (int j = 0; j < 4; j++)
 		{
 			iaux[i][j][0] = target[mipmapLevel - 1][i][(curHeight*curMipmapWidth * 4 + curWidth * 4) * 2 + 1];
-			iaux[i][j][1] = target[mipmapLevel - 1][i][(curHeight*curMipmapWidth * 4 + curWidth * 4) * 2 * 2];
-			iaux[i][j][2] = target[mipmapLevel - 1][i][(curHeight*curMipmapWidth * 4 + curWidth * 4) * 2 * 2];
+			iaux[i][j][1] = target[mipmapLevel - 1][i][(curHeight*curMipmapWidth * 4 + curWidth * 4) * 2 + 2];
+			iaux[i][j][2] = target[mipmapLevel - 1][i][(curHeight*curMipmapWidth * 4 + curWidth * 4) * 2 + 3];
 			ialpha[i][j] = target[mipmapLevel - 1][i][(curHeight*curMipmapWidth * 4 + curWidth * 4) * 2 + 0];
 		}
-		normalize(iaux[i][0], mu[i]);
+		normalize(iaux[i][i], mu[i]);
 	}
+
 
 
 	//Initial Guess Stage (mu, kappa)
@@ -614,7 +615,6 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float alignCtrl){
 		//////////////////////////////////////
 		default://ii >0
 		{
-			break;
 			if (mipmapHeight > 1)
 				mipmapHeight /= 2;
 			if (mipmapWidth > 1)
@@ -1279,7 +1279,7 @@ void initBuffers() {
 
 	
 //	generatevMFmap(textureData, numLobes, alpha, aux, alignCtrl);
-	generatevMFmap2(textureData, numLobes, alignCtrl);
+//	generatevMFmap2(textureData, numLobes, alignCtrl);
 
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);

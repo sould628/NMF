@@ -98,10 +98,10 @@ void vMFtexture::generatevMFmaps()
 		for (int j = 0; j < height; j++)
 		{
 			cv::Vec4f temp;
-			temp[0] = 1;
-			temp[1] = rawData.at<cv::Vec3f>(j, i)[0];
-			temp[2] = rawData.at<cv::Vec3f>(j, i)[1];
-			temp[3] = rawData.at<cv::Vec3f>(j, i)[2];
+			temp[3] = 1;
+			temp[0] = rawData.at<cv::Vec3f>(j, i)[0];
+			temp[1] = rawData.at<cv::Vec3f>(j, i)[1];
+			temp[2] = rawData.at<cv::Vec3f>(j, i)[2];
 			vMFdata[0][0].at<cv::Vec4f>(j, i) = temp;
 		}
 	}
@@ -112,10 +112,10 @@ void vMFtexture::generatevMFmaps()
 			for (int j = 0; j < height; j++)
 			{
 				cv::Vec4f temp;
-				temp[0] = 0;
-				temp[1] = 0;
-				temp[2] = 0;
 				temp[3] = 0;
+				temp[0] = 0*rawData.at<cv::Vec3f>(j, i)[0];
+				temp[1] = 0*rawData.at<cv::Vec3f>(j, i)[1];
+				temp[2] = 0*rawData.at<cv::Vec3f>(j, i)[2];
 				vMFdata[0][l].at<cv::Vec4f>(j, i) = temp;
 			}
 		}
@@ -155,7 +155,34 @@ void vMFtexture::generatevMFmaps()
 
 void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][4])
 {
+	float mu[10][3], kappa[10];
+	int numLobes = this->numLobes;
+	int sideX = targetRegion.cols, sideY = targetRegion.rows;
+
+	//Initialization
+	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 300;
+	for (int i = 0; i < numLobes-1; i++)
+	{
+		mu[i+1][0] = cos(i*(2 * vmfPI) / (numLobes - 1));
+		mu[i+1][1] = sin(i*(2 * vmfPI) / (numLobes - 1));
+		mu[i+1][2] = 0.f;
+		kappa[i + 1] = 300.f;
+	}
+
+	for (int row = 0; row < sideY; row++)
+	{
+		for (int col = 0; col < sideX; col++)
+		{
+
+		}
+	}
 	
+
+	
+	//E
+
+
+	//M
 }
 
 //display Functions

@@ -138,6 +138,6 @@ void main(void)
 	}
 //	color.rgb=texture2D(vMFmap1, fs_in.texCoord.xy).gba;
 //	color.a=1;
-//	color.rgb=textureLod(vMFmap1, fs_in.texCoord.xy, 2).gba;
+//	color.rgb=textureLod(vMFmap1, fs_in.texCoord.xy, 1).gba;
 //	color.a=1;
 }
