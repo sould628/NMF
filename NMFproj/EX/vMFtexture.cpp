@@ -158,31 +158,89 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 	float mu[10][3], kappa[10];
 	int numLobes = this->numLobes;
 	int sideX = targetRegion.cols, sideY = targetRegion.rows;
+	int area = sideX*sideY;
+	float **z;
 
+	z = new float*[numLobes];
+	for (int j = 0; j < numLobes; j++)
+	{
+		z[j] = new float[area];
+		for (int i = 0; i < area; i++)
+		{
+			z[j][i] = 0.f;
+		}
+	}
 	//Initialization
 	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 300;
 	for (int i = 0; i < numLobes-1; i++)
-	{
+	{ 
 		mu[i+1][0] = cos(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][1] = sin(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][2] = 0.f;
-		kappa[i + 1] = 300.f;
+		kappa[i + 1] = 10.f;
 	}
 
+
+	//E
 	for (int row = 0; row < sideY; row++)
 	{
 		for (int col = 0; col < sideX; col++)
 		{
-
+			cv::Vec3f Vec3_ni = targetRegion.at<cv::Vec3f>(row, col);
+			float float_ni[3] = { Vec3_ni[0], Vec3_ni[1], Vec3_ni[2] };
+			float zsum = 0;
+			for (int j = 0; j < numLobes; j++)
+			{
+				zsum += vMFfunc::vMF(float_ni, mu[j], kappa[j]);
+			}
+			if (zsum < 0.0001)
+			{
+				std::cout << "too small zsum\n";
+			}
+			for (int j = 0; j < numLobes; j++)
+			{
+				z[j][sideX*col + col] = vMFfunc::vMF(float_ni, mu[j], kappa[j])/zsum;
+			}
 		}
 	}
+	//E End
 	
-
-	
-	//E
-
-
 	//M
+	bool converge = false;
+	while (!converge)
+	{
+		float zj[10] = { 0.f };
+		cv::Vec3f znj[10] = { 0.f };
+		for (int j = 0; j < numLobes; j++)
+		{
+			for (int row = 0; row < sideY; row++)
+			{
+				for (int col = 0; col < sideX; col++)
+				{
+					cv::Vec3f Vec3_ni = targetRegion.at<cv::Vec3f>(row, col);
+					zj[j] += z[j][sideX*col + col];
+					znj[j] += z[j][sideX*col + col] * Vec3_ni;
+				}
+			}
+		}
+
+		//Alpha
+		for (j = 0; j < numLobes; j++)
+		{
+
+			alpha[j] = zj[j] / area;
+		}
+
+		//Gamma
+	}
+
+
+
+	for (int i = 0; i < numLobes; i++)
+	{
+		delete[] z[i];
+	}
+	delete[] z;
 }
 
 //display Functions

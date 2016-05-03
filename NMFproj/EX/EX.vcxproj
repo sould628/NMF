@@ -83,7 +83,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="generatevMF.cpp" />
     <ClCompile Include="include\list.cpp" />
     <ClCompile Include="include\objLoader.cpp" />
     <ClCompile Include="include\obj_parser.cpp" />
@@ -92,7 +91,6 @@
     <ClCompile Include="vMFtexture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="generatevMF.h" />
     <ClInclude Include="globalVariables.h" />
     <ClInclude Include="GLSLProgram.h" />
     <ClInclude Include="include\Camera.h" />

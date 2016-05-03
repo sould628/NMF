@@ -12,6 +12,7 @@
 
 class vMFtexture {
 private:
+	//Vec3f
 	cv::Mat originalNormals[2];
 	
 	int oWidth, oHeight;
