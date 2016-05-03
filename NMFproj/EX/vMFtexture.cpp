@@ -124,6 +124,7 @@ void vMFtexture::generatevMFmaps()
 	for (int m = 1; m < mipmapLevel; m++)
 	{
 		width = this->vWidth[m]; height = this->vHeight[m];
+		std::cout << "Proceeding mipmap level " << m << " generagion (" << width << ", " << height << ")\n";
 		int side = pow(2, m);
 		for (int w = 0; w < width; w++)
 		{
@@ -140,6 +141,12 @@ void vMFtexture::generatevMFmaps()
 
 				for (int l = 0; l < numLobes; l++)
 				{
+					cv::Vec4f computeData;
+					computeData[0] = alpha[l];
+					computeData[1] = aux[l][0];
+					computeData[2] = aux[l][1];
+					computeData[3] = aux[l][2];
+					vMFdata[m][l].at<cv::Vec4f>(w, h) = computeData;
 				}
 			}
 		}
@@ -155,6 +162,8 @@ void vMFtexture::generatevMFmaps()
 
 void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][4])
 {
+	int iteration = 0;
+
 	float mu[10][3], kappa[10];
 	int numLobes = this->numLobes;
 	int sideX = targetRegion.cols, sideY = targetRegion.rows;
@@ -210,7 +219,7 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 	while (!converge)
 	{
 		float zj[10] = { 0.f };
-		cv::Vec3f znj[10] = { 0.f };
+		cv::Vec3f Vec3_znj[10] = { 0.f };
 		for (int j = 0; j < numLobes; j++)
 		{
 			for (int row = 0; row < sideY; row++)
@@ -219,19 +228,30 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 				{
 					cv::Vec3f Vec3_ni = targetRegion.at<cv::Vec3f>(row, col);
 					zj[j] += z[j][sideX*col + col];
-					znj[j] += z[j][sideX*col + col] * Vec3_ni;
+					Vec3_znj[j] += z[j][sideX*col + col] * Vec3_ni;
 				}
 			}
 		}
 
+		cv::Vec3f Vec3_aux[10];
 		//Alpha
-		for (j = 0; j < numLobes; j++)
+		for (int j = 0; j < numLobes; j++)
 		{
 
 			alpha[j] = zj[j] / area;
+			Vec3_aux[j] = Vec3_znj[j] / zj[j];
+			aux[j][0] = Vec3_aux[j][0];
+			aux[j][1] = Vec3_aux[j][1];
+			aux[j][2] = Vec3_aux[j][2];
+			float lenAux = vectorFunc::norm(aux[j]);
+			kappa[j] = ((3 * lenAux) - (lenAux*lenAux*lenAux)) / ((1 - lenAux)*(1 - lenAux));
+			mu[j][0] = aux[j][0];
+			mu[j][1] = aux[j][1];
+			mu[j][2] = aux[j][2];
+			vectorFunc::normalize(mu[j]);
 		}
-
-		//Gamma
+		if (iteration++ == 10)
+			converge = true;
 	}
 
 
@@ -310,6 +330,20 @@ void vMFtexture::showOriginalImage(int channel) const
 	cv::destroyWindow("originalImage");
 
 	return;
+}
+void vMFtexture::showvMFImage(int level, int lobe, int mode) const
+{
+	cv::namedWindow("vMF"); cv::namedWindow("vMF", CV_WINDOW_NORMAL);
+	cv::Mat **data = this->vMFdata;
+	char key = 0;
+
+	while (key != myESC)
+	{
+		cv::imshow("vMF", data[level][lobe]);
+		key=cv::waitKey();
+
+	}
+	cv::destroyWindow("vMF");
 }
 
 

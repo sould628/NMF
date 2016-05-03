@@ -1734,6 +1734,7 @@ int main(int argc, char** argv){
 	cVMFtex.showOriginalImage(0);
 	cVMFtex.generatevMFmaps();
 
+	cVMFtex.showvMFImage(2, 0, 0);
 	
 	NMTdata = vMFfunc::LoadImage(NMT, NMwidth, NMheight);
 

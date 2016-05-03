@@ -29,6 +29,7 @@ public:
 	vMFtexture();
 	vMFtexture(const char* filename, int numLobes = 4, int mipmapLevel = -1);
 	~vMFtexture();
+	void showvMFImage(int level, int lobe, int mode=0) const;
 	void showOriginalImage(int channel = -1) const;
 	void generatevMFmaps();
 };
