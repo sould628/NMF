@@ -32,6 +32,22 @@ public:
 	void showvMFImage(int level, int lobe, int mode=0) const;
 	void showOriginalImage(int channel = -1) const;
 	void generatevMFmaps();
+
+public:
+	int getWidth(int level) const {
+		if (level > mipmapLevel - 1) { std::cout << "error\n"; return 0; }
+		else return vWidth[level];
+	}
+	int getHeight(int level) const {
+		if (level > mipmapLevel - 1) { std::cout << "error\n"; return 0; }
+		else return vHeight[level];
+	}
+	int getMipmapLevel() const { return mipmapLevel; }
+	int getNumLobes() const { return numLobes; }
+	float getvMFcompoenent(int level, int lobe, int w, int h, int c) const
+	{
+		return vMFdata[level][lobe].at<cv::Vec4f>(w, h)[c];
+	}
 };
 
 

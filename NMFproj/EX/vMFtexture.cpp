@@ -342,6 +342,35 @@ void vMFtexture::showvMFImage(int level, int lobe, int mode) const
 		cv::imshow("vMF", data[level][lobe]);
 		key=cv::waitKey();
 
+		switch (key)
+		{
+		case '.':case'>':
+			if (level == mipmapLevel-1)
+				level = 0;
+			else
+				level++;
+			break;
+		case ',':case'<':
+			if (level == 0)
+				level = mipmapLevel-1;
+			else
+				level--;
+			break;
+		case 'n':
+			if (lobe == numLobes - 1)
+				lobe = 0;
+			else
+				lobe++;
+			break;
+		case'b':
+			if (lobe == 0)
+				lobe = numLobes - 1;
+			else
+				lobe--;
+			break;
+		default:
+			break;
+		}
 	}
 	cv::destroyWindow("vMF");
 }
