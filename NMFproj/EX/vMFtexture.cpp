@@ -98,10 +98,10 @@ void vMFtexture::generatevMFmaps()
 		for (int j = 0; j < height; j++)
 		{
 			cv::Vec4f temp;
-			temp[3] = 1;
-			temp[0] = rawData.at<cv::Vec3f>(j, i)[0];
-			temp[1] = rawData.at<cv::Vec3f>(j, i)[1];
-			temp[2] = rawData.at<cv::Vec3f>(j, i)[2];
+			temp[0] = 1;
+			temp[1] = rawData.at<cv::Vec3f>(j, i)[0];
+			temp[2] = rawData.at<cv::Vec3f>(j, i)[1];
+			temp[3] = rawData.at<cv::Vec3f>(j, i)[2];
 			vMFdata[0][0].at<cv::Vec4f>(j, i) = temp;
 		}
 	}
@@ -112,10 +112,10 @@ void vMFtexture::generatevMFmaps()
 			for (int j = 0; j < height; j++)
 			{
 				cv::Vec4f temp;
-				temp[3] = 0;
-				temp[0] = 0*rawData.at<cv::Vec3f>(j, i)[0];
-				temp[1] = 0*rawData.at<cv::Vec3f>(j, i)[1];
-				temp[2] = 0*rawData.at<cv::Vec3f>(j, i)[2];
+				temp[0] = 0;
+				temp[1] = 0*rawData.at<cv::Vec3f>(j, i)[0];
+				temp[2] = 0*rawData.at<cv::Vec3f>(j, i)[1];
+				temp[3] = 0*rawData.at<cv::Vec3f>(j, i)[2];
 				vMFdata[0][l].at<cv::Vec4f>(j, i) = temp;
 			}
 		}
@@ -143,10 +143,10 @@ void vMFtexture::generatevMFmaps()
 				{
 					cv::Vec4f computeData;
 					computeData[0] = alpha[l];
-					computeData[1] = aux[l][0];
-					computeData[2] = aux[l][1];
-					computeData[3] = aux[l][2];
-					vMFdata[m][l].at<cv::Vec4f>(w, h) = computeData;
+					computeData[1] = alpha[l]*aux[l][0];
+					computeData[2] = alpha[l] * aux[l][1];
+					computeData[3] = alpha[l] * aux[l][2];
+					vMFdata[m][l].at<cv::Vec4f>(h, w) = computeData;
 				}
 			}
 		}

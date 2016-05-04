@@ -709,10 +709,10 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 			{
 				for (int i = 0; i < cWidth; i++)
 				{
-					vMFtextureData[4 * (j*cWidth + i) + 0] = cVMFtex.getvMFcompoenent(m, l, i, j, 0);
-					vMFtextureData[4 * (j*cWidth + i) + 1] = cVMFtex.getvMFcompoenent(m, l, i, j, 1);
-					vMFtextureData[4 * (j*cWidth + i) + 2] = cVMFtex.getvMFcompoenent(m, l, i, j, 2);
-					vMFtextureData[4 * (j*cWidth + i) + 3] = cVMFtex.getvMFcompoenent(m, l, i, j, 3);
+					vMFtextureData[4 * (j*cWidth + i) + 0] = cVMFtex.getvMFcompoenent(m, l, j, i, 0);
+					vMFtextureData[4 * (j*cWidth + i) + 1] = cVMFtex.getvMFcompoenent(m, l, j, i, 1);
+					vMFtextureData[4 * (j*cWidth + i) + 2] = cVMFtex.getvMFcompoenent(m, l, j, i, 2);
+					vMFtextureData[4 * (j*cWidth + i) + 3] = cVMFtex.getvMFcompoenent(m, l, j, i, 3);
 				}
 			}
 
