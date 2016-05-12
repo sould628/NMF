@@ -70,7 +70,7 @@ time_t sysTime, currentTime;
 float* alpha;
 float** aux;
 
-vMFtexture cVMFtex(NMT, 5);
+vMFtexture cVMFtex(NMT, 7);
 
 static const float exampleData[] =
 {

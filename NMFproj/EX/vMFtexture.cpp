@@ -12,12 +12,23 @@ vMFtexture::vMFtexture(const char* filename, int numLobes, int mipmapLevel)
 	this->numLobes = numLobes;
 
 	this->originalNormals[1] = vMFfunc::cvLoadImage(filename, this->oWidth, this->oHeight);
+
+	float resizeFactx, resizeFacty;
+
+	resizeFactx = 256.f/(float)oWidth; resizeFacty = 256.f / (float)oHeight;
+
+	oWidth = 256; oHeight = 256;
+
+	cv::resize(originalNormals[1], originalNormals[1], cv::Size(), resizeFactx, resizeFacty);
+
+
 	std::vector<cv::Mat> change(3); cv::split(this->originalNormals[1], change);
 	cv::Mat temp = change[0].clone();
 	change[0] = change[2].clone();
 	change[2] = temp.clone();
 
 	merge(change, this->originalNormals[1]);
+
 
 	this->originalNormals[0] = this->originalNormals[1].clone();
 	std::vector<cv::Mat> spl(3); cv::split(this->originalNormals[0], spl);
@@ -92,16 +103,17 @@ void vMFtexture::generatevMFmaps()
 	}
 
 	//Seed Level
-
+	float seedAlpha = 1.f / numLobes;
+	float seedAlpha2 = 1.f / numLobes;
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < height; j++)
 		{
 			cv::Vec4f temp;
-			temp[0] = 1;
-			temp[1] = rawData.at<cv::Vec3f>(j, i)[0];
-			temp[2] = rawData.at<cv::Vec3f>(j, i)[1];
-			temp[3] = rawData.at<cv::Vec3f>(j, i)[2];
+			temp[0] = seedAlpha;
+			temp[1] = seedAlpha*rawData.at<cv::Vec3f>(j, i)[0];
+			temp[2] = seedAlpha*rawData.at<cv::Vec3f>(j, i)[1];
+			temp[3] = seedAlpha*rawData.at<cv::Vec3f>(j, i)[2];
 			vMFdata[0][0].at<cv::Vec4f>(j, i) = temp;
 		}
 	}
@@ -112,10 +124,10 @@ void vMFtexture::generatevMFmaps()
 			for (int j = 0; j < height; j++)
 			{
 				cv::Vec4f temp;
-				temp[0] = 0;
-				temp[1] = 0*rawData.at<cv::Vec3f>(j, i)[0];
-				temp[2] = 0*rawData.at<cv::Vec3f>(j, i)[1];
-				temp[3] = 0*rawData.at<cv::Vec3f>(j, i)[2];
+				temp[0] = seedAlpha2;
+				temp[1] = seedAlpha2*rawData.at<cv::Vec3f>(j, i)[0];
+				temp[2] = seedAlpha2*rawData.at<cv::Vec3f>(j, i)[1];
+				temp[3] = seedAlpha2*rawData.at<cv::Vec3f>(j, i)[2];
 				vMFdata[0][l].at<cv::Vec4f>(j, i) = temp;
 			}
 		}
