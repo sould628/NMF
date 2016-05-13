@@ -40,7 +40,7 @@ out vec4 color;
 vec4 lightIntensity=vec4(1.0f, 1.0f, 1.f, 1.0f);
 
 vec4 Kd=vec4(0.3f,0.3f,0.3f,1.0f);
-vec4 Ks=vec4(0.1f,0.1f,0.1f,1.0f);
+vec4 Ks=vec4(0.05f,0.05f,0.05f,1.0f);
 vec4 Ka=vec4(0.1f,0.1f,0.1f,1.0f);
 
 void main(void)

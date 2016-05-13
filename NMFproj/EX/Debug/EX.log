@@ -1,34 +1,18 @@
-﻿Build started 2016-05-13 오후 12:49:24.
-     1>Project "E:\Hyo\Github\NMF\NMFproj\EX\EX.vcxproj" on node 2 (Build target(s)).
-     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(388,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (NMF.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I./include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
-         main.cpp
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(18): warning C4091: 'typedef ' : ignored on left of 'obj_face' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(27): warning C4091: 'typedef ' : ignored on left of 'obj_sphere' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(36): warning C4091: 'typedef ' : ignored on left of 'obj_plane' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(41): warning C4091: 'typedef ' : ignored on left of 'obj_vector' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(57): warning C4091: 'typedef ' : ignored on left of 'obj_material' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(64): warning C4091: 'typedef ' : ignored on left of 'obj_camera' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(70): warning C4091: 'typedef ' : ignored on left of 'obj_light_point' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(77): warning C4091: 'typedef ' : ignored on left of 'obj_light_disc' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(83): warning C4091: 'typedef ' : ignored on left of 'obj_light_quad' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(106): warning C4091: 'typedef ' : ignored on left of 'obj_growable_scene_data' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\obj_parser.h(139): warning C4091: 'typedef ' : ignored on left of 'obj_scene_data' when no variable is declared
-     1>e:\hyo\github\nmf\nmfproj\ex\include\opencv2\core\mat.hpp(1914): warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
-     1>e:\hyo\github\nmf\nmfproj\ex\include\opencv2\core\persistence.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
-     1>e:\hyo\github\nmf\nmfproj\ex\include\opencv2\core\utility.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
-     1>e:\hyo\github\nmf\nmfproj\ex\glslprogram.h(29): warning C4715: 'GLSLProgram::readFromFile' : not all control paths return a value
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"./bin/EX.exe" /INCREMENTAL /NOLOGO /LIBPATH:./lib opencv_ts310d.lib opencv_world310d.lib FreeImage.lib glut32.lib glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"./bin/EX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"./bin/EX.lib" /MACHINE:X86 Debug\list.obj
-         Debug\objLoader.obj
-         Debug\obj_parser.obj
-         Debug\string_extra.obj
-         Debug\main.obj
-         Debug\vMFtexture.obj
-         EX.vcxproj -> E:\Hyo\Github\NMF\NMFproj\EX\./bin/EX.exe
-     1>Done Building Project "E:\Hyo\Github\NMF\NMFproj\EX\EX.vcxproj" (Build target(s)).
-
-Build succeeded.
-
-Time Elapsed 00:00:01.27
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(388,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (NMF.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  main.cpp
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(18): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_face' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(27): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_sphere' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(36): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_plane' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(41): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_vector' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(57): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_material' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(64): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_camera' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(70): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_point' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(77): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_disc' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(83): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_quad' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(106): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_growable_scene_data' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(139): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_scene_data' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\mat.hpp(1914): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\persistence.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\utility.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\glslprogram.h(29): warning C4715: 'GLSLProgram::readFromFile' : 모든 제어 경로에서 값을 반환하지는 않습니다.
+  EX.vcxproj -> C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\./bin/EX.exe

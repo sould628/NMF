@@ -3,7 +3,7 @@
 #define MAXITERATION 10
 
 
-extern const char* NMT = "./1.jpg";
+extern const char* NMT = "./2.jpg";
 extern const int numLobes = 7;
 extern const int textLobes = 4;
 extern int MipMapLevel = 3;
