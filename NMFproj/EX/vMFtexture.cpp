@@ -105,6 +105,8 @@ void vMFtexture::generatevMFmaps()
 	//Seed Level
 	float seedAlpha = 1.f / numLobes;
 	float seedAlpha2 = 1.f / numLobes;
+	seedAlpha = 1.f;
+	seedAlpha2 = 0.f;
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < height; j++)

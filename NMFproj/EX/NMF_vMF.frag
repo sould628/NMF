@@ -1,6 +1,9 @@
 #version 450 core
 
 layout (binding=0) uniform sampler2D original;
+layout (binding=8) uniform sampler2D vMFmap8;
+layout (binding=7) uniform sampler2D vMFmap7;
+layout (binding=6) uniform sampler2D vMFmap6;
 layout (binding=5) uniform sampler2D vMFmap5;
 layout (binding=4) uniform sampler2D vMFmap4;
 layout (binding=3) uniform sampler2D vMFmap3;
@@ -34,7 +37,7 @@ in VS_OUT{
 out vec4 color;
 
 
-vec4 lightIntensity=vec4(4.0f, 4.0f, 4.f, 1.0f);
+vec4 lightIntensity=vec4(1.0f, 1.0f, 1.f, 1.0f);
 
 vec4 Kd=vec4(0.3f,0.3f,0.3f,1.0f);
 vec4 Ks=vec4(0.1f,0.1f,0.1f,1.0f);
@@ -80,14 +83,17 @@ void main(void)
 
 	h=normalize(-eyeDir+lightDir);
 	
-	vec4 coeffs[6];
+	vec4 coeffs[10];
 	coeffs[0]=texture2D(vMFmap1, fs_in.texCoord.xy);
 	coeffs[1]=texture2D(vMFmap2, fs_in.texCoord.xy);
 	coeffs[2]=texture2D(vMFmap3, fs_in.texCoord.xy);
 	coeffs[3]=texture2D(vMFmap4, fs_in.texCoord.xy);
 	coeffs[4]=texture2D(vMFmap5, fs_in.texCoord.xy);
+	coeffs[5]=texture2D(vMFmap6, fs_in.texCoord.xy);
+	coeffs[6]=texture2D(vMFmap7, fs_in.texCoord.xy);
+	coeffs[7]=texture2D(vMFmap8, fs_in.texCoord.xy);
 
-	for(int i=0; i<2; i++)
+	for(int i=0; i<numLobes; i++)
 	{
 
 		float alpha=0.0;
