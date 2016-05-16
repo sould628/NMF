@@ -140,12 +140,38 @@ void vMFtexture::generatevMFmaps()
 		width = this->vWidth[m]; height = this->vHeight[m];
 		std::cout << "Proceeding mipmap level " << m << " generagion (" << width << ", " << height << ")\n";
 		int side = pow(2, m);
+
 		for (int w = 0; w < width; w++)
 		{
 			for (int h = 0; h < height; h++)
 			{
+				float tKappa = { 0.f };
+				float tR[3] = { 0.f };
+				float prevData[4][10][4];
+				for (int i = 0; i < 4; i++)
+				{
+					for (int l = 0; l < numLobes; l++)
+					{
+						cv::Vec4f temp = vMFdata[m - 1][l].at<cv::Vec4f>(h * 2 + (i % 2), w * 2 + (int)(i / 2));
+						if (temp[0] != 0)
+						{
+							temp[1] /= temp[0]; temp[2] /= temp[0]; temp[3] /= temp[0];
+							tR[0] = temp[1]; tR[1] = temp[2]; tR[2] = temp[3];
+							tKappa = vMFfunc::r2kappa(tR);
+							vectorFunc::normalize(tR);
+						}
+						else
+						{
+							tKappa = 0.f;
+							tR[0] = 0.f; tR[1] = 0.f; tR[2] = 0.f;
+						}
+
+						prevData[i][l][0] = tR[0]; prevData[i][l][1] = tR[1]; prevData[i][l][2] = tR[2];
+						prevData[i][l][3] = tKappa;
+					}
+				}
 				cv::Rect ROI(w*side, h*side, side, side);
-				cv::Mat targetRegion; float prevData[4][4];
+				cv::Mat targetRegion; 
 				targetRegion = originalNormals[0](ROI).clone();
 
 				//prevData for mu initialization
@@ -174,7 +200,7 @@ void vMFtexture::generatevMFmaps()
 	delete[] aux; delete[] alpha;
 }
 
-void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][4])
+void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][10][4])
 {
 	int iteration = 0;
 
@@ -192,6 +218,23 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		{
 			z[j][i] = 0.f;
 		}
+	}
+
+	//find suitable initial value
+	int numLobes2bUsed[4] = { 0.f };
+	int ind2bUsed[4][10];
+	for (int i = 0; i < 4; i++)
+	{
+		int count = 0;
+		for (int l = 0; l < this->numLobes; l++)
+		{
+			if (prevData[i][l][3] != 0)
+			{
+				ind2bUsed[i][count] = l;
+				count++;
+			}
+		}
+		numLobes2bUsed[i] = count;
 	}
 	//Initialization
 	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 11.f;
@@ -220,7 +263,7 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 				}
 				if (zsum < 0.0001)
 				{
-//					std::cout << "too small zsum\n";
+					std::cout << "too small zsum\n";
 				}
 				for (int j = 0; j < numLobes; j++)
 				{
@@ -390,6 +433,13 @@ void vMFtexture::showvMFImage(int level, int lobe, int mode) const
 
 
 //vMFfunc
+float vMFfunc::r2kappa(float r[3])
+{
+	float result = 0.f;
+	float normR = vectorFunc::norm(r);
+	result = ((3 * normR) - (normR*normR*normR)) / (1 - (normR*normR));
+	return result;
+}
 cv::Mat vMFfunc::cvLoadImage(const char* filename, int &imageWidth, int &imageHeight)
 {
 	cv::Mat load, floatScale;

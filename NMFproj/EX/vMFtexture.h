@@ -22,7 +22,7 @@ private:
 	int mipmapLevel;
 	int *vMFmaps; //glGenerate
 
-	void computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][4]);
+	void computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][10][4]);
 
 
 public:
@@ -55,6 +55,7 @@ namespace vMFfunc {
 	extern FIBITMAP* LoadImage(const char* filename, int &imageWidth, int &imageHeight);
 	extern cv::Mat cvLoadImage(const char* filename, int &imageWidth, int &imageHeight);
 	extern float vMF(float normal[3], float mu[3], float kappa);
+	extern float r2kappa(float r[3]);
 }
 
 namespace vectorFunc
