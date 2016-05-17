@@ -236,10 +236,25 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		}
 		numLobes2bUsed[i] = count;
 	}
+
+	initGraph graph;
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < numLobes2bUsed[i]; j++)
+		{
+			int indUsed = ind2bUsed[i][j];
+			int indkey[2] = { i, indUsed };
+			float pos[3] = { prevData[i][indUsed][0], prevData[i][indUsed][1],prevData[i][indUsed][2] };
+			Node *nodePtr = new Node(indkey, pos);
+			graph.addNode(nodePtr);
+			graph.makeComplete();
+		}
+	}
+
 	//Initialization
 	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 11.f;
 	for (int i = 0; i < numLobes-1; i++)
-	{ 
+	{
 		mu[i+1][0] = cos(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][1] = sin(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][2] = 0.f;
@@ -274,7 +289,6 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		//E End
 
 		//M
-
 		float zj[10] = { 0.f };
 		cv::Vec3f Vec3_znj[10] = { 0.f };
 		for (int j = 0; j < numLobes; j++)
@@ -528,3 +542,49 @@ float vectorFunc::norm(float input[3])
 {
 	return sqrt((input[0] * input[0]) + (input[1] * input[1]) + (input[2] * input[2]));
 }
+
+//graphFunc
+extern float graphFunc::calcWeight(Node* n1, Node* n2)
+{
+	float pos1[3] = { n1->pos[0],n1->pos[1],n1->pos[2] };
+	float pos2[3] = { n2->pos[0],n2->pos[1],n2->pos[2] };
+
+	float weight = sqrt(((pos1[0] - pos2[0])*(pos1[0] - pos2[0]))
+		+ ((pos1[1] - pos2[1])*(pos1[1] - pos2[1]))
+		+ ((pos1[2] - pos2[2])*(pos1[2] - pos2[2]))
+		);
+	return weight;
+}
+
+void initGraph::makeComplete()
+{
+	sortedEdgeList.clear();
+
+	int numNodes = this->numNodes;
+	for (int i = 0; i < numNodes; i++)
+	{
+		Node* curNode;
+		curNode = (Node*)this->getNode(i);
+		curNode->edges.clear();
+	}
+
+	std::vector<float> weightList;
+	for (int i = 0; i < numNodes; i++)
+	{
+		Node* curNode;
+		curNode = (Node*)this->getNode(i);
+		for (int j = 0; j < numNodes; j++)
+		{
+			if (i == j)
+				continue;
+			Node* neighbor = (Node*)this->getNode(j);
+
+			float weight=graphFunc::calcWeight(curNode, neighbor);
+
+			Edge* edge = new Edge(neighbor, weight);
+			
+		}
+	}
+
+}
+

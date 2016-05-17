@@ -10,6 +10,85 @@
 
 #define vmfPI 3.141592653589793f
 
+struct Node;
+struct Edge;
+
+
+
+struct Edge
+{
+	Node* nextNode;
+	float weight;
+
+	Edge(Node* nextNode, float weight)
+	{
+		this->nextNode = nextNode;
+		this->weight = weight;
+	}
+	
+};
+
+struct Node {
+
+	int indexKey[2];
+	float pos[3];
+	std::vector<Edge*> edges;
+
+	Node()
+	{
+		this->indexKey[0] = 0;
+		this->indexKey[1] = 0;
+		this->pos[0] = 0;
+		this->pos[1] = 0;
+		this->pos[2] = 0;
+	}
+	Node(int indexKey[2], float pos[3])
+	{
+		this->indexKey[0] = indexKey[0];
+		this->indexKey[1] = indexKey[1];
+		this->pos[0] = pos[0];
+		this->pos[1] = pos[1];
+		this->pos[2] = pos[2];
+	}
+	~Node() { this->edges.clear(); }
+	void setKey(int indexKey[2])
+	{
+		this->indexKey[0] = indexKey[0];
+		this->indexKey[1] = indexKey[1];
+	}
+	void addEdge(Edge* newedge)
+	{
+		edges.push_back(newedge);
+	}
+};
+
+class initGraph {
+private:
+	std::vector<Node*> node;
+	std::vector<Edge*> sortedEdgeList;
+	int numNodes;
+public:
+	initGraph() { numNodes = 0; };
+	~initGraph() { this->node.clear(); this->sortedEdgeList.clear(); };
+	void addNode(Node* node)
+	{
+		this->node.push_back(node);
+		numNodes++;
+	}
+	const Node* getNode(const int ind) const
+	{
+		Node* node=new Node;
+		if (ind >= numNodes)
+		{
+			std::cout << "graph::getNode(): index error\n";
+			return node;
+		}
+		return this->node[ind];
+	}
+	void makeComplete();
+};
+
+
 class vMFtexture {
 private:
 	//Vec3f
@@ -62,5 +141,9 @@ namespace vectorFunc
 {
 	void normalize(float input[3]);
 	float norm(float input[3]);
+
+}
+namespace graphFunc {
+	extern float calcWeight(Node* n1, Node* n2);
 
 }
