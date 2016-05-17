@@ -558,7 +558,8 @@ extern float graphFunc::calcWeight(Node* n1, Node* n2)
 
 void initGraph::makeComplete()
 {
-	sortedEdgeList.clear();
+	this->edgeList.clear();
+	this->numEdges = 0;
 
 	int numNodes = this->numNodes;
 	for (int i = 0; i < numNodes; i++)
@@ -573,6 +574,7 @@ void initGraph::makeComplete()
 	{
 		Node* curNode;
 		curNode = (Node*)this->getNode(i);
+		std::vector<float> weightCur;
 		for (int j = 0; j < numNodes; j++)
 		{
 			if (i == j)
@@ -582,9 +584,28 @@ void initGraph::makeComplete()
 			float weight=graphFunc::calcWeight(curNode, neighbor);
 
 			Edge* edge = new Edge(neighbor, weight);
-			
+
+			curNode->addEdge(edge);
+			this->addEdge(edge);
 		}
+		
 	}
 
 }
 
+extern void graphFunc::sortEdgeList(std::vector<Edge*> &edgeList, int numEdges)
+{
+	if (numEdges == -1)
+		numEdges = edgeList.size();
+	
+	std::vector<float> weight(numEdges);
+	std::vector<int> ind(numEdges);
+	for (int i = 0; i < numEdges; i++)
+	{
+		weight.push_back(edgeList[i]->weight);
+		ind.push_back(i);
+	}
+
+	
+
+}

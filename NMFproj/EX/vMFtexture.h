@@ -65,15 +65,21 @@ struct Node {
 class initGraph {
 private:
 	std::vector<Node*> node;
-	std::vector<Edge*> sortedEdgeList;
+	std::vector<Edge*> edgeList;
 	int numNodes;
+	int numEdges;
 public:
-	initGraph() { numNodes = 0; };
-	~initGraph() { this->node.clear(); this->sortedEdgeList.clear(); };
+	initGraph() { numNodes = 0; numEdges = 0; };
+	~initGraph() { this->node.clear(); this->edgeList.clear(); };
 	void addNode(Node* node)
 	{
 		this->node.push_back(node);
 		numNodes++;
+	}
+	void addEdge(Edge* edge)
+	{
+		this->edgeList.push_back(edge);
+		numEdges++;
 	}
 	const Node* getNode(const int ind) const
 	{
@@ -145,5 +151,5 @@ namespace vectorFunc
 }
 namespace graphFunc {
 	extern float calcWeight(Node* n1, Node* n2);
-
+	extern void sortEdgeList(std::vector<Edge*> &edgeList, int numEdges=-1);
 }
