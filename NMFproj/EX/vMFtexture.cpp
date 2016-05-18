@@ -593,7 +593,7 @@ void initGraph::makeComplete()
 
 }
 
-extern void graphFunc::sortEdgeList(std::vector<Edge*> &edgeList, int numEdges)
+void graphFunc::sortEdgeList(std::vector<Edge*> &edgeList, int numEdges)
 {
 	if (numEdges == -1)
 		numEdges = edgeList.size();
@@ -608,4 +608,20 @@ extern void graphFunc::sortEdgeList(std::vector<Edge*> &edgeList, int numEdges)
 
 	
 
+}
+
+void graphFunc::qSort(std::vector<float> &weightList, std::vector<int> &indList, int a, int b)
+{
+	
+	int numCurrent = b - a + 1;
+	int pivot = rand() % numCurrent + a;
+	if (b - a <= 1)
+		return;
+	std::vector<float>::iterator weightIt = weightList.begin() + a;
+	std::vector<int>::iterator indIt = indList.begin() + a;
+	for (int i = 0; i < numCurrent; i++)
+	{
+		
+	}
+	
 }

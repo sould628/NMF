@@ -152,4 +152,5 @@ namespace vectorFunc
 namespace graphFunc {
 	extern float calcWeight(Node* n1, Node* n2);
 	extern void sortEdgeList(std::vector<Edge*> &edgeList, int numEdges=-1);
+	extern void qSort(std::vector<float> &weightList, std::vector<int> &indList, int a, int b);
 }
