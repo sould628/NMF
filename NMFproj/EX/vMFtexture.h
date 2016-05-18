@@ -12,8 +12,65 @@
 
 struct Node;
 struct Edge;
+struct Cluster;
+struct Sample;
 
+struct Sample
+{
+	int indexKey[2];
+	float pos[3];
+	Sample(int indexKey[2], float pos[3])
+	{
+		this->indexKey[0] = indexKey[0];
+		this->indexKey[1] = indexKey[1];
 
+		this->pos[0] = pos[0];
+		this->pos[1] = pos[1];
+		this->pos[2] = pos[2];
+	}
+};
+
+struct Cluster
+{
+	std::vector<Sample*> samples;
+	float centroid[3];
+	Cluster() { 
+		centroid[0] = 0.f;
+		centroid[1] = 0.f; 
+		centroid[2] = 0.f;}
+	Cluster(Cluster &cluster)
+	{
+		this->centroid[0] = cluster.centroid[0];
+		this->centroid[1] = cluster.centroid[1];
+		this->centroid[2] = cluster.centroid[2];
+
+		for (int i = 0; i < cluster.samples.size(); i++)
+		{
+			this->samples.push_back(samples[i]);
+		}
+	}
+	void addSample(Sample* sample)
+	{
+		this->samples.push_back(sample);
+	}
+	void setCentroid(float centroid[3])
+	{
+		this->centroid[0] = centroid[0];
+		this->centroid[1] = centroid[1];
+		this->centroid[2] = centroid[2];
+	}
+	void operator=(const Cluster &cluster)
+	{
+		this->centroid[0] = cluster.centroid[0];
+		this->centroid[1] = cluster.centroid[1];
+		this->centroid[2] = cluster.centroid[2];
+
+		for (int i = 0; i < (int)cluster.samples.size(); i++)
+		{
+			this->samples.push_back(cluster.samples[i]);
+		}
+	}
+};
 
 struct Edge
 {
@@ -149,6 +206,11 @@ namespace vectorFunc
 	float norm(float input[3]);
 
 }
+
+namespace clusterFunc {
+	extern void doKcluster(Cluster *clusters, int numClusters, std::vector<Sample*> samples);
+}
+
 namespace graphFunc {
 	extern float calcWeight(Node* n1, Node* n2);
 	extern void sortEdgeList(std::vector<Edge*> &edgeList, int a, int b, int numEdges);

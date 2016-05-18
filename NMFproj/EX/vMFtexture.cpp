@@ -237,19 +237,83 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		numLobes2bUsed[i] = count;
 	}
 
-	initGraph graph;
+//	initGraph graph;
+//	for (int i = 0; i < 4; i++)
+//	{
+//		for (int j = 0; j < numLobes2bUsed[i]; j++)
+//		{
+//			int indUsed = ind2bUsed[i][j];
+//			int indkey[2] = { i, indUsed };
+//			float pos[3] = { prevData[i][indUsed][0], prevData[i][indUsed][1],prevData[i][indUsed][2] };
+//			Node *nodePtr = new Node(indkey, pos);
+//			graph.addNode(nodePtr);
+//		}
+//	}
+//	graph.makeComplete();
+	std::vector<Sample*> samples;
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < numLobes2bUsed[i]; j++)
 		{
-			int indUsed = ind2bUsed[i][j];
-			int indkey[2] = { i, indUsed };
-			float pos[3] = { prevData[i][indUsed][0], prevData[i][indUsed][1],prevData[i][indUsed][2] };
-			Node *nodePtr = new Node(indkey, pos);
-			graph.addNode(nodePtr);
+			int indKey[2] = { i, ind2bUsed[i][j] };
+			float pos[3] = { prevData[i][indKey[1]][0], prevData[i][indKey[1]][1], prevData[i][indKey[1]][2] };
+			Sample* sample = new Sample(indKey, pos);
+			samples.push_back(sample);
 		}
 	}
-	graph.makeComplete();
+
+	//If numSample=1
+	int numSample = (int)samples.size();
+	int k = numLobes;
+	if (numSample < k)
+	{
+		for (int i = 0; i < numLobes; i++)
+		{
+			if (i < numSample) 
+			{
+				alpha[i] = 1.f;
+				aux[i][0] = samples[i]->pos[0];
+				aux[i][1] = samples[i]->pos[1];
+				aux[i][2] = samples[i]->pos[2];
+			}
+			else
+			{
+				alpha[i] = 0.f;
+				aux[i][0] = samples[numSample - 1]->pos[0];
+				aux[i][1] = samples[numSample - 1]->pos[1];
+				aux[i][2] = samples[numSample - 1]->pos[2];
+			}
+		}
+		return;
+	}
+
+	Cluster *kCluster = new Cluster[7];
+	std::vector<int> indFlag;
+	std::vector<float*> centroids;
+	//Randomly Select k samples
+	for (int i = 0; i < k; i++)
+	{
+		int ind;
+		bool found = true;
+		while (found)
+		{
+			ind = rand() % k;
+			for (int ii = 0; ii < indFlag.size(); ii++)
+			{
+				if (ind == indFlag[ii])
+					break;
+			}
+			found = false;
+			indFlag.push_back(ind);
+		}
+		float tPos[3] = {
+			samples[ind]->pos[0], samples[ind]->pos[1], samples[ind]->pos[2] };
+		kCluster[i].addSample(samples[ind]);
+		kCluster[i].setCentroid(tPos);
+	}
+	
+	clusterFunc::doKcluster(kCluster, k, samples);
+
 
 	//Initialization
 	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 11.f;
@@ -652,3 +716,56 @@ void graphFunc::sortEdgeList(std::vector<Edge*> &edgeList,int a, int b, int numE
 
 }
 
+void clusterFunc::doKcluster(Cluster *clusters, int numClusters, std::vector<Sample*> samples)
+{
+	int numSamples = (int)samples.size();
+	Cluster* convChecker = new Cluster[numClusters];
+
+	bool converge = false;
+	while (!converge)
+	{
+		for (int j = 0; j < numSamples; j++)
+		{
+			int fInd = 0;
+			float fDistance = FLT_MAX;
+			for (int i = 0; i < numClusters; i++)
+			{
+				float cent[3] = { clusters[i].centroid[0], clusters[i].centroid[1], clusters[i].centroid[2] };
+				float pos[3] = { samples[i]->pos[0],samples[i]->pos[1], samples[i]->pos[2] };
+
+				float distance = sqrt(((cent[0] - pos[0])*(cent[0] - pos[0]))
+					+ ((cent[1] - pos[1])*(cent[1] - pos[1]))
+					+ ((cent[2] - pos[2])*(cent[2] - pos[2])));
+				if (distance < fDistance)
+				{
+					fInd = i;
+					fDistance = distance;
+				}
+			}
+			clusters[fInd].addSample(samples[j]);
+		}
+
+		//Check Convergence
+		for (int i = 0; i < numClusters; i++)
+		{
+			convChecker[i] = clusters[i];
+		}
+
+		//Reset Centroids
+		for (int i = 0; i < numClusters; i++)
+		{
+			float newCent[3] = { 0.f };
+			int sampSize = clusters[i].samples.size();
+			for (int j = 0; j < sampSize; j++)
+			{
+				newCent[0] += clusters[i].samples[j]->pos[0];
+				newCent[1] += clusters[i].samples[j]->pos[1];
+				newCent[2] += clusters[i].samples[j]->pos[2];
+			}
+			newCent[0] /= sampSize; newCent[1] /= sampSize; newCent[2] /= sampSize;
+			clusters[i].setCentroid(newCent);
+		}
+
+
+	}
+}
