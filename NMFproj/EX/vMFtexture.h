@@ -132,7 +132,7 @@ public:
 	float getvMFcompoenent(int level, int lobe, int w, int h, int c) const
 	{
 		return vMFdata[level][lobe].at<cv::Vec4f>(w, h)[c];
-	}
+	}	
 };
 
 
@@ -151,6 +151,6 @@ namespace vectorFunc
 }
 namespace graphFunc {
 	extern float calcWeight(Node* n1, Node* n2);
-	extern void sortEdgeList(std::vector<Edge*> &edgeList, int numEdges=-1);
-	extern void qSort(std::vector<float> &weightList, std::vector<int> &indList, int a, int b);
+	extern void sortEdgeList(std::vector<Edge*> &edgeList, int a, int b, int numEdges);
+//	extern void qSort(std::vector<float> &weightList, std::vector<int> &indList, int a, int b, int numEdges);
 }

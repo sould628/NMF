@@ -247,9 +247,9 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 			float pos[3] = { prevData[i][indUsed][0], prevData[i][indUsed][1],prevData[i][indUsed][2] };
 			Node *nodePtr = new Node(indkey, pos);
 			graph.addNode(nodePtr);
-			graph.makeComplete();
 		}
 	}
+	graph.makeComplete();
 
 	//Initialization
 	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 11.f;
@@ -588,40 +588,67 @@ void initGraph::makeComplete()
 			curNode->addEdge(edge);
 			this->addEdge(edge);
 		}
-		
+		int numEdges = (int)curNode->edges.size();
+		graphFunc::sortEdgeList(curNode->edges, 0, numEdges - 1, numEdges);
 	}
+	int numEdges = this->edgeList.size();
+	graphFunc::sortEdgeList(this->edgeList, 0, numEdges - 1, numEdges);
 
+	std::cout << "making complete graph done\n";
 }
 
-void graphFunc::sortEdgeList(std::vector<Edge*> &edgeList, int numEdges)
+void graphFunc::sortEdgeList(std::vector<Edge*> &edgeList,int a, int b, int numEdges)
 {
-	if (numEdges == -1)
-		numEdges = edgeList.size();
-	
-	std::vector<float> weight(numEdges);
-	std::vector<int> ind(numEdges);
-	for (int i = 0; i < numEdges; i++)
-	{
-		weight.push_back(edgeList[i]->weight);
-		ind.push_back(i);
-	}
 
-	
-
-}
-
-void graphFunc::qSort(std::vector<float> &weightList, std::vector<int> &indList, int a, int b)
-{
-	
 	int numCurrent = b - a + 1;
-	int pivot = rand() % numCurrent + a;
-	if (b - a <= 1)
+
+	if (numCurrent <= 1)
 		return;
-	std::vector<float>::iterator weightIt = weightList.begin() + a;
-	std::vector<int>::iterator indIt = indList.begin() + a;
+
+	int pivot = rand() % numCurrent + a;
+
+	std::vector<Edge*> tempList;
+
+	std::vector<Edge*>::iterator it;
+	float pivotWeight = edgeList[pivot]->weight;
+	int ii = 0;
+	int jj = 0;
+
+
+	tempList.assign(edgeList.begin(), edgeList.end());
+
+	tempList.erase(tempList.begin()+a);
+	tempList.insert(tempList.begin()+a, edgeList[pivot]);
+	int p=0;
 	for (int i = 0; i < numCurrent; i++)
 	{
-		
+		if (i != pivot)
+		{
+			if (pivotWeight < edgeList[i+a]->weight)
+			{
+				it = tempList.begin()+a+ii;
+				tempList.insert(it, edgeList[i+a]);
+				it = tempList.begin() + b+1;
+				tempList.erase(it);
+				ii++; p++;
+			}
+			else
+			{
+				it = tempList.begin()+a + p + jj + 1;
+				tempList.insert(it, edgeList[i+a]);
+				it = tempList.begin() + b+1;
+				tempList.erase(it);
+				jj++;
+			}
+		}
 	}
-	
+	edgeList.swap(tempList);
+
+	int lb, le, rb, re;
+	lb = a; le = ii-1; rb = p + 1; re = p + jj;
+
+	graphFunc::sortEdgeList(edgeList, lb, le, numEdges);
+	graphFunc::sortEdgeList(edgeList, rb, re, numEdges);
+
 }
+
