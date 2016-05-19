@@ -223,6 +223,7 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 	//find suitable initial value
 	int numLobes2bUsed[4] = { 0.f };
 	int ind2bUsed[4][10];
+	std::vector<float*> validityStack;
 	for (int i = 0; i < 4; i++)
 	{
 		int count = 0;
@@ -230,12 +231,28 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		{
 			if (prevData[i][l][3] != 0)
 			{
-				ind2bUsed[i][count] = l;
-				count++;
+				bool valid = true;
+				for (int j = 0; j < validityStack.size(); j++)
+				{
+					if ((validityStack[j][0] == prevData[i][l][0])
+						&& (validityStack[j][1] == prevData[i][l][1])
+						&& (validityStack[j][2] == prevData[i][l][2]))
+						valid = false;
+				}
+				if (valid)
+				{
+					ind2bUsed[i][count] = l;
+					count++;
+					float *newStack = new float[3]{ prevData[i][l][0],prevData[i][l][1] ,prevData[i][l][2] };
+					validityStack.push_back(newStack);
+				}
 			}
 		}
 		numLobes2bUsed[i] = count;
 	}
+	for (int i = 0; i < validityStack.size(); i++)
+		delete[] validityStack[i];
+	validityStack.clear();
 
 //	initGraph graph;
 //	for (int i = 0; i < 4; i++)
@@ -297,15 +314,22 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		bool found = true;
 		while (found)
 		{
-			ind = rand() % k;
+			ind = rand() % numSample;
 			for (int ii = 0; ii < indFlag.size(); ii++)
 			{
 				if (ind == indFlag[ii])
-					break;
+				{
+					found = true;
+					ind = rand() % numSample;
+					ii = 0;
+				}
+				else if (ii == ( indFlag.size() - 1))
+					found = false;
 			}
-			found = false;
 			indFlag.push_back(ind);
+			found = false;
 		}
+	
 		float tPos[3] = {
 			samples[ind]->pos[0], samples[ind]->pos[1], samples[ind]->pos[2] };
 		kCluster[i].addSample(samples[ind]);
@@ -731,7 +755,7 @@ void clusterFunc::doKcluster(Cluster *clusters, int numClusters, std::vector<Sam
 			for (int i = 0; i < numClusters; i++)
 			{
 				float cent[3] = { clusters[i].centroid[0], clusters[i].centroid[1], clusters[i].centroid[2] };
-				float pos[3] = { samples[i]->pos[0],samples[i]->pos[1], samples[i]->pos[2] };
+				float pos[3] = { samples[j]->pos[0],samples[j]->pos[1], samples[j]->pos[2] };
 
 				float distance = sqrt(((cent[0] - pos[0])*(cent[0] - pos[0]))
 					+ ((cent[1] - pos[1])*(cent[1] - pos[1]))
@@ -748,24 +772,48 @@ void clusterFunc::doKcluster(Cluster *clusters, int numClusters, std::vector<Sam
 		//Check Convergence
 		for (int i = 0; i < numClusters; i++)
 		{
-			convChecker[i] = clusters[i];
-		}
-
-		//Reset Centroids
-		for (int i = 0; i < numClusters; i++)
-		{
-			float newCent[3] = { 0.f };
-			int sampSize = clusters[i].samples.size();
-			for (int j = 0; j < sampSize; j++)
+			int numSampleInClust = clusters[i].samples.size();
+			int numChecker = convChecker[i].samples.size();
+			if (numSampleInClust != numChecker)
+				break;
+			for (int j = 0; j < numSampleInClust; j++)
 			{
-				newCent[0] += clusters[i].samples[j]->pos[0];
-				newCent[1] += clusters[i].samples[j]->pos[1];
-				newCent[2] += clusters[i].samples[j]->pos[2];
+				float newPos[3] = { clusters[i].samples[j]->pos[0],clusters[i].samples[j]->pos[1],clusters[i].samples[j]->pos[2] };
+				float prePos[3] = { convChecker[i].samples[j]->pos[0],convChecker[i].samples[j]->pos[1],convChecker[i].samples[j]->pos[2] };
+				if ((newPos[0] == prePos[0]) && (newPos[1] == prePos[1]) && (newPos[2] == prePos[2]))
+				{
+					if ((i == numClusters - 1) && (j== numSampleInClust - 1))
+						converge = true;
+				}
+				else
+					break;
 			}
-			newCent[0] /= sampSize; newCent[1] /= sampSize; newCent[2] /= sampSize;
-			clusters[i].setCentroid(newCent);
 		}
 
+		if (!converge)
+		{
+			for (int i = 0; i < numClusters; i++)
+			{
+				convChecker[i].clearSamplelist();
+				convChecker[i] = clusters[i];
+			}
+
+			//Reset Centroids
+			for (int i = 0; i < numClusters; i++)
+			{
+				float newCent[3] = { 0.f };
+				int sampSize = clusters[i].samples.size();
+				for (int j = 0; j < sampSize; j++)
+				{
+					newCent[0] += clusters[i].samples[j]->pos[0];
+					newCent[1] += clusters[i].samples[j]->pos[1];
+					newCent[2] += clusters[i].samples[j]->pos[2];
+				}
+				newCent[0] /= sampSize; newCent[1] /= sampSize; newCent[2] /= sampSize;
+				clusters[i].setCentroid(newCent);
+				clusters[i].clearSamplelist();
+			}
+		}
 
 	}
 }

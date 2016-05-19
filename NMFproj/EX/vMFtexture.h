@@ -70,6 +70,10 @@ struct Cluster
 			this->samples.push_back(cluster.samples[i]);
 		}
 	}
+	void clearSamplelist()
+	{
+		this->samples.clear();
+	}
 };
 
 struct Edge
