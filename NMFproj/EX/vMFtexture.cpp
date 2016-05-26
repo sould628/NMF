@@ -152,6 +152,7 @@ void vMFtexture::generatevMFmaps()
 				{
 					for (int l = 0; l < numLobes; l++)
 					{
+
 						cv::Vec4f temp = vMFdata[m - 1][l].at<cv::Vec4f>(h * 2 + (i % 2), w * 2 + (int)(i / 2));
 						if (temp[0] != 0)
 						{
@@ -175,12 +176,15 @@ void vMFtexture::generatevMFmaps()
 				targetRegion = originalNormals[0](ROI).clone();
 
 				//prevData for mu initialization
-				this->computeParameters(alpha, aux, targetRegion, prevData);
+				if (w % 100 == 0)
+					std::cout << "(" << w << ", " << h << ")\n";
+																																					this->computeParameters(alpha, aux, targetRegion, prevData);
 
 				//alignment between neighboring pixels of same mipmap level
 
 				for (int l = 0; l < numLobes; l++)
 				{
+
 					cv::Vec4f computeData;
 					computeData[0] = alpha[l];
 					computeData[1] = alpha[l]*aux[l][0];
@@ -219,124 +223,125 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 			z[j][i] = 0.f;
 		}
 	}
-
-	//find suitable initial value
-	int numLobes2bUsed[4] = { 0.f };
-	int ind2bUsed[4][10];
-	std::vector<float*> validityStack;
-	for (int i = 0; i < 4; i++)
-	{
-		int count = 0;
-		for (int l = 0; l < this->numLobes; l++)
-		{
-			if (prevData[i][l][3] != 0)
-			{
-				bool valid = true;
-				for (int j = 0; j < validityStack.size(); j++)
-				{
-					if ((validityStack[j][0] == prevData[i][l][0])
-						&& (validityStack[j][1] == prevData[i][l][1])
-						&& (validityStack[j][2] == prevData[i][l][2]))
-						valid = false;
-				}
-				if (valid)
-				{
-					ind2bUsed[i][count] = l;
-					count++;
-					float *newStack = new float[3]{ prevData[i][l][0],prevData[i][l][1] ,prevData[i][l][2] };
-					validityStack.push_back(newStack);
-				}
-			}
-		}
-		numLobes2bUsed[i] = count;
-	}
-	for (int i = 0; i < validityStack.size(); i++)
-		delete[] validityStack[i];
-	validityStack.clear();
-
-//	initGraph graph;
+//
+//	//find suitable initial value
+//	int numLobes2bUsed[4] = { 0.f };
+//	int ind2bUsed[4][10];
+//	std::vector<float*> validityStack;
+//	for (int i = 0; i < 4; i++)
+//	{
+//		int count = 0;
+//		for (int l = 0; l < this->numLobes; l++)
+//		{
+//			if (prevData[i][l][3] != 0)
+//			{
+//				bool valid = true;
+//				for (int j = 0; j < validityStack.size(); j++)
+//				{
+//					if ((validityStack[j][0] == prevData[i][l][0])
+//						&& (validityStack[j][1] == prevData[i][l][1])
+//						&& (validityStack[j][2] == prevData[i][l][2]))
+//						valid = false;
+//				}
+//				if (valid)
+//				{
+//					ind2bUsed[i][count] = l;
+//					count++;
+//					float *newStack = new float[3]{ prevData[i][l][0],prevData[i][l][1] ,prevData[i][l][2] };
+//					validityStack.push_back(newStack);
+//				}
+//			}
+//		}
+//		numLobes2bUsed[i] = count;
+//	}
+//	for (int i = 0; i < validityStack.size(); i++)
+//		delete[] validityStack[i];
+//	validityStack.clear();
+//
+////	initGraph graph;
+////	for (int i = 0; i < 4; i++)
+////	{
+////		for (int j = 0; j < numLobes2bUsed[i]; j++)
+////		{
+////			int indUsed = ind2bUsed[i][j];
+////			int indkey[2] = { i, indUsed };
+////			float pos[3] = { prevData[i][indUsed][0], prevData[i][indUsed][1],prevData[i][indUsed][2] };
+////			Node *nodePtr = new Node(indkey, pos);
+////			graph.addNode(nodePtr);
+////		}
+////	}
+////	graph.makeComplete();
+//	std::vector<Sample*> samples;
 //	for (int i = 0; i < 4; i++)
 //	{
 //		for (int j = 0; j < numLobes2bUsed[i]; j++)
 //		{
-//			int indUsed = ind2bUsed[i][j];
-//			int indkey[2] = { i, indUsed };
-//			float pos[3] = { prevData[i][indUsed][0], prevData[i][indUsed][1],prevData[i][indUsed][2] };
-//			Node *nodePtr = new Node(indkey, pos);
-//			graph.addNode(nodePtr);
+//			int indKey[2] = { i, ind2bUsed[i][j] };
+//			float pos[3] = { prevData[i][indKey[1]][0], prevData[i][indKey[1]][1], prevData[i][indKey[1]][2] };
+//			Sample* sample = new Sample(indKey, pos);
+//			samples.push_back(sample);
 //		}
 //	}
-//	graph.makeComplete();
-	std::vector<Sample*> samples;
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < numLobes2bUsed[i]; j++)
-		{
-			int indKey[2] = { i, ind2bUsed[i][j] };
-			float pos[3] = { prevData[i][indKey[1]][0], prevData[i][indKey[1]][1], prevData[i][indKey[1]][2] };
-			Sample* sample = new Sample(indKey, pos);
-			samples.push_back(sample);
-		}
-	}
-
-	//If numSample=1
-	int numSample = (int)samples.size();
-	int k = numLobes;
-	if (numSample < k)
-	{
-		for (int i = 0; i < numLobes; i++)
-		{
-			if (i < numSample) 
-			{
-				alpha[i] = 1.f;
-				aux[i][0] = samples[i]->pos[0];
-				aux[i][1] = samples[i]->pos[1];
-				aux[i][2] = samples[i]->pos[2];
-			}
-			else
-			{
-				alpha[i] = 0.f;
-				aux[i][0] = samples[numSample - 1]->pos[0];
-				aux[i][1] = samples[numSample - 1]->pos[1];
-				aux[i][2] = samples[numSample - 1]->pos[2];
-			}
-		}
-		return;
-	}
-
-	Cluster *kCluster = new Cluster[7];
-	std::vector<int> indFlag;
-	std::vector<float*> centroids;
-	//Randomly Select k samples
-	for (int i = 0; i < k; i++)
-	{
-		int ind;
-		bool found = true;
-		while (found)
-		{
-			ind = rand() % numSample;
-			for (int ii = 0; ii < indFlag.size(); ii++)
-			{
-				if (ind == indFlag[ii])
-				{
-					found = true;
-					ind = rand() % numSample;
-					ii = 0;
-				}
-				else if (ii == ( indFlag.size() - 1))
-					found = false;
-			}
-			indFlag.push_back(ind);
-			found = false;
-		}
-	
-		float tPos[3] = {
-			samples[ind]->pos[0], samples[ind]->pos[1], samples[ind]->pos[2] };
-		kCluster[i].addSample(samples[ind]);
-		kCluster[i].setCentroid(tPos);
-	}
-	
-	clusterFunc::doKcluster(kCluster, k, samples);
+//
+//	//If numSample=1
+//	int numSample = (int)samples.size();
+//	int k = numLobes;
+//	if (numSample < k)
+//	{
+//		for (int i = 0; i < numLobes; i++)
+//		{
+//			if (i < numSample) 
+//			{
+//				alpha[i] = 1.f;
+//				aux[i][0] = samples[i]->pos[0];
+//				aux[i][1] = samples[i]->pos[1];
+//				aux[i][2] = samples[i]->pos[2];
+//			}
+//			else
+//			{
+//				alpha[i] = 0.f;
+//				aux[i][0] = samples[numSample - 1]->pos[0];
+//				aux[i][1] = samples[numSample - 1]->pos[1];
+//				aux[i][2] = samples[numSample - 1]->pos[2];
+//			}
+//		}
+//		return;
+//	}
+//
+//	Cluster *kCluster = new Cluster[7];
+//	std::vector<int> indFlag;
+//	std::vector<float*> centroids;
+//	//Randomly Select k samples
+//	for (int i = 0; i < k; i++)
+//	{
+//		int ind;
+//		bool found = true;
+//		while (found)
+//		{
+//			std::cout << "check2";
+//			ind = rand() % numSample;
+//			for (int ii = 0; ii < indFlag.size(); ii++)
+//			{
+//				if (ind == indFlag[ii])
+//				{
+//					found = true;
+//					ind = rand() % numSample;
+//					ii = 0;
+//				}
+//				else if (ii == ( indFlag.size() - 1))
+//					found = false;
+//			}
+//			indFlag.push_back(ind);
+//			found = false;
+//		}
+//	
+//		float tPos[3] = {
+//			samples[ind]->pos[0], samples[ind]->pos[1], samples[ind]->pos[2] };
+//		kCluster[i].addSample(samples[ind]);
+//		kCluster[i].setCentroid(tPos);
+//	}
+//	
+//	clusterFunc::doKcluster(kCluster, k, samples);
 
 
 	//Initialization
@@ -346,7 +351,7 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		mu[i+1][0] = cos(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][1] = sin(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][2] = 0.f;
-		kappa[i + 1] = 11.f;
+		kappa[i + 1] = 1.f;
 	}
 
 	bool converge = false;
@@ -366,7 +371,7 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 				}
 				if (zsum < 0.0001)
 				{
-					std::cout << "too small zsum\n";
+//					std::cout << "too small zsum\n";
 				}
 				for (int j = 0; j < numLobes; j++)
 				{
@@ -514,13 +519,13 @@ void vMFtexture::showvMFImage(int level, int lobe, int mode) const
 			else
 				level--;
 			break;
-		case 'n':
+		case 'n':case'N':
 			if (lobe == numLobes - 1)
 				lobe = 0;
 			else
 				lobe++;
 			break;
-		case'b':
+		case'b':case'B':
 			if (lobe == 0)
 				lobe = numLobes - 1;
 			else
@@ -535,11 +540,51 @@ void vMFtexture::showvMFImage(int level, int lobe, int mode) const
 
 
 //vMFfunc
+void vMFfunc::displayvMF(int numLobes, float *alpha, float **aux, int width, int height)
+{
+
+	float *a = alpha;
+	float **r = aux;
+
+	cv::Mat NMFdisplay = cv::Mat::zeros(width, height, CV_32FC1);
+
+	float center[2] = { (float)height / 2, width / 2 };
+	for (int w = 0; w < width; w++)
+	{
+		for (int h = 0; h < height; h++)
+		{
+			for (int i = 0; i < numLobes; i++)
+			{
+				float mu[3] = { r[i][0], r[i][1], r[i][2] };
+				float kappa = 0;
+				vectorFunc::normalize(mu);
+				kappa=vMFfunc::r2kappa((float*)r[i]);
+				cv::Vec3f value = 0.f;
+				float curPos[3] = {2.f*(float)(w - center[0])/(float)width,  2.f*(float)(h - center[1]) / (float)height, 0.f };
+				if (((curPos[0] * curPos[0]) + (curPos[1] * curPos[1])) > 1.f)
+					continue;
+				else
+				{
+					if ((w == 256) && (h == 256))
+						std::cout << "test";
+					curPos[2] = sqrt(1 - ((curPos[0] * curPos[0]) + (curPos[1] * curPos[1])));
+					NMFdisplay.at<float>(h, w) += alpha[i] * vMFfunc::vMF(curPos, mu, kappa);
+				}
+			}
+		}
+	}
+	normalize(NMFdisplay, NMFdisplay, 1.f, 0.f, cv::NORM_MINMAX);
+	displayImage("vMF", NMFdisplay, cvCtrl::skip::no, cvCtrl::destroy::yes);
+
+}
+
 float vMFfunc::r2kappa(float r[3])
 {
 	float result = 0.f;
 	float normR = vectorFunc::norm(r);
 	result = ((3 * normR) - (normR*normR*normR)) / (1 - (normR*normR));
+	if (normR == 1)
+		result = 707;
 	return result;
 }
 cv::Mat vMFfunc::cvLoadImage(const char* filename, int &imageWidth, int &imageHeight)

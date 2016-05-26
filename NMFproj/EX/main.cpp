@@ -1577,12 +1577,24 @@ int main(int argc, char** argv){
 	objData = new objLoader();
 	objData->load("./cube.obj");
 
+	float testa = 1.f;
+	float *testaptr = &testa;
+	float testAux[3] = { 0.f, 0.f, 1.f };
+	float *testA1 = testAux;
+	float **testAuxptr = &testA1;
+
+	vMFfunc::displayvMF(1, testaptr, testAuxptr, 512, 512);
+
+
 	cVMFtex.showOriginalImage(0);
 	cVMFtex.generatevMFmaps();
 
 	cVMFtex.showvMFImage(0, 0, 0);
 	
+
 	NMTdata = vMFfunc::LoadImage(NMT, NMwidth, NMheight);
+
+
 
 	printf("Number of vertices: %i\n", objData->vertexCount);
 	printf("Number of vertex normals: %i\n", objData->normalCount);

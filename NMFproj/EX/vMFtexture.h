@@ -202,6 +202,7 @@ namespace vMFfunc {
 	extern cv::Mat cvLoadImage(const char* filename, int &imageWidth, int &imageHeight);
 	extern float vMF(float normal[3], float mu[3], float kappa);
 	extern float r2kappa(float r[3]);
+	extern void displayvMF(int numLobes, float *alpha, float **aux, int width=512, int height=512);
 }
 
 namespace vectorFunc
