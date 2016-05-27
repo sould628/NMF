@@ -1,9 +1,29 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(388,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (NMF.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  vMFtexture.cpp
-e:\hyo\github\nmf\nmfproj\ex\include\opencv2\core\mat.hpp(1914): warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
-e:\hyo\github\nmf\nmfproj\ex\include\opencv2\core\persistence.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
-e:\hyo\github\nmf\nmfproj\ex\include\opencv2\core\utility.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
-e:\hyo\github\nmf\nmfproj\ex\vmftexture.h(47): warning C4018: '<' : signed/unsigned mismatch
-e:\hyo\github\nmf\nmfproj\ex\vmftexture.cpp(142): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
-e:\hyo\github\nmf\nmfproj\ex\vmftexture.cpp(551): warning C4244: 'initializing' : conversion from 'int' to 'float', possible loss of data
-  EX.vcxproj -> E:\Hyo\Github\NMF\NMFproj\EX\./bin/EX.exe
+﻿Build started 2016-05-27 오후 5:18:48.
+     1>Project "C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\EX.vcxproj" on node 2 (Build target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(388,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (NMF.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I./include /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt vMFtexture.cpp
+         vMFtexture.cpp
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\mat.hpp(1914): warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\persistence.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\utility.hpp : warning C4819: The file contains a character that cannot be represented in the current code page (949). Save the file in Unicode format to prevent data loss
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.h(47): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.cpp(142): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.cpp(285): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.cpp(310): warning C4305: '=' : truncation from 'double' to 'float'
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.cpp(463): warning C4244: 'initializing' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.cpp(483): warning C4244: '+=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.cpp(497): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"./bin/EX.exe" /INCREMENTAL /NOLOGO /LIBPATH:./lib opencv_ts310d.lib opencv_world310d.lib FreeImage.lib glut32.lib glew32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"./bin/EX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"./bin/EX.lib" /MACHINE:X86 Debug\list.obj
+         Debug\objLoader.obj
+         Debug\obj_parser.obj
+         Debug\string_extra.obj
+         Debug\main.obj
+         Debug\vMFtexture.obj
+         EX.vcxproj -> C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\./bin/EX.exe
+     1>Done Building Project "C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\EX.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.10

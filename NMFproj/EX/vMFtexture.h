@@ -200,9 +200,10 @@ public:
 namespace vMFfunc {
 	extern FIBITMAP* LoadImage(const char* filename, int &imageWidth, int &imageHeight);
 	extern cv::Mat cvLoadImage(const char* filename, int &imageWidth, int &imageHeight);
-	extern float vMF(float normal[3], float mu[3], float kappa);
+	extern double vMF(float normal[3], float mu[3], float kappa);
 	extern float r2kappa(float r[3]);
-	extern void displayvMF(int numLobes, float *alpha, float **aux, int width=512, int height=512);
+	extern void displayvMF(int numLobes, float *alpha, float **aux, int width = 512, int height = 512, int skip=0, int destroy=0);
+	extern void mukappa2aux(float *aux, float mu[3], float kappa);
 }
 
 namespace vectorFunc
@@ -216,8 +217,3 @@ namespace clusterFunc {
 	extern void doKcluster(Cluster *clusters, int numClusters, std::vector<Sample*> samples);
 }
 
-namespace graphFunc {
-	extern float calcWeight(Node* n1, Node* n2);
-	extern void sortEdgeList(std::vector<Edge*> &edgeList, int a, int b, int numEdges);
-//	extern void qSort(std::vector<float> &weightList, std::vector<int> &indList, int a, int b, int numEdges);
-}

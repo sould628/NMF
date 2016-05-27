@@ -176,10 +176,11 @@ void vMFtexture::generatevMFmaps()
 				targetRegion = originalNormals[0](ROI).clone();
 
 				//prevData for mu initialization
-				if (w % 100 == 0)
-					std::cout << "(" << w << ", " << h << ")\n";
-																																					this->computeParameters(alpha, aux, targetRegion, prevData);
+				this->computeParameters(alpha, aux, targetRegion, prevData);
+				
 
+				if (m==mipmapLevel-1)
+				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 0, 0);
 				//alignment between neighboring pixels of same mipmap level
 
 				for (int l = 0; l < numLobes; l++)
@@ -187,7 +188,7 @@ void vMFtexture::generatevMFmaps()
 
 					cv::Vec4f computeData;
 					computeData[0] = alpha[l];
-					computeData[1] = alpha[l]*aux[l][0];
+					computeData[1] = alpha[l] * aux[l][0];
 					computeData[2] = alpha[l] * aux[l][1];
 					computeData[3] = alpha[l] * aux[l][2];
 					vMFdata[m][l].at<cv::Vec4f>(h, w) = computeData;
@@ -223,136 +224,44 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 			z[j][i] = 0.f;
 		}
 	}
-//
-//	//find suitable initial value
-//	int numLobes2bUsed[4] = { 0.f };
-//	int ind2bUsed[4][10];
-//	std::vector<float*> validityStack;
-//	for (int i = 0; i < 4; i++)
-//	{
-//		int count = 0;
-//		for (int l = 0; l < this->numLobes; l++)
-//		{
-//			if (prevData[i][l][3] != 0)
-//			{
-//				bool valid = true;
-//				for (int j = 0; j < validityStack.size(); j++)
-//				{
-//					if ((validityStack[j][0] == prevData[i][l][0])
-//						&& (validityStack[j][1] == prevData[i][l][1])
-//						&& (validityStack[j][2] == prevData[i][l][2]))
-//						valid = false;
-//				}
-//				if (valid)
-//				{
-//					ind2bUsed[i][count] = l;
-//					count++;
-//					float *newStack = new float[3]{ prevData[i][l][0],prevData[i][l][1] ,prevData[i][l][2] };
-//					validityStack.push_back(newStack);
-//				}
-//			}
-//		}
-//		numLobes2bUsed[i] = count;
-//	}
-//	for (int i = 0; i < validityStack.size(); i++)
-//		delete[] validityStack[i];
-//	validityStack.clear();
-//
-////	initGraph graph;
-////	for (int i = 0; i < 4; i++)
-////	{
-////		for (int j = 0; j < numLobes2bUsed[i]; j++)
-////		{
-////			int indUsed = ind2bUsed[i][j];
-////			int indkey[2] = { i, indUsed };
-////			float pos[3] = { prevData[i][indUsed][0], prevData[i][indUsed][1],prevData[i][indUsed][2] };
-////			Node *nodePtr = new Node(indkey, pos);
-////			graph.addNode(nodePtr);
-////		}
-////	}
-////	graph.makeComplete();
-//	std::vector<Sample*> samples;
-//	for (int i = 0; i < 4; i++)
-//	{
-//		for (int j = 0; j < numLobes2bUsed[i]; j++)
-//		{
-//			int indKey[2] = { i, ind2bUsed[i][j] };
-//			float pos[3] = { prevData[i][indKey[1]][0], prevData[i][indKey[1]][1], prevData[i][indKey[1]][2] };
-//			Sample* sample = new Sample(indKey, pos);
-//			samples.push_back(sample);
-//		}
-//	}
-//
-//	//If numSample=1
-//	int numSample = (int)samples.size();
-//	int k = numLobes;
-//	if (numSample < k)
-//	{
-//		for (int i = 0; i < numLobes; i++)
-//		{
-//			if (i < numSample) 
-//			{
-//				alpha[i] = 1.f;
-//				aux[i][0] = samples[i]->pos[0];
-//				aux[i][1] = samples[i]->pos[1];
-//				aux[i][2] = samples[i]->pos[2];
-//			}
-//			else
-//			{
-//				alpha[i] = 0.f;
-//				aux[i][0] = samples[numSample - 1]->pos[0];
-//				aux[i][1] = samples[numSample - 1]->pos[1];
-//				aux[i][2] = samples[numSample - 1]->pos[2];
-//			}
-//		}
-//		return;
-//	}
-//
-//	Cluster *kCluster = new Cluster[7];
-//	std::vector<int> indFlag;
-//	std::vector<float*> centroids;
-//	//Randomly Select k samples
-//	for (int i = 0; i < k; i++)
-//	{
-//		int ind;
-//		bool found = true;
-//		while (found)
-//		{
-//			std::cout << "check2";
-//			ind = rand() % numSample;
-//			for (int ii = 0; ii < indFlag.size(); ii++)
-//			{
-//				if (ind == indFlag[ii])
-//				{
-//					found = true;
-//					ind = rand() % numSample;
-//					ii = 0;
-//				}
-//				else if (ii == ( indFlag.size() - 1))
-//					found = false;
-//			}
-//			indFlag.push_back(ind);
-//			found = false;
-//		}
-//	
-//		float tPos[3] = {
-//			samples[ind]->pos[0], samples[ind]->pos[1], samples[ind]->pos[2] };
-//		kCluster[i].addSample(samples[ind]);
-//		kCluster[i].setCentroid(tPos);
-//	}
-//	
-//	clusterFunc::doKcluster(kCluster, k, samples);
 
 
-	//Initialization
-	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 11.f;
+	//Initialization method1
+	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 10.f;
 	for (int i = 0; i < numLobes-1; i++)
 	{
 		mu[i+1][0] = cos(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][1] = sin(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][2] = 0.f;
-		kappa[i + 1] = 1.f;
+		kappa[i + 1] = 10.f;
 	}
+
+
+	//initialization method2
+//	int idx = 0;
+//	bool match_found;
+//	for (int i = 0; i < numLobes; i++)
+//	{
+//		cv::Vec3f temp = targetRegion.at<cv::Vec3f>((idx%sideX), (idx / sideX));
+//		for (int j = 0; j < i; j++)
+//		{
+//			if ((temp[0] == mu[j][0]) && (temp[1] == mu[j][1]) && (temp[2] == mu[j][2]))
+//			{
+//								i--;
+//				match_found = true;
+//			}
+//		}
+//		idx++;
+//		if (match_found)
+//		{
+//			match_found = false;
+//			continue;
+//		}
+//		else
+//		{
+//			mu[i][0] = temp[0]; mu[i][1] = temp[1]; mu[i][2] = temp[2];
+//		}
+//	}
 
 	bool converge = false;
 	while (!converge)
@@ -364,18 +273,16 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 			{
 				cv::Vec3f Vec3_ni = targetRegion.at<cv::Vec3f>(row, col);
 				float float_ni[3] = { Vec3_ni[0], Vec3_ni[1], Vec3_ni[2] };
-				float zsum = 0;
+				double zsum = 0;
+				double vMFzij[10];
 				for (int j = 0; j < numLobes; j++)
 				{
-					zsum += vMFfunc::vMF(float_ni, mu[j], kappa[j]);
-				}
-				if (zsum < 0.0001)
-				{
-//					std::cout << "too small zsum\n";
+					vMFzij[j] = vMFfunc::vMF(float_ni, mu[j], kappa[j]);
+					zsum += vMFzij[j];
 				}
 				for (int j = 0; j < numLobes; j++)
 				{
-					z[j][sideX*col + col] = vMFfunc::vMF(float_ni, mu[j], kappa[j]) / zsum;
+					z[j][sideX*row + col] = vMFzij[j] / zsum;
 				}
 			}
 		}
@@ -391,30 +298,35 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 				for (int col = 0; col < sideX; col++)
 				{
 					cv::Vec3f Vec3_ni = targetRegion.at<cv::Vec3f>(row, col);
-					zj[j] += z[j][sideX*col + col];
-					Vec3_znj[j] += z[j][sideX*col + col] * Vec3_ni;
+					zj[j] += z[j][sideX*row + col];
+					Vec3_znj[j] += z[j][sideX*row + col] * Vec3_ni;
 				}
 			}
 		}
 
+		for (int j = 0; j < numLobes; j++)
+		{
+			if (zj[j] < 0.01)
+				zj[j] = 0.01;
+		}
 		cv::Vec3f Vec3_aux[10];
 		//Alpha
 		for (int j = 0; j < numLobes; j++)
 		{
 
-			alpha[j] = zj[j] / area;
+			alpha[j] = zj[j] / (float)area;
 			Vec3_aux[j] = Vec3_znj[j] / zj[j];
 			aux[j][0] = Vec3_aux[j][0];
 			aux[j][1] = Vec3_aux[j][1];
 			aux[j][2] = Vec3_aux[j][2];
 			float lenAux = vectorFunc::norm(aux[j]);
-			kappa[j] = ((3 * lenAux) - (lenAux*lenAux*lenAux)) / ((1 - lenAux)*(1 - lenAux));
+			kappa[j] = ((3 * lenAux) - (lenAux*lenAux*lenAux)) / (1 - lenAux*lenAux);
 			mu[j][0] = aux[j][0];
 			mu[j][1] = aux[j][1];
 			mu[j][2] = aux[j][2];
 			vectorFunc::normalize(mu[j]);
 		}
-		if (iteration++ == 10)
+		if (iteration++ == 100)
 			converge = true;
 	}
 
@@ -540,7 +452,7 @@ void vMFtexture::showvMFImage(int level, int lobe, int mode) const
 
 
 //vMFfunc
-void vMFfunc::displayvMF(int numLobes, float *alpha, float **aux, int width, int height)
+void vMFfunc::displayvMF(int numLobes, float *alpha, float **aux, int width, int height, int skip, int destroy)
 {
 
 	float *a = alpha;
@@ -558,15 +470,15 @@ void vMFfunc::displayvMF(int numLobes, float *alpha, float **aux, int width, int
 				float mu[3] = { r[i][0], r[i][1], r[i][2] };
 				float kappa = 0;
 				vectorFunc::normalize(mu);
-				kappa=vMFfunc::r2kappa((float*)r[i]);
+				kappa = vMFfunc::r2kappa((float*)r[i]);
 				cv::Vec3f value = 0.f;
-				float curPos[3] = {2.f*(float)(w - center[0])/(float)width,  2.f*(float)(h - center[1]) / (float)height, 0.f };
+				float curPos[3] = { 2.f*(float)(w - center[0]) / (float)width,  2.f*(float)(h - center[1]) / (float)height, 0.f };
 				if (((curPos[0] * curPos[0]) + (curPos[1] * curPos[1])) > 1.f)
+				{
 					continue;
+				}
 				else
 				{
-					if ((w == 256) && (h == 256))
-						std::cout << "test";
 					curPos[2] = sqrt(1 - ((curPos[0] * curPos[0]) + (curPos[1] * curPos[1])));
 					NMFdisplay.at<float>(h, w) += alpha[i] * vMFfunc::vMF(curPos, mu, kappa);
 				}
@@ -574,8 +486,16 @@ void vMFfunc::displayvMF(int numLobes, float *alpha, float **aux, int width, int
 		}
 	}
 	normalize(NMFdisplay, NMFdisplay, 1.f, 0.f, cv::NORM_MINMAX);
-	displayImage("vMF", NMFdisplay, cvCtrl::skip::no, cvCtrl::destroy::yes);
+	displayImage("vMF", NMFdisplay, skip, destroy);
 
+}
+
+
+void vMFfunc::mukappa2aux(float *aux, float mu[3], float kappa)
+{
+	double Kappa = kappa;
+	float Ak = cosh(Kappa) / sinh(Kappa) - 1 / Kappa;
+	aux[0] = mu[0] * Ak; aux[1] = mu[1] * Ak; aux[2] = mu[2] * Ak;
 }
 
 float vMFfunc::r2kappa(float r[3])
@@ -595,12 +515,12 @@ cv::Mat vMFfunc::cvLoadImage(const char* filename, int &imageWidth, int &imageHe
 	imageWidth = load.cols; imageHeight = load.rows;
 	return floatScale;
 }
-float vMFfunc::vMF(float normal[3], float mu[3], float kappa) {
+double vMFfunc::vMF(float normal[3], float mu[3], float kappa) {
 	double NdotMu = (mu[0] * normal[0]) + (mu[1] * normal[1]) + (mu[2] * normal[2]);
 	double Kappa = kappa;
 	double result = (Kappa / (4 * vmfPI*sinh(Kappa)))*exp(Kappa*(NdotMu));
 
-	return (float)result;
+	return result;
 }
 FIBITMAP* vMFfunc::LoadImage(const char* filename, int &imageWidth, int &imageHeight) {
 	FREE_IMAGE_FORMAT format = FreeImage_GetFileType(filename);
@@ -674,115 +594,6 @@ void vectorFunc::normalize(float input[3])
 float vectorFunc::norm(float input[3])
 {
 	return sqrt((input[0] * input[0]) + (input[1] * input[1]) + (input[2] * input[2]));
-}
-
-//graphFunc
-extern float graphFunc::calcWeight(Node* n1, Node* n2)
-{
-	float pos1[3] = { n1->pos[0],n1->pos[1],n1->pos[2] };
-	float pos2[3] = { n2->pos[0],n2->pos[1],n2->pos[2] };
-
-	float weight = sqrt(((pos1[0] - pos2[0])*(pos1[0] - pos2[0]))
-		+ ((pos1[1] - pos2[1])*(pos1[1] - pos2[1]))
-		+ ((pos1[2] - pos2[2])*(pos1[2] - pos2[2]))
-		);
-	return weight;
-}
-
-void initGraph::makeComplete()
-{
-	this->edgeList.clear();
-	this->numEdges = 0;
-
-	int numNodes = this->numNodes;
-	for (int i = 0; i < numNodes; i++)
-	{
-		Node* curNode;
-		curNode = (Node*)this->getNode(i);
-		curNode->edges.clear();
-	}
-
-	std::vector<float> weightList;
-	for (int i = 0; i < numNodes; i++)
-	{
-		Node* curNode;
-		curNode = (Node*)this->getNode(i);
-		std::vector<float> weightCur;
-		for (int j = 0; j < numNodes; j++)
-		{
-			if (i == j)
-				continue;
-			Node* neighbor = (Node*)this->getNode(j);
-
-			float weight=graphFunc::calcWeight(curNode, neighbor);
-
-			Edge* edge = new Edge(neighbor, weight);
-
-			curNode->addEdge(edge);
-			this->addEdge(edge);
-		}
-		int numEdges = (int)curNode->edges.size();
-		graphFunc::sortEdgeList(curNode->edges, 0, numEdges - 1, numEdges);
-	}
-	int numEdges = this->edgeList.size();
-	graphFunc::sortEdgeList(this->edgeList, 0, numEdges - 1, numEdges);
-
-	std::cout << "making complete graph done\n";
-}
-
-void graphFunc::sortEdgeList(std::vector<Edge*> &edgeList,int a, int b, int numEdges)
-{
-
-	int numCurrent = b - a + 1;
-
-	if (numCurrent <= 1)
-		return;
-
-	int pivot = rand() % numCurrent + a;
-
-	std::vector<Edge*> tempList;
-
-	std::vector<Edge*>::iterator it;
-	float pivotWeight = edgeList[pivot]->weight;
-	int ii = 0;
-	int jj = 0;
-
-
-	tempList.assign(edgeList.begin(), edgeList.end());
-
-	tempList.erase(tempList.begin()+a);
-	tempList.insert(tempList.begin()+a, edgeList[pivot]);
-	int p=0;
-	for (int i = 0; i < numCurrent; i++)
-	{
-		if (i != pivot)
-		{
-			if (pivotWeight < edgeList[i+a]->weight)
-			{
-				it = tempList.begin()+a+ii;
-				tempList.insert(it, edgeList[i+a]);
-				it = tempList.begin() + b+1;
-				tempList.erase(it);
-				ii++; p++;
-			}
-			else
-			{
-				it = tempList.begin()+a + p + jj + 1;
-				tempList.insert(it, edgeList[i+a]);
-				it = tempList.begin() + b+1;
-				tempList.erase(it);
-				jj++;
-			}
-		}
-	}
-	edgeList.swap(tempList);
-
-	int lb, le, rb, re;
-	lb = a; le = ii-1; rb = p + 1; re = p + jj;
-
-	graphFunc::sortEdgeList(edgeList, lb, le, numEdges);
-	graphFunc::sortEdgeList(edgeList, rb, re, numEdges);
-
 }
 
 void clusterFunc::doKcluster(Cluster *clusters, int numClusters, std::vector<Sample*> samples)

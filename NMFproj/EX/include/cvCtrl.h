@@ -13,8 +13,8 @@
 
 namespace {
 	namespace cvCtrl {
-		namespace skip { enum Type { yes, no }; };
-		namespace destroy { enum Type { yes, no }; };
+		namespace skip { enum Type { no, yes }; };
+		namespace destroy { enum Type { no, yes }; };
 	}
 
 	void displayImage(const char *windowName, cv::Mat imgToshow, int skip = 1, int flag = 0)
@@ -25,7 +25,7 @@ namespace {
 		while (key != myESC)
 		{
 			cv::imshow(windowName, imgToshow);
-			if (skip == 0)
+			if (skip == 1)
 			{
 				cv::waitKey(1);
 				key = myESC;
@@ -34,7 +34,7 @@ namespace {
 				key = cv::waitKey();
 			}
 		}
-		if (flag == 0)
+		if (flag == 1)
 			cv::destroyWindow(windowName);
 	}
 
