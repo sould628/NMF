@@ -147,7 +147,7 @@ void vMFtexture::generatevMFmaps()
 			{
 				float tKappa = { 0.f };
 				float tR[3] = { 0.f };
-				float prevData[4][10][4];
+				float prevData[4][20][4];
 				for (int i = 0; i < 4; i++)
 				{
 					for (int l = 0; l < numLobes; l++)
@@ -205,11 +205,11 @@ void vMFtexture::generatevMFmaps()
 	delete[] aux; delete[] alpha;
 }
 
-void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][10][4])
+void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][20][4])
 {
 	int iteration = 0;
 
-	float mu[10][3], kappa[10];
+	float mu[20][3], kappa[20];
 	int numLobes = this->numLobes;
 	int sideX = targetRegion.cols, sideY = targetRegion.rows;
 	int area = sideX*sideY;
@@ -274,7 +274,7 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 				cv::Vec3f Vec3_ni = targetRegion.at<cv::Vec3f>(row, col);
 				float float_ni[3] = { Vec3_ni[0], Vec3_ni[1], Vec3_ni[2] };
 				double zsum = 0;
-				double vMFzij[10];
+				double vMFzij[20];
 				for (int j = 0; j < numLobes; j++)
 				{
 					vMFzij[j] = vMFfunc::vMF(float_ni, mu[j], kappa[j]);
@@ -289,8 +289,8 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		//E End
 
 		//M
-		float zj[10] = { 0.f };
-		cv::Vec3f Vec3_znj[10] = { 0.f };
+		float zj[20] = { 0.f };
+		cv::Vec3f Vec3_znj[20] = { 0.f };
 		for (int j = 0; j < numLobes; j++)
 		{
 			for (int row = 0; row < sideY; row++)
@@ -309,7 +309,7 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 			if (zj[j] < 0.01)
 				zj[j] = 0.01;
 		}
-		cv::Vec3f Vec3_aux[10];
+		cv::Vec3f Vec3_aux[20];
 		//Alpha
 		for (int j = 0; j < numLobes; j++)
 		{

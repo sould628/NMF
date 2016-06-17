@@ -45,10 +45,10 @@
     <ClInclude Include="include\string_extra.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="vMFtexture.h">
+    <ClInclude Include="include\cvCtrl.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="include\cvCtrl.h">
+    <ClInclude Include="vMFtexture.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
