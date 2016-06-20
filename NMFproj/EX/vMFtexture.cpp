@@ -178,9 +178,8 @@ void vMFtexture::generatevMFmaps()
 				//prevData for mu initialization
 				this->computeParameters(alpha, aux, targetRegion, prevData);
 				
-
-				if (m==mipmapLevel-1)
-				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 0, 0);
+//				if(m!=1)
+//				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 1, 0);
 				//alignment between neighboring pixels of same mipmap level
 
 				for (int l = 0; l < numLobes; l++)
@@ -227,13 +226,13 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 
 
 	//Initialization method1
-	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 10.f;
+	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 500.f;
 	for (int i = 0; i < numLobes-1; i++)
 	{
 		mu[i+1][0] = cos(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][1] = sin(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][2] = 0.f;
-		kappa[i + 1] = 10.f;
+		kappa[i + 1] = 500.f;
 	}
 
 
@@ -280,13 +279,19 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 					vMFzij[j] = vMFfunc::vMF(float_ni, mu[j], kappa[j]);
 					zsum += vMFzij[j];
 				}
+				if (zsum < 0.001)
+				{
+					zsum = 0.001;
+				}
 				for (int j = 0; j < numLobes; j++)
 				{
 					z[j][sideX*row + col] = vMFzij[j] / zsum;
+
 				}
 			}
 		}
 		//E End
+
 
 		//M
 		float zj[20] = { 0.f };
@@ -306,8 +311,8 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 
 		for (int j = 0; j < numLobes; j++)
 		{
-			if (zj[j] < 0.01)
-				zj[j] = 0.01;
+			if (zj[j] < 0.0001)
+				zj[j] = 0.0001;
 		}
 		cv::Vec3f Vec3_aux[20];
 		//Alpha
@@ -325,12 +330,16 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 			mu[j][1] = aux[j][1];
 			mu[j][2] = aux[j][2];
 			vectorFunc::normalize(mu[j]);
+			float musqr = sqrt(mu[j][0] * mu[j][0] + mu[j][1] * mu[j][1] + mu[j][2] * mu[j][2]);
+
 		}
 		if (iteration++ == 100)
 			converge = true;
 	}
-
-
+	if (isnan<float>(alpha[0]))
+		std::cout << alpha[0] << std::endl;
+//	std::cout << "alpha: " << alpha[0] << std::endl;
+//	std::cout << "zj: " << zj[0] << std::endl;
 	for (int i = 0; i < numLobes; i++)
 	{
 		delete[] z[i];
@@ -518,7 +527,14 @@ cv::Mat vMFfunc::cvLoadImage(const char* filename, int &imageWidth, int &imageHe
 double vMFfunc::vMF(float normal[3], float mu[3], float kappa) {
 	double NdotMu = (mu[0] * normal[0]) + (mu[1] * normal[1]) + (mu[2] * normal[2]);
 	double Kappa = kappa;
+	if (Kappa == 0)
+		Kappa = 0.0001;
+	if (Kappa > 700.)
+		Kappa = 700.;
 	double result = (Kappa / (4 * vmfPI*sinh(Kappa)))*exp(Kappa*(NdotMu));
+
+//	if (isnan<double>(result))
+//		std::cout << "wrong vMF value\n";
 
 	return result;
 }
@@ -579,16 +595,18 @@ void vectorFunc::normalize(float input[3])
 {
 	int counter = 0;
 	float norm = vectorFunc::norm(input);
-	while ((vectorFunc::norm(input) > 1.f)||(counter++>=4))
+	if (norm == 0)
+		return;
+	input[0] /= norm;
+	input[1] /= norm;
+	input[2] /= norm;
+	norm = vectorFunc::norm(input);
+	while ((norm > 1.0000f)|| (norm < 0.999999f))
 	{
 		input[0] /= norm;
 		input[1] /= norm;
 		input[2] /= norm;
 		norm = vectorFunc::norm(input);
-	}
-	if (vectorFunc::norm(input)>1.f)
-	{
-		std::cout << "\nWarning! Normalized vector is larger than 1\n";
 	}
 }
 float vectorFunc::norm(float input[3])
