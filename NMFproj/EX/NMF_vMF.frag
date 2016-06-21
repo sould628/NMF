@@ -118,7 +118,7 @@ void main(void)
 		float HdotMu=dot(h,mu);
 		Bs=((sPrime+1.0)/(2.0*PI))*pow(HdotMu, sPrime);
 		float LdotMu=max(dot(lightDir,mu),0.0);
-		effBRDF+=(alpha*(Ks*Bs+Kd*LdotMu));
+		effBRDF+=(alpha*(Ks*Bs+Kd)*LdotMu);
 	}
 
 	switch(renderScene){

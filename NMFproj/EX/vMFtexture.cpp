@@ -193,8 +193,8 @@ void vMFtexture::generatevMFmaps()
 				//prevData for mu initialization
 				this->computeParameters(alpha, aux, targetRegion, prevData);
 				
-//				if(m!=1)
-//				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 1, 0);
+				if(m>6)
+				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 1, 0);
 				//alignment between neighboring pixels of same mipmap level
 
 				for (int l = 0; l < numLobes; l++)
@@ -212,18 +212,11 @@ void vMFtexture::generatevMFmaps()
 	}
 
 	char* outName="out_";
-	std::cout << outName;
 	for (int m = 0; m < mipmapLevel; m++)
 	{
 		for (int l = 0; l < numLobes; l++)
 		{
-			char* t="";
-			_itoa(m, t, 10);
-			strcat(outName, t);
-			strcat(outName, "_");
-			_itoa(l, t, 10);
-			strcat(outName, t);
-			std::cout << outName;
+
 	
 		}
 	}

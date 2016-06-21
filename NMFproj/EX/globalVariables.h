@@ -3,7 +3,7 @@
 #define MAXITERATION 10
 
 
-extern const char* NMT = "./3.jpg";
+extern const char* NMT = "./2.jpg";
 extern const int numLobes = 6;
 extern const int textLobes = 4;
 extern int MipMapLevel = 3;
@@ -15,7 +15,7 @@ extern int renderMode = 3;
 extern int renderScene = 0;
 extern int MipMapped = 1;
 
-extern const float BPexp = 500.0f;
+extern const float BPexp = 100.0f;
 
 
 
