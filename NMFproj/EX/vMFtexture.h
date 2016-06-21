@@ -210,7 +210,7 @@ namespace vectorFunc
 {
 	void normalize(float input[3]);
 	float norm(float input[3]);
-
+	float dotProd(float a[3], float b[3]);
 }
 
 namespace clusterFunc {

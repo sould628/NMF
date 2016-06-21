@@ -1,3 +1,5 @@
+#include <string>
+
 #include "vMFtexture.h"
 
 
@@ -102,6 +104,19 @@ void vMFtexture::generatevMFmaps()
 		aux[l] = new float[3];
 	}
 
+	for (int i = 0; i < rawData.rows; i++)
+	{
+		for (int j = 0; j < rawData.cols; j++)
+		{
+			cv::Vec3f ntemp = rawData.at<cv::Vec3f>(i, j);
+			float nftemp[3] = { ntemp[0], ntemp[1], ntemp[2] };
+			vectorFunc::normalize(nftemp);
+			rawData.at<cv::Vec3f>(i, j) = cv::Vec3f(nftemp[0], nftemp[1], nftemp[2]);
+
+		}
+	}
+
+
 	//Seed Level
 	float seedAlpha = 1.f / numLobes;
 	float seedAlpha2 = 1.f / numLobes;
@@ -138,7 +153,7 @@ void vMFtexture::generatevMFmaps()
 	for (int m = 1; m < mipmapLevel; m++)
 	{
 		width = this->vWidth[m]; height = this->vHeight[m];
-		std::cout << "Proceeding mipmap level " << m << " generagion (" << width << ", " << height << ")\n";
+		std::cout << "Proceeding mipmap level " << m << " generation (" << width << ", " << height << ")\n";
 		int side = pow(2, m);
 
 		for (int w = 0; w < width; w++)
@@ -173,7 +188,7 @@ void vMFtexture::generatevMFmaps()
 				}
 				cv::Rect ROI(w*side, h*side, side, side);
 				cv::Mat targetRegion; 
-				targetRegion = originalNormals[0](ROI).clone();
+				targetRegion = rawData(ROI).clone();
 
 				//prevData for mu initialization
 				this->computeParameters(alpha, aux, targetRegion, prevData);
@@ -196,6 +211,22 @@ void vMFtexture::generatevMFmaps()
 		}
 	}
 
+	char* outName="out_";
+	std::cout << outName;
+	for (int m = 0; m < mipmapLevel; m++)
+	{
+		for (int l = 0; l < numLobes; l++)
+		{
+			char* t="";
+			_itoa(m, t, 10);
+			strcat(outName, t);
+			strcat(outName, "_");
+			_itoa(l, t, 10);
+			strcat(outName, t);
+			std::cout << outName;
+	
+		}
+	}
 
 	for (int l = 0; l < numLobes; l++)
 	{
@@ -226,41 +257,20 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 
 
 	//Initialization method1
-	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 500.f;
+	float align[20][3] = { 0.f };
+	mu[0][0] = 0.0f; mu[0][1] = 0.0f; mu[0][2] = 1.0f; kappa[0] = 700.f;
+	align[0][0] = 0.0f; align[0][1] = 0.0f; align[0][2] = 1.0f;
 	for (int i = 0; i < numLobes-1; i++)
 	{
 		mu[i+1][0] = cos(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][1] = sin(i*(2 * vmfPI) / (numLobes - 1));
 		mu[i+1][2] = 0.f;
-		kappa[i + 1] = 500.f;
+		kappa[i + 1] = 700.f;
+
+		align[i + 1][0] = cos(i*(2 * vmfPI) / (numLobes - 1));
+		align[i + 1][1] = sin(i*(2 * vmfPI) / (numLobes - 1));
+		align[i + 1][2] = 0.f;
 	}
-
-
-	//initialization method2
-//	int idx = 0;
-//	bool match_found;
-//	for (int i = 0; i < numLobes; i++)
-//	{
-//		cv::Vec3f temp = targetRegion.at<cv::Vec3f>((idx%sideX), (idx / sideX));
-//		for (int j = 0; j < i; j++)
-//		{
-//			if ((temp[0] == mu[j][0]) && (temp[1] == mu[j][1]) && (temp[2] == mu[j][2]))
-//			{
-//								i--;
-//				match_found = true;
-//			}
-//		}
-//		idx++;
-//		if (match_found)
-//		{
-//			match_found = false;
-//			continue;
-//		}
-//		else
-//		{
-//			mu[i][0] = temp[0]; mu[i][1] = temp[1]; mu[i][2] = temp[2];
-//		}
-//	}
 
 	bool converge = false;
 	while (!converge)
@@ -286,6 +296,11 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 				for (int j = 0; j < numLobes; j++)
 				{
 					z[j][sideX*row + col] = vMFzij[j] / zsum;
+					if (isinf<float>(zsum))
+					{
+						std::cout << "inf zsum detected\n";
+						z[j][sideX*row + col] = 0.f;
+					}
 
 				}
 			}
@@ -311,8 +326,8 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 
 		for (int j = 0; j < numLobes; j++)
 		{
-			if (zj[j] < 0.0001)
-				zj[j] = 0.0001;
+			if (zj[j] < 0.01)
+				zj[j] = 0.01;
 		}
 		cv::Vec3f Vec3_aux[20];
 		//Alpha
@@ -321,14 +336,18 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 
 			alpha[j] = zj[j] / (float)area;
 			Vec3_aux[j] = Vec3_znj[j] / zj[j];
+
 			aux[j][0] = Vec3_aux[j][0];
 			aux[j][1] = Vec3_aux[j][1];
 			aux[j][2] = Vec3_aux[j][2];
-			float lenAux = vectorFunc::norm(aux[j]);
+			float lenAux = cv::norm(Vec3_aux[j]);
 			kappa[j] = ((3 * lenAux) - (lenAux*lenAux*lenAux)) / (1 - lenAux*lenAux);
-			mu[j][0] = aux[j][0];
-			mu[j][1] = aux[j][1];
-			mu[j][2] = aux[j][2];
+			if (kappa[j] < 0.f)
+				kappa[j] = 700.f;
+			Vec3_aux[j] = cv::normalize(Vec3_aux[j]);
+			mu[j][0] = Vec3_aux[j][0];
+			mu[j][1] = Vec3_aux[j][1];
+			mu[j][2] = Vec3_aux[j][2];
 			vectorFunc::normalize(mu[j]);
 			float musqr = sqrt(mu[j][0] * mu[j][0] + mu[j][1] * mu[j][1] + mu[j][2] * mu[j][2]);
 
@@ -336,10 +355,34 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		if (iteration++ == 100)
 			converge = true;
 	}
-	if (isnan<float>(alpha[0]))
-		std::cout << alpha[0] << std::endl;
+	for (int i = 0; i < numLobes; i++)
+	{
+		if (isnan<float>(alpha[i]))
+			std::cout << alpha[i] << std::endl;
+	}
 //	std::cout << "alpha: " << alpha[0] << std::endl;
 //	std::cout << "zj: " << zj[0] << std::endl;
+
+	for (int i = 0; i < numLobes; i++)
+	{
+		float val[20] = { 0.f };
+		for (int j = i; j < numLobes; j++)
+		{
+			val[j] = vectorFunc::dotProd(align[i], aux[j]);
+		}
+		float highestVal = 0.f;
+		int ind;
+		for (int k = 0; k < numLobes; k++)
+		{
+			if (highestVal < val[k])
+				highestVal = val[k];
+			ind = k;
+		}
+		float temp[3] = { aux[ind][0], aux[ind][1], aux[ind][2] };
+		aux[ind][0] = aux[i][0]; aux[ind][1] = aux[i][1]; aux[ind][2] = aux[i][2];
+		aux[i][0] = temp[0]; aux[i][1] = temp[1]; aux[i][2] = temp[2];
+	}
+
 	for (int i = 0; i < numLobes; i++)
 	{
 		delete[] z[i];
@@ -525,6 +568,9 @@ cv::Mat vMFfunc::cvLoadImage(const char* filename, int &imageWidth, int &imageHe
 	return floatScale;
 }
 double vMFfunc::vMF(float normal[3], float mu[3], float kappa) {
+	float normalNorm = vectorFunc::norm(normal);
+	if ((normalNorm > 1.f) || (normalNorm < 0.99999f))
+		vectorFunc::normalize(normal);
 	double NdotMu = (mu[0] * normal[0]) + (mu[1] * normal[1]) + (mu[2] * normal[2]);
 	double Kappa = kappa;
 	if (Kappa == 0)
@@ -533,8 +579,13 @@ double vMFfunc::vMF(float normal[3], float mu[3], float kappa) {
 		Kappa = 700.;
 	double result = (Kappa / (4 * vmfPI*sinh(Kappa)))*exp(Kappa*(NdotMu));
 
-//	if (isnan<double>(result))
-//		std::cout << "wrong vMF value\n";
+	if (isinf<double>(result))
+	{
+		std::cout << "inf vMF value detected\n";
+
+	}
+	if (isnan<double>(result))
+		std::cout << "wrong vMF value\n";
 
 	return result;
 }
@@ -601,7 +652,7 @@ void vectorFunc::normalize(float input[3])
 	input[1] /= norm;
 	input[2] /= norm;
 	norm = vectorFunc::norm(input);
-	while ((norm > 1.0000f)|| (norm < 0.999999f))
+	while ((norm > 1.00000f)|| (norm < 0.999999f))
 	{
 		input[0] /= norm;
 		input[1] /= norm;
@@ -612,6 +663,13 @@ void vectorFunc::normalize(float input[3])
 float vectorFunc::norm(float input[3])
 {
 	return sqrt((input[0] * input[0]) + (input[1] * input[1]) + (input[2] * input[2]));
+}
+
+float vectorFunc::dotProd(float a[3], float b[3])
+{
+	float ret;
+	ret = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+	return ret;
 }
 
 void clusterFunc::doKcluster(Cluster *clusters, int numClusters, std::vector<Sample*> samples)
