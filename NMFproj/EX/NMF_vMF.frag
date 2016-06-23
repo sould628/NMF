@@ -60,7 +60,7 @@ void main(void)
 //	vec3 lightAngle=normalize((mv_matrix*lightPos).xyz-fs_in.p.xyz);
 
 	vec3 toeye=normalize(-fs_in.p.xyz);
-	vec3 h=normalize((toeye+lightDir)/2);
+//	vec3 h=normalize((toeye+lightDir)/2);
 
 	v.x=dot(fs_in.eyePos, fs_in.t);
 	v.y=dot(fs_in.eyePos, fs_in.b);
@@ -69,19 +69,19 @@ void main(void)
 	eyeDir=normalize(v);
 
 	//diriectional (lightPos =(x,x,x,0.0) in vert shader)
-	v.x=dot(fs_in.lightPos.xyz, fs_in.t);
-	v.y=dot(fs_in.lightPos.xyz, fs_in.b);
-	v.z=dot(fs_in.lightPos.xyz, fs_in.n);
+//	v.x=dot(fs_in.lightPos.xyz, fs_in.t);
+//	v.y=dot(fs_in.lightPos.xyz, fs_in.b);
+//	v.z=dot(fs_in.lightPos.xyz, fs_in.n);
 
 	//point (lightPos = (x,x,x,1.0) in vert shader)
-//	v.x=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.t);
-//	v.y=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.b);
-//	v.z=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.n);
+	v.x=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.t);
+	v.y=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.b);
+	v.z=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.n);
 
 
 	lightDir=normalize(v);
 
-	h=normalize(-eyeDir+lightDir);
+	vec3 h=normalize(-eyeDir+lightDir);
 	
 	vec4 coeffs[10];
 	coeffs[0]=texture2D(vMFmap1, fs_in.texCoord.xy);

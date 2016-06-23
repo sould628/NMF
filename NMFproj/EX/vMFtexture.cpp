@@ -193,8 +193,8 @@ void vMFtexture::generatevMFmaps()
 				//prevData for mu initialization
 				this->computeParameters(alpha, aux, targetRegion, prevData);
 				
-				if(m>6)
-				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 1, 0);
+//				if(m>6)
+//				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 1, 0);
 				//alignment between neighboring pixels of same mipmap level
 
 				for (int l = 0; l < numLobes; l++)
@@ -503,31 +503,37 @@ void vMFfunc::displayvMF(int numLobes, float *alpha, float **aux, int width, int
 	float *a = alpha;
 	float **r = aux;
 
-	cv::Mat NMFdisplay = cv::Mat::zeros(width, height, CV_32FC1);
+	cv::Mat NMFdisplay = cv::Mat::zeros(width, height, CV_32FC3);
 
 	float center[2] = { (float)height / 2, width / 2 };
 	for (int w = 0; w < width; w++)
 	{
 		for (int h = 0; h < height; h++)
 		{
+			float val = 0;
+			cv::Vec3f value(0.f, 0.f, 0.f);
 			for (int i = 0; i < numLobes; i++)
 			{
 				float mu[3] = { r[i][0], r[i][1], r[i][2] };
 				float kappa = 0;
 				vectorFunc::normalize(mu);
 				kappa = vMFfunc::r2kappa((float*)r[i]);
-				cv::Vec3f value = 0.f;
 				float curPos[3] = { 2.f*(float)(w - center[0]) / (float)width,  2.f*(float)(h - center[1]) / (float)height, 0.f };
 				if (((curPos[0] * curPos[0]) + (curPos[1] * curPos[1])) > 1.f)
 				{
-					continue;
+					value = cv::Vec3f(0.f, 30.f, 0.f);
+					break;
 				}
 				else
 				{
 					curPos[2] = sqrt(1 - ((curPos[0] * curPos[0]) + (curPos[1] * curPos[1])));
-					NMFdisplay.at<float>(h, w) += alpha[i] * vMFfunc::vMF(curPos, mu, kappa);
+					val+= alpha[i] * vMFfunc::vMF(curPos, mu, kappa);
+					value = cv::Vec3f(val, val, val);
 				}
 			}
+			NMFdisplay.at<cv::Vec3f>(h, w) = value;
+			value = cv::Vec3f(0.f, 0.f, 0.f);
+			val = 0.f;
 		}
 	}
 	normalize(NMFdisplay, NMFdisplay, 1.f, 0.f, cv::NORM_MINMAX);

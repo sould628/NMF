@@ -1448,6 +1448,12 @@ void keyboardCB(unsigned char key, int x, int y){
 //			if (MipMapped == 0) { std::cout << "NotMipMapped\n"; } else { std::cout << "MipMapped\n"; }
 			(MipMapped == 0) ? (std::cout << "NotMipMapped\n") : (std::cout << "MipMapped\n");
 			break;
+		case 'r':
+			
+			delete NMFvMF;
+			NMFvMF = new GLSLProgram("NMF_vMF.vert", "NMF_vMF.frag");
+			std::cout << "Renewed GLSL Program\n";
+			break;
 		}
 	}
 	glutPostRedisplay();
