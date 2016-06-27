@@ -26,7 +26,7 @@ out VS_OUT{
 
 void main(void)
 {
-	double texSize=1000.0;
+	double texSize=50.0;
 	double modelSize=0.5;
 	vec4 lightPos=vec4(10.0, 0.0f, 10.0f, 0.0f);
 	const vec4 vertices[4] = vec4[](vec4(modelSize, modelSize, 0.0, 1.0), vec4(-modelSize, modelSize, 0.0, 1.0), vec4(-modelSize, -modelSize, 0.0, 1.0), vec4(modelSize, -modelSize, 0.0, 1.0));
