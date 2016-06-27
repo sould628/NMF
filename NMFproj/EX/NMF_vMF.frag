@@ -37,7 +37,7 @@ in VS_OUT{
 out vec4 color;
 
 
-vec4 lightIntensity=vec4(1.0f, 1.0f, 1.f, 1.0f);
+vec4 lightIntensity=vec4(3.0f, 3.0f, 3.f, 1.0f);
 
 vec4 Kd=vec4(0.f,0.f,0.f,1.0f);
 vec4 Ks=vec4(1.f,1.f,1.f,1.0f);
@@ -115,7 +115,7 @@ void main(void)
 		mu=normalize(aux);
 
 		sPrime=(kappa*BPexp)/(kappa+BPexp);
-		float HdotMu=dot(h,mu);
+		float HdotMu=max(dot(h,mu),0.0);
 		Bs=((sPrime+1.0)/(2.0*PI))*pow(HdotMu, sPrime);
 		float LdotMu=max(dot(lightDir,mu),0.0);
 		effBRDF+=(alpha*(Ks*Bs+Kd)*LdotMu);
