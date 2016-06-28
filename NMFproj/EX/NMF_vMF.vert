@@ -26,7 +26,7 @@ out VS_OUT{
 
 void main(void)
 {
-	double texSize=1000.0;
+	double texSize=100.0;
 	double modelSize=0.5;
 	vec4 lightPos=vec4(10.0, 0.0f, 10.0f, 0.0f);
 	const vec4 vertices[4] = vec4[](vec4(modelSize, modelSize, 0.0, 1.0), vec4(-modelSize, modelSize, 0.0, 1.0), vec4(-modelSize, -modelSize, 0.0, 1.0), vec4(modelSize, -modelSize, 0.0, 1.0));
@@ -43,7 +43,7 @@ void main(void)
 	
 	vs_out.eyePos=vec3(mv_matrix*vertices[gl_VertexID]);
 	vs_out.lightPos=vec3(mv_matrix*lightPos);
-//	vs_out.lightPos=lightPos.xyz;
+	vs_out.lightPos=lightPos.xyz;
 
 	vs_out.p=mv_matrix*vertices[gl_VertexID];
 	gl_Position=proj_matrix*mv_matrix*vertices[gl_VertexID];

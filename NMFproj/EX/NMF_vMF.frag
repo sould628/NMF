@@ -15,7 +15,7 @@ layout (location = 10) uniform mat4 mv_matrix;
 
 
 layout (location = 100) uniform int numLobes;
-layout (location = 101) uniform float BPexp;
+//layout (location = 101) uniform float BPexp;
 
 layout (location = 1000) uniform int renderScene;
 layout (location = 1001) uniform int MipMapped;
@@ -40,12 +40,12 @@ out vec4 color;
 vec4 lightIntensity=vec4(3.0f, 3.0f, 3.f, 1.0f);
 
 vec4 Kd=vec4(0.f,0.f,0.f,1.0f);
-vec4 Ks=vec4(1.f,1.f,1.f,1.0f);
+vec4 Ks=vec4(1.f,0.0f,0.f,1.0f);
 vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
 void main(void)
 {
-	
+	const float BPexp=10.f;
 	vec4 effBRDF=vec4(0.0,0.0,0.0,1.0);
 	vec3 v=vec3(0.0, 0.0, 0.0);
 	color=vec4(0.0, 0.0, 0.0, 0.0);
