@@ -1,1 +1,27 @@
+<<<<<<< HEAD
 ﻿  EX.vcxproj -> E:\Hyo\Github\NMF\NMFproj\EX\./bin/release/EX.exe
+=======
+﻿  main.cpp
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(18): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_face' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(27): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_sphere' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(36): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_plane' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(41): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_vector' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(57): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_material' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(64): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_camera' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(70): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_light_point' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(77): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_light_disc' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(83): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_light_quad' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(106): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_growable_scene_data' 왼쪽은 무시됩니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(139): warning C4091: 'typedef ': 변수를 선언하지 않으면 'obj_scene_data' 왼쪽은 무시됩니다.
+C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\include\opencv2/core/mat.hpp(1914): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\include\opencv2/core/persistence.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\include\opencv2/core/utility.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\include\opencv2/core/utility.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\vMFtexture.h(47): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  코드를 생성하고 있습니다.
+  7 of 253 functions ( 2.8%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
+  코드를 생성했습니다.
+  EX.vcxproj -> C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\./bin/release/EX.exe
+>>>>>>> origin/master
