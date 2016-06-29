@@ -31,21 +31,21 @@ in VS_OUT{
 	vec3 t;
 	vec3 b;
 	vec4 p;
-	vec4 texCoord;
+	vec2 texCoord;
 }fs_in;
 //output into color buffer frame
 out vec4 color;
 
 
-vec4 lightIntensity=vec4(3.0f, 3.0f, 3.f, 1.0f);
+vec4 lightIntensity=vec4(1.0f, 1.0f, 1.f, 1.0f);
 
-vec4 Kd=vec4(0.f,0.f,0.f,1.0f);
-vec4 Ks=vec4(1.f,0.0f,0.f,1.0f);
+vec4 Kd=vec4(0.1f,0.f,0.f,1.0f);
+vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
 vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
 void main(void)
 {
-	const float BPexp=10.f;
+	const float BPexp=100.f;
 	vec4 effBRDF=vec4(0.0,0.0,0.0,1.0);
 	vec3 v=vec3(0.0, 0.0, 0.0);
 	color=vec4(0.0, 0.0, 0.0, 0.0);
@@ -57,17 +57,12 @@ void main(void)
 	//lightDir: w_i
 	//toeye: w_o
 	//h:half
-//	vec3 lightAngle=normalize((mv_matrix*lightPos).xyz-fs_in.p.xyz);
-
-	vec3 toeye=normalize(-fs_in.p.xyz);
-//	vec3 h=normalize((toeye+lightDir)/2);
 
 	v.x=dot(fs_in.eyePos, fs_in.t);
 	v.y=dot(fs_in.eyePos, fs_in.b);
 	v.z=dot(fs_in.eyePos, fs_in.n);
 
 	eyeDir=normalize(v);
-
 	//diriectional (lightPos =(x,x,x,0.0) in vert shader)
 //	v.x=dot(fs_in.lightPos.xyz, fs_in.t);
 //	v.y=dot(fs_in.lightPos.xyz, fs_in.b);
@@ -78,11 +73,16 @@ void main(void)
 	v.y=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.b);
 	v.z=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.n);
 
-
 	lightDir=normalize(v);
-
 	vec3 h=normalize(-eyeDir+lightDir);
 	
+
+//	lightDir=normalize((mv_matrix*vec4(fs_in.lightPos,1)).xyz-fs_in.p.xyz);
+//	lightDir=normalize((vec4(fs_in.lightPos,1)).xyz-fs_in.p.xyz);
+	vec3 toeye=normalize(-fs_in.p.xyz);
+//	h=normalize((toeye+lightDir)/2);
+
+
 	vec4 coeffs[10];
 	coeffs[0]=texture2D(vMFmap1, fs_in.texCoord.xy);
 	coeffs[1]=texture2D(vMFmap2, fs_in.texCoord.xy);
@@ -107,10 +107,9 @@ void main(void)
 
 
 		alpha=coeffs[i].x;
-		aux=coeffs[i].yzw/max(alpha,0.001);
+		aux=coeffs[i].yzw/max(alpha,0.00001);
 		r=length(aux);
-		kappa=((3*r)-(r*r*r))/max(0.01, (1.0-(r*r)));
-
+		kappa=((3*r)-(r*r*r))/max(0.000001, (1.0-(r*r)));
 
 		mu=normalize(aux);
 
@@ -125,6 +124,7 @@ void main(void)
 		case 0:
 		{
 			color=(lightIntensity*effBRDF);
+//			color=vec4(1.0, 1.0, 0.0, 0.0);
 			break;
 		}
 		case 1:

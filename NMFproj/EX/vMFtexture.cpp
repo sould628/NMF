@@ -193,8 +193,8 @@ void vMFtexture::generatevMFmaps()
 				//prevData for mu initialization
 				this->computeParameters(alpha, aux, targetRegion, prevData);
 				
-				if(m>6)
-				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 0, 0);
+//				if(m>6)
+//				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 0, 0);
 				//alignment between neighboring pixels of same mipmap level
 
 				for (int l = 0; l < numLobes; l++)

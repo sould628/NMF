@@ -123,8 +123,8 @@ private:
 public:
 	Camera();
 	void glRender();
-	void getPosition(float* pos);
-	void setPosition(float x, float y, float z);
+	void getPosition(float* pos, float* lookat, float* up);
+	void setPosition(float* pos, float* lookat, float* up);
 	void setLookat(float x, float y, float z);
 	void setUp(float x, float y, float z);
 	void setViewAngle(float viewAngle_);
@@ -141,11 +141,16 @@ private:
 	float zNear, zFar;
 
 };
-void Camera::getPosition(float* pos){
-	pos[0] = position[0];
-	pos[1] = position[1];
-	pos[2] = position[2];
-
+void Camera::getPosition(float* pos, float* lookat, float*up){
+	pos[0] = ori_vec[0];
+	pos[1] = ori_vec[1];
+	pos[2] = ori_vec[2];
+	lookat[0] = this->lookat[0];
+	lookat[1] = this->lookat[1];
+	lookat[2] = this->lookat[2];
+	up[0] = this->up[0];
+	up[1] = this->up[1];
+	up[2] = this->up[2];
 }
 Camera::Camera(){
 	ori_vec[0] = 0;
@@ -158,10 +163,16 @@ Camera::Camera(){
 	zNear = 0.001;
 	zFar = 100;
 }
-void Camera::setPosition(float x, float y, float z){
-	position[0] = x;
-	position[1] = y;
-	position[2] = z;
+void Camera::setPosition(float* pos, float* lookat, float* up){
+	ori_vec[0] = pos[0];
+	ori_vec[1] = pos[1];
+	ori_vec[2] = pos[2];
+	this->lookat[0] = lookat[0];
+	this->lookat[1] = lookat[1];
+	this->lookat[2] = lookat[2];
+	this->up[0] = up[0];
+	this->up[1] = up[1];
+	this->up[2] = up[2];
 }
 void Camera::setLookat(float x, float y, float z){
 	lookat[0] = x;

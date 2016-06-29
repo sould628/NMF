@@ -6,6 +6,8 @@
 #include <math.h>
 #include <algorithm> //min max
 #include <float.h> //isinf
+#include <iostream>
+#include <fstream>
 
 #include <GL/glew.h>
 #include <GL/glut.h>
@@ -1195,9 +1197,7 @@ void displayCB(){
 
 	cam->glRender();
 
-	float eyePos[3] = { 0 };
 
-	cam->getPosition(eyePos);
 
 //	std::cout << "eyePos: " << eyePos[0] << " " << eyePos[1] << " " << eyePos[2] << "\n";
 
@@ -1208,8 +1208,6 @@ void displayCB(){
 	normalMatrix[0] = modelviewMatrix[0]; normalMatrix[3] = modelviewMatrix[4]; normalMatrix[6] = modelviewMatrix[8];
 	normalMatrix[1] = modelviewMatrix[1]; normalMatrix[4] = modelviewMatrix[5]; normalMatrix[7] = modelviewMatrix[9];
 	normalMatrix[2] = modelviewMatrix[2]; normalMatrix[5] = modelviewMatrix[6]; normalMatrix[8] = modelviewMatrix[10];
-
-
 
 	switch (renderMode){
 	case 0:
@@ -1449,12 +1447,48 @@ void keyboardCB(unsigned char key, int x, int y){
 			(MipMapped == 0) ? (std::cout << "NotMipMapped\n") : (std::cout << "MipMapped\n");
 			break;
 		case 'r':
-			
 			delete NMFvMF;
 			NMFvMF = new GLSLProgram("NMF_vMF.vert", "NMF_vMF.frag");
 			std::cout << "Renewed GLSL Program\n";
 			break;
+		case 'q':
+		{
+			GLfloat m[16];
+			glGetFloatv(GL_MODELVIEW_MATRIX, m);
+
+			std::ofstream camFile("camPos");
+			float pos[3], up[3], lookat[3];
+			cam->getPosition(pos, lookat, up);
+			camFile << pos[0] << " " << pos[1] << " " << pos[2]<<"\n";
+			camFile << lookat[0] << " " << lookat[1] << " " << lookat[2] << "\n";
+			camFile << up[0] << " " << up[1] << " " << up[2] << "\n";
+
+			camFile.close();
+			std::cout << "Saved Cam Pos\n";
+			std::cout << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
+			break;
 		}
+
+		case 'w':
+		{
+			GLfloat m[16];
+			glGetFloatv(GL_MODELVIEW_MATRIX, m);
+
+			float pos[3], lookat[3], up[3];
+			std::ifstream camFile("camPos");
+			camFile >> pos[0] >> pos[1]  >> pos[2];
+			camFile >> lookat[0] >> lookat[1] >> lookat[2];
+			camFile >> up[0] >> up[1] >> up[2];
+
+			cam->setPosition(pos, lookat, up);
+
+			std::cout << "loaded cam\n";
+
+			break;
+		}
+
+		}
+
 	}
 	glutPostRedisplay();
 }
