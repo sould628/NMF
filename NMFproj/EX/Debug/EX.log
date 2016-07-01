@@ -1,60 +1,14 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(388,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (NMF.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (NMF.vcxproj).  This can lead to incorrect clean and rebuild behavior.
   main.cpp
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(18): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_face' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(27): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_sphere' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(36): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_plane' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(41): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_vector' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(57): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_material' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(64): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_camera' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(70): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_point' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(77): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_disc' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(83): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_light_quad' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(106): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_growable_scene_data' 왼쪽은 무시됩니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\obj_parser.h(139): warning C4091: 'typedef ' : 변수를 선언하지 않으면 'obj_scene_data' 왼쪽은 무시됩니다.
 c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\mat.hpp(1914): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
 c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\persistence.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
 c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\utility.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.h(47): warning C4018: '<' : signed 또는 unsigned가 일치하지 않습니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\glslprogram.h(29): warning C4715: 'GLSLProgram::readFromFile' : 모든 제어 경로에서 값을 반환하지는 않습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2038: '_MSC_VER'에 대해 불일치가 검색되었습니다. '1900' 값이 '1800'(main.obj에 위치) 값과 일치하지 않습니다.
-opencv_ts310d.lib(opencv_ts_pch.obj) : error LNK2038: '_MSC_VER'에 대해 불일치가 검색되었습니다. '1900' 값이 '1800'(main.obj에 위치) 값과 일치하지 않습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2038: '_MSC_VER'에 대해 불일치가 검색되었습니다. '1900' 값이 '1800'(main.obj에 위치) 값과 일치하지 않습니다.
-opencv_ts310d.lib(ts.obj) : error LNK2038: '_MSC_VER'에 대해 불일치가 검색되었습니다. '1900' 값이 '1800'(main.obj에 위치) 값과 일치하지 않습니다.
-MSVCRTD.lib(MSVCR120D.dll) : error LNK2005: _printf이(가) opencv_ts310d.lib(ts_perf.obj)에 이미 정의되어 있습니다.
-MSVCRTD.lib(MSVCR120D.dll) : error LNK2005: _fprintf이(가) opencv_ts310d.lib(ts_gtest.obj)에 이미 정의되어 있습니다.
-msvcprtd.lib(MSVCP120D.dll) : error LNK2005: "public: __thiscall std::_Container_base12::_Container_base12(void)" (??0_Container_base12@std@@QAE@XZ)이(가) opencv_ts310d.lib(ts_perf.obj)에 이미 정의되어 있습니다.
-msvcprtd.lib(MSVCP120D.dll) : error LNK2005: "public: __thiscall std::_Container_base12::~_Container_base12(void)" (??1_Container_base12@std@@QAE@XZ)이(가) opencv_ts310d.lib(ts_perf.obj)에 이미 정의되어 있습니다.
-msvcprtd.lib(MSVCP120D.dll) : error LNK2005: "public: void __thiscall std::_Container_base12::_Orphan_all(void)" (?_Orphan_all@_Container_base12@std@@QAEXXZ)이(가) opencv_ts310d.lib(ts_perf.obj)에 이미 정의되어 있습니다.
-msvcprtd.lib(MSVCP120D.dll) : error LNK2005: "public: struct std::_Iterator_base12 * * __thiscall std::_Container_base12::_Getpfirst(void)const " (?_Getpfirst@_Container_base12@std@@QBEPAPAU_Iterator_base12@2@XZ)이(가) opencv_ts310d.lib(ts_perf.obj)에 이미 정의되어 있습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: "void __cdecl operator delete(void *,unsigned int)" (??3@YAXPAXI@Z) 외부 기호(참조 위치: "public: virtual void * __thiscall std::basic_filebuf<char,struct std::char_traits<char> >::`scalar deleting destructor'(unsigned int)" (??_G?$basic_filebuf@DU?$char_traits@D@std@@@std@@UAEPAXI@Z) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2001: "void __cdecl operator delete(void *,unsigned int)" (??3@YAXPAXI@Z) 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts.obj) : error LNK2001: "void __cdecl operator delete(void *,unsigned int)" (??3@YAXPAXI@Z) 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: __Init_thread_header 외부 기호(참조 위치: "private: static class perf::Regression & __cdecl perf::Regression::instance(void)" (?instance@Regression@perf@@CAAAV12@XZ) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2001: __Init_thread_header 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: __Init_thread_abort 외부 기호(참조 위치: __unwindfunclet$?instance@Regression@perf@@CAAAV12@XZ$0 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2001: __Init_thread_abort 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: __Init_thread_footer 외부 기호(참조 위치: "private: static class perf::Regression & __cdecl perf::Regression::instance(void)" (?instance@Regression@perf@@CAAAV12@XZ) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2001: __Init_thread_footer 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: __imp___invalid_parameter_noinfo 외부 기호(참조 위치: _memcpy_s 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: __imp____acrt_iob_func 외부 기호(참조 위치: "public: static void __cdecl perf::TestBase::Init(class std::vector<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,class std::allocator<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > > > const &,int,char const * const * const)" (?Init@TestBase@perf@@SAXABV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@HQBQBD@Z) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2001: __imp____acrt_iob_func 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: __imp____std_exception_copy 외부 기호(참조 위치: "public: __thiscall std::exception::exception(class std::exception const &)" (??0exception@std@@QAE@ABV01@@Z) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2001: __imp____std_exception_copy 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: __imp____std_exception_destroy 외부 기호(참조 위치: "public: virtual __thiscall std::exception::~exception(void)" (??1exception@std@@UAE@XZ) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2001: __imp____std_exception_destroy 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: __imp___get_stream_buffer_pointers 외부 기호(참조 위치: "protected: void __thiscall std::basic_filebuf<char,struct std::char_traits<char> >::_Init(struct _iobuf *,enum std::basic_filebuf<char,struct std::char_traits<char> >::_Initfl)" (?_Init@?$basic_filebuf@DU?$char_traits@D@std@@@std@@IAEXPAU_iobuf@@W4_Initfl@12@@Z) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: __imp____stdio_common_vfprintf 외부 기호(참조 위치: __vfprintf_l 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2001: __imp____stdio_common_vfprintf 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: "__declspec(dllimport) public: int __thiscall std::codecvt<char,char,struct _Mbstatet>::in(struct _Mbstatet &,char const *,char const *,char const * &,char *,char *,char * &)const " (__imp_?in@?$codecvt@DDU_Mbstatet@@@std@@QBEHAAU_Mbstatet@@PBD1AAPBDPAD3AAPAD@Z) 외부 기호(참조 위치: "protected: virtual int __thiscall std::basic_filebuf<char,struct std::char_traits<char> >::uflow(void)" (?uflow@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MAEHXZ) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: "__declspec(dllimport) public: int __thiscall std::codecvt<char,char,struct _Mbstatet>::out(struct _Mbstatet &,char const *,char const *,char const * &,char *,char *,char * &)const " (__imp_?out@?$codecvt@DDU_Mbstatet@@@std@@QBEHAAU_Mbstatet@@PBD1AAPBDPAD3AAPAD@Z) 외부 기호(참조 위치: "protected: virtual int __thiscall std::basic_filebuf<char,struct std::char_traits<char> >::overflow(int)" (?overflow@?$basic_filebuf@DU?$char_traits@D@std@@@std@@MAEHH@Z) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: "__declspec(dllimport) public: int __thiscall std::codecvt<char,char,struct _Mbstatet>::unshift(struct _Mbstatet &,char *,char *,char * &)const " (__imp_?unshift@?$codecvt@DDU_Mbstatet@@@std@@QBEHAAU_Mbstatet@@PAD1AAPAD@Z) 외부 기호(참조 위치: "protected: bool __thiscall std::basic_filebuf<char,struct std::char_traits<char> >::_Endwrite(void)" (?_Endwrite@?$basic_filebuf@DU?$char_traits@D@std@@@std@@IAE_NXZ) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2019: "__declspec(dllimport) public: static unsigned int __cdecl std::codecvt<char,char,struct _Mbstatet>::_Getcat(class std::locale::facet const * *,class std::locale const *)" (__imp_?_Getcat@?$codecvt@DDU_Mbstatet@@@std@@SAIPAPBVfacet@locale@2@PBV42@@Z) 외부 기호(참조 위치: "class std::codecvt<char,char,struct _Mbstatet> const & __cdecl std::use_facet<class std::codecvt<char,char,struct _Mbstatet> >(class std::locale const &)" (??$use_facet@V?$codecvt@DDU_Mbstatet@@@std@@@std@@YAABV?$codecvt@DDU_Mbstatet@@@0@ABVlocale@0@@Z) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2001: __Init_thread_epoch 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2001: __Init_thread_epoch 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_perf.obj) : error LNK2001: "__declspec(dllimport) public: static class std::locale::id std::codecvt<char,char,struct _Mbstatet>::id" (__imp_?id@?$codecvt@DDU_Mbstatet@@@std@@2V0locale@2@A) 외부 기호를 확인할 수 없습니다.
-opencv_ts310d.lib(ts_gtest.obj) : error LNK2019: __imp____stdio_common_vsnprintf_s 외부 기호(참조 위치: __vsnprintf_s_l 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts.obj) : error LNK2019: "void __stdcall `eh vector constructor iterator'(void *,unsigned int,unsigned int,void (__thiscall*)(void *),void (__thiscall*)(void *))" (??_L@YGXPAXIIP6EX0@Z1@Z) 외부 기호(참조 위치: "public: __thiscall cvtest::TS::TS(void)" (??0TS@cvtest@@QAE@XZ) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts.obj) : error LNK2019: "void __stdcall `eh vector destructor iterator'(void *,unsigned int,unsigned int,void (__thiscall*)(void *))" (??_M@YGXPAXIIP6EX0@Z@Z) 외부 기호(참조 위치: __unwindfunclet$??0TS@cvtest@@QAE@XZ$1 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts.obj) : error LNK2019: __imp___set_se_translator 외부 기호(참조 위치: "public: virtual void __thiscall cvtest::TS::init(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &)" (?init@TS@cvtest@@UAEXABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z) 함수)에서 확인하지 못했습니다.
-opencv_ts310d.lib(ts.obj) : error LNK2019: __imp____stdio_common_vsprintf 외부 기호(참조 위치: __vsnprintf_l 함수)에서 확인하지 못했습니다.
-./bin/EX.exe : fatal error LNK1120: 21개의 확인할 수 없는 외부 참조입니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\utility.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.h(48): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1609): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1612): warning C4477: 'printf' : 서식 문자열 '%ld'에 'long' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'double'입니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1612): warning C4473: 'printf': 서식 문자열에 대한 인수가 충분하게 전달되지 않았습니다.
+  c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1612): note: 자리 표시자 및 해당 매개 변수에는 variadic 인수가 5개 필요하지만 4개가 제공되었습니다.
+  c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1612): note: 누락된 variadic 인수 5이(가) 서식 문자열 '%f'에 필요합니다.
+c:\users\hyo\documents\github\nmf\nmfproj\ex\glslprogram.h(29): warning C4715: 'GLSLProgram::readFromFile': 모든 제어 경로에서 값을 반환하지는 않습니다.
+  EX.vcxproj -> C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\./bin/EX.exe

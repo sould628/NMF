@@ -20,7 +20,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -88,10 +88,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\list.cpp" />
-    <ClCompile Include="include\objLoader.cpp" />
-    <ClCompile Include="include\obj_parser.cpp" />
-    <ClCompile Include="include\string_extra.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="vMFtexture.cpp" />
   </ItemGroup>
@@ -101,10 +97,7 @@
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\cvCtrl.h" />
     <ClInclude Include="include\FreeImage.h" />
-    <ClInclude Include="include\list.h" />
-    <ClInclude Include="include\objLoader.h" />
-    <ClInclude Include="include\obj_parser.h" />
-    <ClInclude Include="include\string_extra.h" />
+    <ClInclude Include="include\tiny_obj_loader.h" />
     <ClInclude Include="SHtexture.h" />
     <ClInclude Include="vMFtexture.h" />
   </ItemGroup>

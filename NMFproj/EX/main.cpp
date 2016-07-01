@@ -1,13 +1,12 @@
 //kixor.net
 //OpenGL Extension registry: http://www.opengl.org/registry
 //Realtech VR's OpenGL Extensions Viewer
-
+//#include <fstream>
 #include <ctime>
 #include <math.h>
 #include <algorithm> //min max
 #include <float.h> //isinf
-#include <iostream>
-#include <fstream>
+
 
 #include <GL/glew.h>
 #include <GL/glut.h>
@@ -17,9 +16,9 @@
 
 #include <map>
 #include <string>
-
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
 #include "FreeImage.h"
-#include "objLoader.h"
 
 #include "globalVariables.h"
 #include "GLSLProgram.h"
@@ -37,8 +36,6 @@ const int l_index = 4;
 int width = 800, height = 800;
 int NMwidth, NMheight;
 
-
-objLoader *objData;
 
 //const char* NMT = "./bricks_normal_map.jpg";
 
@@ -1161,31 +1158,6 @@ void initBuffers() {
 
 
 
-void drawObj(objLoader *data){
-	if (data->faceCount == 0)
-	{
-		std::cout << "No Obj Exists" << std::endl;
-		return;
-	}
-	obj_vector **vertList=data->vertexList;
-	std::cout << "numFaces: " << data->faceCount << std::endl;
-	for (int i = 0; i < data->faceCount; i++)
-	{
-		glColor3f((GLfloat)((float)i/10.f-i/10), 0.5, 0);
-		obj_face *flist;
-		flist = data->faceList[i];
-		int matIndex=flist->material_index;
-		glBegin(GL_POLYGON);
-		for (int ii = 0; ii < flist->vertex_count; ii++){
-			int* vertIndex = flist->vertex_index;
-			glVertex3f(vertList[vertIndex[ii]]->e[0], vertList[vertIndex[ii]]->e[1], vertList[vertIndex[ii]]->e[2]);
-//			std::cout << "Current Vertex: "<<vertList[vertIndex[ii]]->e[0] << "," << vertList[vertIndex[ii]]->e[1] << "," << vertList[vertIndex[ii]]->e[2] << std::endl;
-		}
-		glEnd();
-
-
-	}
-}
 
 
 void displayCB(){
@@ -1456,33 +1428,33 @@ void keyboardCB(unsigned char key, int x, int y){
 			GLfloat m[16];
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
 
-			std::ofstream camFile("camPos");
-			float pos[3], up[3], lookat[3];
-			cam->getPosition(pos, lookat, up);
-			camFile << pos[0] << " " << pos[1] << " " << pos[2]<<"\n";
-			camFile << lookat[0] << " " << lookat[1] << " " << lookat[2] << "\n";
-			camFile << up[0] << " " << up[1] << " " << up[2] << "\n";
-
-			camFile.close();
-			std::cout << "Saved Cam Pos\n";
-			std::cout << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
+//			std::ofstream camFile("camPos");
+//			float pos[3], up[3], lookat[3];
+//			cam->getPosition(pos, lookat, up);
+//			camFile << pos[0] << " " << pos[1] << " " << pos[2]<<"\n";
+//			camFile << lookat[0] << " " << lookat[1] << " " << lookat[2] << "\n";
+//			camFile << up[0] << " " << up[1] << " " << up[2] << "\n";
+//
+//			camFile.close();
+//			std::cout << "Saved Cam Pos\n";
+//			std::cout << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
 			break;
 		}
 
 		case 'w':
 		{
-			GLfloat m[16];
-			glGetFloatv(GL_MODELVIEW_MATRIX, m);
-
-			float pos[3], lookat[3], up[3];
-			std::ifstream camFile("camPos");
-			camFile >> pos[0] >> pos[1]  >> pos[2];
-			camFile >> lookat[0] >> lookat[1] >> lookat[2];
-			camFile >> up[0] >> up[1] >> up[2];
-
-			cam->setPosition(pos, lookat, up);
-
-			std::cout << "loaded cam\n";
+//			GLfloat m[16];
+//			glGetFloatv(GL_MODELVIEW_MATRIX, m);
+//
+//			float pos[3], lookat[3], up[3];
+//			std::ifstream camFile("camPos");
+//			camFile >> pos[0] >> pos[1]  >> pos[2];
+//			camFile >> lookat[0] >> lookat[1] >> lookat[2];
+//			camFile >> up[0] >> up[1] >> up[2];
+//
+//			cam->setPosition(pos, lookat, up);
+//
+//			std::cout << "loaded cam\n";
 
 			break;
 		}
@@ -1614,8 +1586,37 @@ int main(int argc, char** argv){
 
 	initSharedMem();
 
-	objData = new objLoader();
-	objData->load("./cube.obj");
+	std::string inputFile = "./cylinder_cloth_0070.obj";
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+
+	std::string err;
+//	int flags = 1;
+	bool ret = tinyobj::LoadObj(shapes, materials, err, inputFile.c_str());
+
+	if (!err.empty())
+		std::cerr << err << std::endl;
+
+	if (!ret)
+		exit(1);
+
+	for (size_t i = 0; i < shapes.size(); i++)
+	{
+		size_t indexOffset = 0;
+		for (size_t n = 0; n < shapes[i].mesh.num_vertices.size(); n++)
+		{
+			int ngon = shapes[i].mesh.num_vertices[n];
+			for (size_t f = 0; f < ngon; f++)
+			{
+				unsigned int v = shapes[i].mesh.indices[indexOffset + f];
+				printf("face [%ld] v[%ld] = (%f, %f, %f)\n", n,
+					shapes[i].mesh.positions[3*v+0],
+					shapes[i].mesh.positions[3*v+1],
+					shapes[i].mesh.positions[3*v+2]);
+			}
+		}
+	}
+
 
 	float testa = 1.f;
 	float *testaptr = &testa;
@@ -1635,11 +1636,6 @@ int main(int argc, char** argv){
 	NMTdata = vMFfunc::LoadImage(NMT, NMwidth, NMheight);
 
 
-
-	printf("Number of vertices: %i\n", objData->vertexCount);
-	printf("Number of vertex normals: %i\n", objData->normalCount);
-	printf("Number of texture coordinates: %i\n", objData->textureCount);
-	printf("\n");
 
 	initGLUT(argc, argv);
 	initGL(argc, argv);

@@ -1,19 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="include\list.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="include\obj_parser.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="include\string_extra.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="include\objLoader.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="vMFtexture.cpp">
@@ -33,18 +21,6 @@
     <ClInclude Include="GLSLProgram.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="include\list.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="include\obj_parser.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="include\objLoader.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="include\string_extra.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="include\cvCtrl.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -52,6 +28,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="SHtexture.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tiny_obj_loader.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

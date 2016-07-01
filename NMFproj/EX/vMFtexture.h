@@ -1,9 +1,10 @@
 #pragma once
 
 #include <vector>
-#include<math.h>
+#include <math.h>
 #include <iostream>
 #include <cstdlib>
+#include <string>
 #include <opencv2/opencv.hpp>
 #include "FreeImage.h"
 #include "cvCtrl.h"
