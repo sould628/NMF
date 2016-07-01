@@ -105,6 +105,7 @@
     <ClInclude Include="include\objLoader.h" />
     <ClInclude Include="include\obj_parser.h" />
     <ClInclude Include="include\string_extra.h" />
+    <ClInclude Include="SHtexture.h" />
     <ClInclude Include="vMFtexture.h" />
   </ItemGroup>
   <ItemGroup>

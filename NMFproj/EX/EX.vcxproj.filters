@@ -51,6 +51,9 @@
     <ClInclude Include="vMFtexture.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="SHtexture.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

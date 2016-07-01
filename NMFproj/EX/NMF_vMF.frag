@@ -45,7 +45,7 @@ vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
 void main(void)
 {
-	const float BPexp=100.f;
+	const float BPexp=10.f;
 	vec4 effBRDF=vec4(0.0,0.0,0.0,1.0);
 	vec3 v=vec3(0.0, 0.0, 0.0);
 	color=vec4(0.0, 0.0, 0.0, 0.0);
@@ -124,7 +124,7 @@ void main(void)
 		case 0:
 		{
 			color=(lightIntensity*effBRDF);
-//			color=vec4(1.0, 1.0, 0.0, 0.0);
+//			color=vec4(1.0, 1.0, 1.0, 1.0);
 			break;
 		}
 		case 1:
