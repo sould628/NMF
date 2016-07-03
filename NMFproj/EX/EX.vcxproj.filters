@@ -7,6 +7,9 @@
     <ClCompile Include="vMFtexture.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="readObj.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Camera.h">
@@ -31,6 +34,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="include\tiny_obj_loader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="readObj.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -64,6 +70,9 @@
     </Filter>
     <Filter Include="GLSL">
       <UniqueIdentifier>{2d982733-2479-4d8c-9b72-0ccf8b7569a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{d46b8cb5-8d03-45aa-8367-28e831a6eb5b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

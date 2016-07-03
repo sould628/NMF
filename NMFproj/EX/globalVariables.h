@@ -1,6 +1,11 @@
+#include <string>
 #include "Camera.h"
 
+
 #define MAXITERATION 10
+
+std::string inputObj = "./cube.obj";
+
 
 extern const char* NMT = "./3.jpg";
 extern const int numLobes = 8;

@@ -1,14 +1,8 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (NMF.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  main.cpp
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\mat.hpp(1914): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\persistence.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\utility.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\include\opencv2\core\utility.hpp : warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\vmftexture.h(48): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1609): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1612): warning C4477: 'printf' : 서식 문자열 '%ld'에 'long' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'double'입니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1612): warning C4473: 'printf': 서식 문자열에 대한 인수가 충분하게 전달되지 않았습니다.
-  c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1612): note: 자리 표시자 및 해당 매개 변수에는 variadic 인수가 5개 필요하지만 4개가 제공되었습니다.
-  c:\users\hyo\documents\github\nmf\nmfproj\ex\main.cpp(1612): note: 누락된 variadic 인수 5이(가) 서식 문자열 '%f'에 필요합니다.
-c:\users\hyo\documents\github\nmf\nmfproj\ex\glslprogram.h(29): warning C4715: 'GLSLProgram::readFromFile': 모든 제어 경로에서 값을 반환하지는 않습니다.
-  EX.vcxproj -> C:\Users\hyo\Documents\GitHub\NMF\NMFproj\EX\./bin/EX.exe
+  readObj.cpp
+e:\hyo\github\nmf\nmfproj\ex\readobj.cpp(35): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+e:\hyo\github\nmf\nmfproj\ex\readobj.cpp(38): warning C4477: 'printf' : 서식 문자열 '%ld'에 'long' 형식의 인수가 필요하지만 variadic 인수 2의 형식이 'double'입니다.
+e:\hyo\github\nmf\nmfproj\ex\readobj.cpp(38): warning C4473: 'printf': 서식 문자열에 대한 인수가 충분하게 전달되지 않았습니다.
+  e:\hyo\github\nmf\nmfproj\ex\readobj.cpp(38): note: 자리 표시자 및 해당 매개 변수에는 variadic 인수가 5개 필요하지만 4개가 제공되었습니다.
+  e:\hyo\github\nmf\nmfproj\ex\readobj.cpp(38): note: 누락된 variadic 인수 5이(가) 서식 문자열 '%f'에 필요합니다.
+  EX.vcxproj -> E:\Hyo\Github\NMF\NMFproj\EX\./bin/EX.exe
