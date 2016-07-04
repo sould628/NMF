@@ -8,7 +8,7 @@
 #define myNext '.'
 #define myPrev ','
 
-
+#define cvPIf 3.141592653589793238462643383279502884197f
 
 
 namespace {
@@ -16,6 +16,16 @@ namespace {
 		namespace skip { enum Type { no, yes }; };
 		namespace destroy { enum Type { no, yes }; };
 	}
+
+	cv::Mat loadImage(const char* filename, int &imageWidth, int &imageHeight)
+	{
+		cv::Mat load, floatScale;
+		load = cv::imread(filename, CV_LOAD_IMAGE_COLOR);
+		load.convertTo(floatScale, CV_32FC1, 1.f / 255.f);
+		imageWidth = load.cols; imageHeight = load.rows;
+		return floatScale;
+	}
+
 
 	void displayImage(const char *windowName, cv::Mat imgToshow, int skip = 1, int flag = 0)
 	{

@@ -10,6 +10,9 @@
     <ClCompile Include="readObj.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="SHtexture.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Camera.h">

@@ -24,6 +24,7 @@
 #include "GLSLProgram.h"
 #include "Camera.h"
 #include "vMFtexture.h"
+#include "SHtexture.h"
 #include "readObj.h"
 
 
@@ -70,6 +71,7 @@ float* alpha;
 float** aux;
 
 vMFtexture cVMFtex(NMT, numLobes);
+SHtexture SHtex(NMT, 5);
 
 static const float exampleData[] =
 {

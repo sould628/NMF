@@ -90,6 +90,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="readObj.cpp" />
+    <ClCompile Include="SHtexture.cpp" />
     <ClCompile Include="vMFtexture.cpp" />
   </ItemGroup>
   <ItemGroup>
