@@ -26,6 +26,7 @@ SHtexture::SHtexture(SHtexture & copy)
 
 SHtexture::SHtexture(const char * filename, int order)
 {
+	this->order = order;
 	readFile(filename);
 	createSHtexture(order);
 }
@@ -216,4 +217,49 @@ bool SHtexture::createSHtexture(int order)
 		}//w
 	}//h
 	return true;
+}
+
+void SHtexture::displayMap(int idx, int skip, int destroy)
+{
+	char key = 0;
+	cv::namedWindow("SHmap"); cv::namedWindow("SHmap", CV_WINDOW_NORMAL);
+	while (key != myESC)
+	{
+		cv::imshow("SHmap", SHmaps[idx]);
+		if (skip == 1)
+		{
+			cv::waitKey(1);
+			key = myESC;
+		}
+		else {
+			key = cv::waitKey();
+			switch (key)
+			{
+			case ',':
+			case '<':
+				if (idx == 0)
+					idx = order*order - 1;
+				else idx--;
+				break;
+
+			case '.':
+			case '>':
+				if (idx == (order*order - 1))
+					idx = 0;
+				else idx++;
+				break;
+			}
+		}
+	}
+	if (destroy == 1)
+		cv::destroyWindow("SHmap");
+
+}
+
+float brdfSH::BlinnPhong(int l, float val[3])
+{
+	float ret;
+
+
+	return 0.0f;
 }

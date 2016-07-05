@@ -23,4 +23,12 @@ public:
 public:
 	bool readFile(const char* filename);
 	bool createSHtexture(int order);
+	void displayMap(int idx, int skip = 0, int destroy = 1);
+
 };
+
+namespace brdfSH
+{
+	float BlinnPhong(int l, float val[3]);
+
+}

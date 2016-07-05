@@ -1587,7 +1587,11 @@ int main(int argc, char** argv){
 
 	initSharedMem();
 
+	SHtex.displayMap(4);
+
 	objreader.readObj(inputObj);
+
+
 
 	float testa = 1.f;
 	float *testaptr = &testa;
