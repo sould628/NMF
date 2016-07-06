@@ -57,11 +57,13 @@ GLuint SHmap0, SHmap1, SHmap2, SHmap3, SHmap4, SHmap5, SHmap6;
 
 GLuint vMFmap0, vMFmap1, vMFmap2, vMFmap3, vMFmap4;
 
-GLuint vMFmaps[5];
+GLuint vMFmaps[10];
+GLuint SHmaps[10];
 GLuint vMFTexMap[10];
+GLuint Ylmmaps[10];
 
 
-GLSLProgram *NMF, *NMFvMF, *NMForiginal;
+GLSLProgram *NMFsh, *NMFvMF, *NMForiginal;
 
 
 time_t sysTime, currentTime;
@@ -71,7 +73,7 @@ float* alpha;
 float** aux;
 
 vMFtexture cVMFtex(NMT, numLobes);
-SHtexture SHtex(NMT, 5);
+SHtexture cSHtex(NMT, 5);
 
 static const float exampleData[] =
 {
@@ -87,7 +89,7 @@ static const float exampleData[] =
 
 void displayCB();
 
-void generateSHmap(GLubyte* TextureData);
+void generateSHmap(GLubyte* TextureData, int order);
 void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux[3], float alignCtrl);
 
 float calculateSHcoeffDelta(int l, int m, float x, float y, float z);
@@ -691,6 +693,8 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float alignCtrl){
 }
 
 
+
+
 void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux[3], float alignCtrl){
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -724,7 +728,10 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 			case 3: glActiveTexture(GL_TEXTURE4); break;
 			case 4: glActiveTexture(GL_TEXTURE5); break;
 			case 5: glActiveTexture(GL_TEXTURE6); break;
-			case 6: glActiveTexture(GL_TEXTURE7); break;}
+			case 6: glActiveTexture(GL_TEXTURE7); break;
+			case 7: glActiveTexture(GL_TEXTURE8); break;
+			case 8: glActiveTexture(GL_TEXTURE9); break;
+			}
 
 			if (m == 0)
 			{
@@ -869,7 +876,7 @@ float calculateSHcoeffDelta(int l, int m, float x, float y, float z){
 	return result;
 }
 
-void generateSHmap(GLubyte* TextureData){
+void generateSHmap(GLubyte* TextureData, int order){
 	float nn[3] = { 0 };
 	int textureCount = 0;
 	GLfloat* coeffTexture;
@@ -1080,7 +1087,7 @@ void checkTextureError(GLenum glError){
 
 #pragma region GLSL
 void createProgram() {
-	NMF = new GLSLProgram("NMF_SH.vert", "NMF_SH.frag");
+	NMFsh = new GLSLProgram("NMF_SH.vert", "NMF_SH.frag");
 	NMFvMF = new GLSLProgram("NMF_vMF.vert", "NMF_vMF.frag");
 	NMForiginal = new GLSLProgram("NMF_original.vert", "NMF_original.frag");
 }
@@ -1113,7 +1120,7 @@ void initBuffers() {
 
 	std::cout << "Texture Loaded!\n" << std::endl;
 
-	generateSHmap(textureData);
+
 	//vMFparameter
 	alpha = new float[numLobes];
 	aux = new float*[numLobes];
@@ -1122,9 +1129,11 @@ void initBuffers() {
 		aux[i] = new float[3];
 	}
 
-	
-	generatevMFmap(textureData, numLobes, alpha, aux, alignCtrl);
+	///bind texture
+//	generatevMFmap(textureData, numLobes, alpha, aux, alignCtrl);
 //	generatevMFmap2(textureData, numLobes, alignCtrl);
+	cSHtex.bindTexture(SHmaps);
+	cSHtex.bindYlm(Ylmmaps);
 
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(GL_TEXTURE0);
@@ -1186,21 +1195,46 @@ void displayCB(){
 	switch (renderMode){
 	case 0:
 	{
-		//GLSL Region
-		NMF->enable();
-		glVertexArrayVertexBuffer(VAO, 0, NMbuffer, 0, (GLsizei)(sizeof(float) * 4));
+		//GLSL Spherical Harmonics
+		NMFsh->enable();
+		NMFsh->SetUniformMatrix4fv("mv_matrix", modelviewMatrix, false);
+		NMFsh->SetUniformMatrix4fv("proj_matrix", projectionMatrix, false);
+		NMFsh->SetUniformMatrix3fv("normal_matrix", normalMatrix, false);
+		NMFsh->setUniform1i("order", cSHtex.getOrder());
+		NMFsh->setUniform1f("BPexp", BPexp);
+		NMFsh->setUniform1i("renderScene", renderScene);
+		NMFsh->setUniform1i("MipMapped", MipMapped);
+
+		//blinphong Coeff
+		NMFsh->setUniform1f("b0", brdfSH::BlinnPhong(0, BPexp));
+		NMFsh->setUniform1f("b1", brdfSH::BlinnPhong(1, BPexp));
+		NMFsh->setUniform1f("b2", brdfSH::BlinnPhong(2, BPexp));
+		NMFsh->setUniform1f("b3", brdfSH::BlinnPhong(3, BPexp));
+		NMFsh->setUniform1f("b4", brdfSH::BlinnPhong(4, BPexp));
+		NMFsh->setUniform1f("b5", brdfSH::BlinnPhong(5, BPexp));
+		NMFsh->setUniform1f("b6", brdfSH::BlinnPhong(6, BPexp));
+
+		//		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
+		glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayVertexBuffer(VAO, 2, vMFnormal, 0, (GLsizei)(sizeof(float) * 4));
+		glVertexArrayVertexBuffer(VAO, 3, vMFtangent, 0, (GLsizei)(sizeof(float) * 4));
 		glVertexArrayAttribFormat(VAO, 0, 4, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(VAO, 1, 4, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(VAO, 2, 4, GL_FLOAT, GL_TRUE, 0);
+		glVertexArrayAttribFormat(VAO, 3, 4, GL_FLOAT, GL_TRUE, 0);
 		glEnableVertexArrayAttrib(VAO, 0);
+		glEnableVertexArrayAttrib(VAO, 1);
+		glEnableVertexArrayAttrib(VAO, 2);
+		glEnableVertexArrayAttrib(VAO, 3);
 
-		GLfloat attrib[] = { (float)sin(t)*0.5f, (float)cos(t)*0.6f, 0.0f, 0.0f };
+		//		glVertexArrayVertexBuffer(TexCoordArray, 0, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+		//		glVertexArrayAttribFormat(TexCoordArray, 0, 4, GL_FLOAT, GL_FALSE, 0);
+		//		glEnableVertexArrayAttrib(TexCoordArray, 0);
 
-
-		glVertexAttrib4fv(10, attrib);
-		glVertexAttrib4fv(11, color);
 		glDrawArrays(GL_QUADS, 0, 4);
 
-		NMF->disable();
-		//GLSL Region
+		NMFsh->disable();
 		break;
 	}
 	case 1:
@@ -1210,64 +1244,7 @@ void displayCB(){
 	}
 	case 2://vMF
 	{
-	//	float maxtest=0.f;
-	//
-	//	for(int j = 0; j < numLobes; j++)
-	//	{
-	//		
-	//		std::cout << "mu[" << j << "] = (" 
-	//			<< mu[j][0] << ", " 
-	//			<< mu[j][1] << ", " 
-	//			<< mu[j][2] << ")" << std::endl;
-	//		std::cout << "kappa[" << j << "] = "
-	//			<< kappa[j] << std::endl;
-	//		std::cout << "alpha[" << j << "] = "
-	//			<< alpha[j] << std::endl << std::endl;
-	//	}
-	//	BYTE *NMFpixels = (BYTE*)malloc(width*height * 3);
-	//	float sum = 0.f;
-	//	float alphasum = 0.f;
-	//	for (int j = 0; j < numLobes; j++)
-	//	{
-	//		alphasum += alpha[j];
-	//	}
-	//	std::cout << "alpha sum=" << alphasum << std::endl;
-	//	for (int j = 0; j < height; j++)
-	//	{
-	//		for (int i = 0; i < width; i++)
-	//		{
-	//			float currentXY[3] = { 0 };
-	//			currentXY[0] = ((float)i / (float)(width / 2)) - 1.f;
-	//			currentXY[1] = ((float)j / (float)(height / 2)) - 1.f;
-	//			NMFpixels[j*height * 3 + i * 3 + 0] = 255;
-	//			if (1.f >= ((currentXY[0] * currentXY[0]) + (currentXY[1] * currentXY[1])))
-	//			{
-	//				currentXY[2] = sqrt(1 - ((currentXY[0] * currentXY[0]) + (currentXY[1] * currentXY[1])));
-	//				float prob = 0.f;
-	//				for (int k = 0; k < numLobes; k++)
-	//				{
-	//					if (maxtest < vMF(currentXY, mu[k], kappa[k]))
-	//						maxtest = vMF(currentXY, mu[k], kappa[k]);
-	//					prob += alpha[k] * vMF(currentXY, mu[k], kappa[k]);
-	//				}
-	//				sum += prob;
-	//
-	//				NMFpixels[j*height * 3 + i * 3 + 0] = std::min(255, (int)(prob * 255));
-	//				NMFpixels[j*height * 3 + i * 3 + 1] = std::min(255, (int)(prob * 255));
-	//				NMFpixels[j*height * 3 + i * 3 + 2] = std::min(255, (int)(prob * 255));
-	//			}
-	//			else
-	//			{
-	//				NMFpixels[j*height * 3 + i * 3 + 0] = 0;
-	//				NMFpixels[j*height * 3 + i * 3 + 1] = 0;
-	//				NMFpixels[j*height * 3 + i * 3 + 2] = 200;
-	//			}
-	//		}
-	//	}
-	//	std::cout << "sinh(30)=" << std::sinh(30) << std::endl;
-	//	std::cout << "MAX of prob="<<maxtest<<std::endl;
-	//	glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, NMFpixels);
-	//	free(NMFpixels);
+
 
 		break;
 	}
@@ -1408,6 +1385,21 @@ void mouseCB(int button, int state, int x, int y){
 
 }
 void keyboardCB(unsigned char key, int x, int y){
+	if (renderMode == 0)
+	{
+		switch (key)
+		{
+		case 'r':
+			delete NMFsh;
+			NMFsh = new GLSLProgram("NMF_SH.vert", "NMF_SH.frag");
+			std::cout << "Renewed NMF_SH GLSL\n";
+			break;
+		case 'c':
+			printf("New BPexp: ");
+			scanf("%f", &BPexp);
+			break;
+		}
+	}
 	if (renderMode == 3)
 	{
 		switch (key){
@@ -1587,7 +1579,7 @@ int main(int argc, char** argv){
 
 	initSharedMem();
 
-	SHtex.displayMap(4);
+	cSHtex.displayMap(4);
 
 	objreader.readObj(inputObj);
 
@@ -1599,16 +1591,16 @@ int main(int argc, char** argv){
 	float *testA1 = testAux;
 	float **testAuxptr = &testA1;
 
-	vMFfunc::displayvMF(1, testaptr, testAuxptr, 512, 512);
+//	vMFfunc::displayvMF(1, testaptr, testAuxptr, 512, 512);
 
 
-	cVMFtex.showOriginalImage(0);
-	cVMFtex.generatevMFmaps();
+//	cVMFtex.showOriginalImage(0);
+//	cVMFtex.generatevMFmaps();
 
-	cVMFtex.showvMFImage(0, 0, 0);
+//	cVMFtex.showvMFImage(0, 0, 0);
 	
 
-	NMTdata = vMFfunc::LoadImage(NMT, NMwidth, NMheight);
+//	NMTdata = vMFfunc::LoadImage(NMT, NMwidth, NMheight);
 
 
 

@@ -193,7 +193,7 @@ public:
 	int getNumLobes() const { return numLobes; }
 	float getvMFcompoenent(int level, int lobe, int w, int h, int c) const
 	{
-		return vMFdata[level][lobe].at<cv::Vec4f>(w, h)[c];
+		return vMFdata[level][lobe].at<cv::Vec4f>(h, w)[c];
 	}	
 };
 
