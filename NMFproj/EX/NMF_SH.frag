@@ -1,6 +1,6 @@
 #version 450 core
 
-layout (binding=0) uniform sampler2D original;
+layout (binding=31) uniform sampler2D original;
 layout (binding=18) uniform sampler2D SHmap8;
 layout (binding=17) uniform sampler2D SHmap7;
 layout (binding=16) uniform sampler2D SHmap6;
@@ -63,7 +63,7 @@ out vec4 color;
 
 vec4 lightIntensity=vec4(1.0f, 1.0f, 1.f, 1.0f);
 
-vec4 Kd=vec4(0.1f,0.f,0.f,1.0f);
+vec4 Kd=vec4(0.2f,0.f,0.f,1.0f);
 vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
 vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
@@ -161,14 +161,16 @@ void main(void)
 			count++;
 		}
 	}
-//	float LdotN=max(dot(lightDir,mu),0.0);
-	effBRDF+=((Ks*Bs+Kd));
+	vec3 mu=texture2D(original, fs_in.texCoord.xy).xyz;
+	float LdotN=max(dot(lightDir,mu),0.0);
+	effBRDF+=((Ks*Bs+Kd)*LdotN);
 	switch(renderScene){
 		case 0:
 		{
 			color=vec4(0., 0., 0., 0.);
 			color=(lightIntensity*effBRDF);
-//			color=(vec4(texture2D(Ylmmap1, fs_in.texCoord.xy)));
+//			color=(vec4(texture2D(original, fs_in.texCoord.xy)));
+//			color=vec4(1.0, 0.0, 0.0, 0.0);
 //			color=vec4(ylmCoord.x, ylmCoord.y, 0., 0.);
 //			color=vec4(1.0, 1.0, 1.0, 1.0);
 			break;

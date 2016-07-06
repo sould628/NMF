@@ -297,13 +297,33 @@ void SHtexture::createYlmtex()
 	}//l
 }
 
-void SHtexture::bindTexture(GLuint *SHtex)
+void SHtexture::bindTexture(GLuint &normalizedNMT, GLuint *SHtex)
 {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glGenTextures(10, SHtex);
+	glGenTextures(1, &normalizedNMT);
 
 	float *shTextureData = new float[4 * oWidth* oHeight];
+	float *originalNMT = new float[4 * oWidth*oHeight];
+	glActiveTexture(GL_TEXTURE31);
+	glBindTexture(GL_TEXTURE_2D, normalizedNMT);
+	for (int h = 0; h < oHeight; h++)
+	{
+		for (int w = 0; w < oWidth; w++)
+		{
+			originalNMT[4 * (h*oWidth + w) + 0] = this->originalNormals[0].at<cv::Vec3f>(h, w)[0];
+			originalNMT[4 * (h*oWidth + w) + 1] = this->originalNormals[0].at<cv::Vec3f>(h, w)[1];
+			originalNMT[4 * (h*oWidth + w) + 2] = this->originalNormals[0].at<cv::Vec3f>(h, w)[2];
+			originalNMT[4 * (h*oWidth + w) + 3] = 0.f;
+		}
+	}
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, oWidth, oHeight, 0, GL_RGBA, GL_FLOAT, originalNMT);
+	GLenum glError = glGetError();
+
 
 	int idx = 0;
 	for (int i = 0; i < order*order; i++)

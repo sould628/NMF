@@ -29,7 +29,7 @@ public:
 	void displayMap(int idx, int skip = 0, int destroy = 1);
 	void createYlmtex();
 
-	void bindTexture(GLuint *SHtex);
+	void bindTexture(GLuint &normalizedNMT, GLuint *SHtex);
 	void bindYlm(GLuint *Ylmtex);
 	int getOrder();
 };

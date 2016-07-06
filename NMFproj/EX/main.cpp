@@ -51,7 +51,7 @@ float t;
 
 GLuint VAO, TexCoordArray;
 GLuint NMbuffer, vMFvertex, vMFtex, vMFnormal, vMFtangent;
-GLuint NormalMap, NormalMipMap;
+GLuint NormalMap, NormalMipMap, normalizedNMT;
 
 GLuint SHmap0, SHmap1, SHmap2, SHmap3, SHmap4, SHmap5, SHmap6;
 
@@ -65,6 +65,7 @@ GLuint Ylmmaps[10];
 
 GLSLProgram *NMFsh, *NMFvMF, *NMForiginal;
 
+GLuint windowSH, windowvMF;
 
 time_t sysTime, currentTime;
 
@@ -1130,9 +1131,9 @@ void initBuffers() {
 	}
 
 	///bind texture
-//	generatevMFmap(textureData, numLobes, alpha, aux, alignCtrl);
+	generatevMFmap(textureData, numLobes, alpha, aux, alignCtrl);
 //	generatevMFmap2(textureData, numLobes, alignCtrl);
-	cSHtex.bindTexture(SHmaps);
+	cSHtex.bindTexture(normalizedNMT, SHmaps);
 	cSHtex.bindYlm(Ylmmaps);
 
 	glEnable(GL_TEXTURE_2D);
@@ -1149,7 +1150,7 @@ void initBuffers() {
 	glDisable(GL_TEXTURE_2D);
 
 	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE9);
+	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, NormalMipMap);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -1168,7 +1169,49 @@ void initBuffers() {
 
 
 
+void displayvMF()
+{
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(0.f, 0.f, 0.0f, 1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	GLfloat color[] = { (float)sin(t)*0.5f, (float)cos(t)*0.5f, 0.3f, 1.0f };
+
+	cam->glRender();
+
+	//GLSLvMF
+	NMFvMF->enable();
+	NMFvMF->SetUniformMatrix4fv("mv_matrix", modelviewMatrix, false);
+	NMFvMF->SetUniformMatrix4fv("proj_matrix", projectionMatrix, false);
+	NMFvMF->SetUniformMatrix3fv("normal_matrix", normalMatrix, false);
+	NMFvMF->setUniform1i("numLobes", numLobes);
+	NMFvMF->setUniform1f("BPexp", BPexp);
+	NMFvMF->setUniform1i("renderScene", renderScene);
+	NMFvMF->setUniform1i("MipMapped", MipMapped);
+	//		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
+	glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
+	glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+	glVertexArrayVertexBuffer(VAO, 2, vMFnormal, 0, (GLsizei)(sizeof(float) * 4));
+	glVertexArrayVertexBuffer(VAO, 3, vMFtangent, 0, (GLsizei)(sizeof(float) * 4));
+	glVertexArrayAttribFormat(VAO, 0, 4, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayAttribFormat(VAO, 1, 4, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayAttribFormat(VAO, 2, 4, GL_FLOAT, GL_TRUE, 0);
+	glVertexArrayAttribFormat(VAO, 3, 4, GL_FLOAT, GL_TRUE, 0);
+	glEnableVertexArrayAttrib(VAO, 0);
+	glEnableVertexArrayAttrib(VAO, 1);
+	glEnableVertexArrayAttrib(VAO, 2);
+	glEnableVertexArrayAttrib(VAO, 3);
+
+	//		glVertexArrayVertexBuffer(TexCoordArray, 0, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+	//		glVertexArrayAttribFormat(TexCoordArray, 0, 4, GL_FLOAT, GL_FALSE, 0);
+	//		glEnableVertexArrayAttrib(TexCoordArray, 0);
+
+	glDrawArrays(GL_QUADS, 0, 4);
+
+	NMFvMF->disable();
+
+	glFlush();
+}
 
 
 void displayCB(){
@@ -1380,9 +1423,9 @@ void mouseCB(int button, int state, int x, int y){
 			click_pos[1] = (y - height / 2.0f) / (height / 2.0f);
 		}
 		button_id = button;
-		glutPostRedisplay();
 	}
-
+	glutSetWindow(windowSH);
+	glutPostRedisplay();
 }
 void keyboardCB(unsigned char key, int x, int y){
 	if (renderMode == 0)
@@ -1403,6 +1446,10 @@ void keyboardCB(unsigned char key, int x, int y){
 	if (renderMode == 3)
 	{
 		switch (key){
+		case 'c':
+			printf("New BPexp: ");
+			scanf("%f", &BPexp);
+			break;
 		case 's':
 			renderScene == 0 ? (renderScene = 1) : (renderScene = 0);
 			break;
@@ -1455,6 +1502,7 @@ void keyboardCB(unsigned char key, int x, int y){
 		}
 
 	}
+	glutSetWindow(windowSH);
 	glutPostRedisplay();
 }
 void motionCB(int x, int y){
@@ -1484,8 +1532,9 @@ void motionCB(int x, int y){
 			click_pos[1] = present[1];
 			break;
 		}
-		glutPostRedisplay();
 	}
+	glutSetWindow(windowSH);
+	glutPostRedisplay();
 }
 
 void mainMenu(int op) {
@@ -1528,7 +1577,8 @@ void initGLUT(int argc, char** argv){
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(width, height);
-	glutCreateWindow("GLEW Test");
+	windowSH=glutCreateWindow("SH Test");
+	glutSetWindow(windowSH);
 	glutDisplayFunc(displayCB);
 	glutIdleFunc(idleCB);
 	glutMouseFunc(mouseCB);
@@ -1546,6 +1596,8 @@ void initGLUT(int argc, char** argv){
 	glutAddMenuEntry("Clean&Exit", 0);
 
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
+
+
 }
 
 
@@ -1595,7 +1647,7 @@ int main(int argc, char** argv){
 
 
 //	cVMFtex.showOriginalImage(0);
-//	cVMFtex.generatevMFmaps();
+	cVMFtex.generatevMFmaps();
 
 //	cVMFtex.showvMFImage(0, 0, 0);
 	
