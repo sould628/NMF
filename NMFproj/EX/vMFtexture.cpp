@@ -17,7 +17,7 @@ vMFtexture::vMFtexture(const char* filename, int numLobes, int mipmapLevel)
 
 	float resizeFactx, resizeFacty;
 
-	resizeFactx = 256.f/(float)oWidth; resizeFacty = 256.f / (float)oHeight;
+	resizeFactx = 256/(float)oWidth; resizeFacty = 256 / (float)oHeight;
 
 	oWidth = 256; oHeight = 256;
 
@@ -356,6 +356,7 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 //	std::cout << "alpha: " << alpha[0] << std::endl;
 //	std::cout << "zj: " << zj[0] << std::endl;
 
+	//Alignment
 	for (int i = 0; i < numLobes; i++)
 	{
 		float val[20] = { 0.f };

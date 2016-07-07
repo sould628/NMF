@@ -11,6 +11,8 @@ layout (binding=2) uniform sampler2D vMFmap2;
 layout (binding=1) uniform sampler2D vMFmap1;
 layout (binding=9) uniform sampler2D originalMipMap;
 
+
+
 layout (location = 10) uniform mat4 mv_matrix;
 
 
@@ -19,6 +21,7 @@ layout (location = 101) uniform float BPexp;
 
 layout (location = 1000) uniform int renderScene;
 layout (location = 1001) uniform int MipMapped;
+layout (location = 1002) uniform int brdfSelect;
 
 const float PI = 3.141592653589793238462643383;
 
@@ -37,7 +40,7 @@ in VS_OUT{
 out vec4 color;
 
 
-vec4 lightIntensity=vec4(1.0f, 1.0f, 1.f, 1.0f);
+vec4 lightIntensity=vec4(0.9f, 0.9f, 0.9f, 1.0f);
 
 vec4 Kd=vec4(0.2f,0.f,0.f,1.0f);
 vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
@@ -92,33 +95,48 @@ void main(void)
 	coeffs[6]=texture2D(vMFmap7, fs_in.texCoord.xy);
 	coeffs[7]=texture2D(vMFmap8, fs_in.texCoord.xy);
 
-	for(int i=0; i<numLobes; i++)
+	switch(brdfSelect)
 	{
-
+	case 0:
+	{
+		for(int i=0; i<numLobes; i++)
+		{
+	
+			float alpha=0.0;
+			vec3 aux=vec3(0.0,0.0,0.0);
+			float kappa=0.0;
+			vec3 mu=vec3(0.0,0.0,0.0);
+			float sPrime=0.0;
+			float Bs=0.0;
+			float r=0.0;
+	
+	
+			alpha=coeffs[i].x;
+			aux=coeffs[i].yzw/max(alpha,0.01);
+			r=length(aux);
+			kappa=((3*r)-(r*r*r))/max(0.001, (1.0-(r*r)));
+	
+			mu=normalize(aux);
+	
+			sPrime=(kappa*BPexp)/(kappa+BPexp);
+			float HdotMu=max(dot(h,mu),0.0);
+			Bs=((sPrime+1.0)/(2.0*PI))*pow(HdotMu, sPrime);
+			float LdotMu=max(dot(lightDir,mu),0.0);
+			effBRDF+=(alpha*(Ks*Bs+Kd)*LdotMu);
+		}
+		break;
+	}
+	case 1:
+	{
 		float alpha=0.0;
 		vec3 aux=vec3(0.0,0.0,0.0);
 		float kappa=0.0;
 		vec3 mu=vec3(0.0,0.0,0.0);
-		float sPrime=0.0;
-		float Bs=0.0;
-		vec3 halfVec=vec3(0.0,0.0,0.0);
 		float r=0.0;
-
-
-		alpha=coeffs[i].x;
-		aux=coeffs[i].yzw/max(alpha,0.00001);
-		r=length(aux);
-		kappa=((3*r)-(r*r*r))/max(0.000001, (1.0-(r*r)));
-
-		mu=normalize(aux);
-
-		sPrime=(kappa*BPexp)/(kappa+BPexp);
-		float HdotMu=max(dot(h,mu),0.0);
-		Bs=((sPrime+1.0)/(2.0*PI))*pow(HdotMu, sPrime);
-		float LdotMu=max(dot(lightDir,mu),0.0);
-		effBRDF+=(alpha*(Ks*Bs+Kd)*LdotMu);
+		break;
 	}
 
+	}
 	switch(renderScene){
 		case 0:
 		{
@@ -128,19 +146,20 @@ void main(void)
 		}
 		case 1:
 		{
-			switch(MipMapped)
-			{
-				case 0:
-				{
-					color+=texture2D(original, fs_in.texCoord.xy);
-					break;
-				}
-				case 1:
-				{
-					color+=texture2D(originalMipMap, fs_in.texCoord.xy);
-					break;
-				}
-			}
+
+			color=vec4(texture2D(vMFmap1, fs_in.texCoord.st))
+			+vec4(texture2D(vMFmap2, fs_in.texCoord.st))
+			+vec4(texture2D(vMFmap3, fs_in.texCoord.st))
+			+vec4(texture2D(vMFmap4, fs_in.texCoord.st))
+			+vec4(texture2D(vMFmap5, fs_in.texCoord.st))
+			+vec4(texture2D(vMFmap6, fs_in.texCoord.st))
+			+vec4(texture2D(vMFmap7, fs_in.texCoord.st))
+			+vec4(texture2D(vMFmap8, fs_in.texCoord.st))
+			;
+			vec4 temp=vec4(color.yza, color.x);
+			color=temp;
+			break;
+
 		}
 	}
 //	color.rgb=texture2D(vMFmap1, fs_in.texCoord.xy).gba;

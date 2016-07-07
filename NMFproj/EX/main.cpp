@@ -74,7 +74,7 @@ float* alpha;
 float** aux;
 
 vMFtexture cVMFtex(NMT, numLobes);
-SHtexture cSHtex(NMT, 5);
+SHtexture cSHtex(NMT, 4);
 
 static const float exampleData[] =
 {
@@ -1302,6 +1302,7 @@ void displayCB(){
 		NMFvMF->setUniform1f("BPexp", BPexp);
 		NMFvMF->setUniform1i("renderScene", renderScene);
 		NMFvMF->setUniform1i("MipMapped", MipMapped);
+		NMFvMF->setUniform1i("brdfSelect", brdfSelect);
 //		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
 		glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
 		glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
@@ -1446,6 +1447,9 @@ void keyboardCB(unsigned char key, int x, int y){
 	if (renderMode == 3)
 	{
 		switch (key){
+		case 'b':
+			brdfSelect == 0 ? (brdfSelect = 1) : (brdfSelect = 0);
+			break;
 		case 'c':
 			printf("New BPexp: ");
 			scanf("%f", &BPexp);
@@ -1461,7 +1465,7 @@ void keyboardCB(unsigned char key, int x, int y){
 		case 'r':
 			delete NMFvMF;
 			NMFvMF = new GLSLProgram("NMF_vMF.vert", "NMF_vMF.frag");
-			std::cout << "Renewed GLSL Program\n";
+			std::cout << "Renewed NMF_vMF Program\n";
 			break;
 		case 'q':
 		{

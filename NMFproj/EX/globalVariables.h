@@ -15,14 +15,14 @@ extern float alignCtrl = 2.0;
 
 
 Camera *cam;
-extern int renderMode = 0;
+extern int renderMode = 3;
 extern int renderScene = 0;
 extern int MipMapped = 1;
 
 extern float BPexp = 100.0f;
 
 
-
+extern int brdfSelect = 0;
 
 
 extern float modelviewMatrix[16] = { 0 };
