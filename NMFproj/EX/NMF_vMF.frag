@@ -18,6 +18,7 @@ layout (location = 10) uniform mat4 mv_matrix;
 
 layout (location = 100) uniform int numLobes;
 layout (location = 101) uniform float BPexp;
+layout (location = 102) uniform float Micro
 
 layout (location = 1000) uniform int renderScene;
 layout (location = 1001) uniform int MipMapped;
@@ -128,11 +129,15 @@ void main(void)
 	}
 	case 1:
 	{
-		float alpha=0.0;
-		vec3 aux=vec3(0.0,0.0,0.0);
-		float kappa=0.0;
-		vec3 mu=vec3(0.0,0.0,0.0);
-		float r=0.0;
+		for(int i=0; i<numLobes; i++)
+		{
+			float alpha=0.0;
+			vec3 aux=vec3(0.0,0.0,0.0);
+			float kappa=0.0;
+			vec3 mu=vec3(0.0,0.0,0.0);
+			float r=0.0;
+
+		}
 		break;
 	}
 
