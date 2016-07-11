@@ -9,7 +9,9 @@ class GLSLProgram {
 private:
 	GLuint program, vertShader, tcShader, fragShader;
 
+
 public:
+
 	char* readFromFile(const char* filename) {
 		FILE* fp = fopen(filename, "rt");
 		if (fp == NULL) { std::cout << "no file exists" << std::endl; return nullptr; }
@@ -35,6 +37,7 @@ public:
 		printShaderInfoLog(shader);
 		return shader;
 	}
+
 	void printShaderInfoLog(GLuint obj) {
 		int len = 0, charsWritten = 0;
 		char* infoLog;
@@ -57,6 +60,7 @@ public:
 			free(infoLog);
 		}
 	}
+
 
 public:
 	GLSLProgram() {}
@@ -113,14 +117,17 @@ public:
 		GLint loc = glGetUniformLocation(program, name);
 		glUniformMatrix4fv(loc, 1, transpose, m);
 	}
+
 	void SetUniformMatrix3fv(const GLchar *name, GLfloat *m, bool transpose) {
 		GLint loc = glGetUniformLocation(program, name);
 		glUniformMatrix3fv(loc, 1, transpose, m);
 	}
+
 	void bindTexture(const char *name, GLuint tex, GLenum target, GLint unit) {
 		glActiveTexture(GL_TEXTURE0_ARB + unit);
 		glBindTexture(target, tex);
 		GLint loc = glGetUniformLocation(program, name);
 		glUniform1i(loc, unit);
 	}
+
 };
