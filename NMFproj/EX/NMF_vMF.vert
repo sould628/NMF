@@ -27,7 +27,7 @@ out VS_OUT{
 void main(void)
 {
 	
-	double texSize=50.0;
+	double texSize=100.0;
 
 	double modelSize=0.5;
 	vec4 lightPos=vec4(0.0, 0.0f, 10.0f, 1.0f);

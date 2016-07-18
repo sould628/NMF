@@ -18,7 +18,7 @@ layout (location = 10) uniform mat4 mv_matrix;
 
 layout (location = 100) uniform int numLobes;
 layout (location = 101) uniform float BPexp;
-layout (location = 102) uniform float Micro
+layout (location = 102) uniform float MicroFacet;
 
 layout (location = 1000) uniform int renderScene;
 layout (location = 1001) uniform int MipMapped;
@@ -98,6 +98,7 @@ void main(void)
 
 	switch(brdfSelect)
 	{
+	//BlinnPhong
 	case 0:
 	{
 		for(int i=0; i<numLobes; i++)
@@ -127,6 +128,7 @@ void main(void)
 		}
 		break;
 	}
+	//MicroFacet
 	case 1:
 	{
 		for(int i=0; i<numLobes; i++)
