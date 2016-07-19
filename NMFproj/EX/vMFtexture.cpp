@@ -376,7 +376,6 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 		aux[ind][0] = aux[i][0]; aux[ind][1] = aux[i][1]; aux[ind][2] = aux[i][2];
 		aux[i][0] = temp[0]; aux[i][1] = temp[1]; aux[i][2] = temp[2];
 	}
-
 	for (int i = 0; i < numLobes; i++)
 	{
 		delete[] z[i];
