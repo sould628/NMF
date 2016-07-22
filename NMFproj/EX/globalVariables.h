@@ -7,7 +7,7 @@
 std::string inputObj = "./cube.obj";
 
 
-extern const char* NMT = "./1.jpg";
+extern const char* NMT = "./3.jpg";
 extern const int numLobes = 8;
 extern const int textLobes = 4;
 extern int MipMapLevel = 3;
@@ -20,7 +20,7 @@ extern int renderScene = 0;
 extern int MipMapped = 1;
 
 extern float BPexp = 100.0f;
-
+extern float MicroSigma = 20.f;
 
 extern int brdfSelect = 0;
 

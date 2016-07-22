@@ -10,6 +10,7 @@ vMFtexture::vMFtexture()
 }
 vMFtexture::vMFtexture(const char* filename, int numLobes, int mipmapLevel)
 {
+	this->filename = filename;
 
 	this->numLobes = numLobes;
 
@@ -211,7 +212,7 @@ void vMFtexture::generatevMFmaps()
 		}
 	}
 
-	char* outName="out_";
+	char* outName="./fit_data";
 	for (int m = 0; m < mipmapLevel; m++)
 	{
 		for (int l = 0; l < numLobes; l++)

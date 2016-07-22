@@ -160,6 +160,8 @@ public:
 class vMFtexture {
 private:
 	//Vec3f
+
+	std::string filename;
 	cv::Mat originalNormals[2];
 	
 	int oWidth, oHeight;

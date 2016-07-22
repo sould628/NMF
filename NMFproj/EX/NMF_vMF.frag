@@ -18,7 +18,7 @@ layout (location = 10) uniform mat4 mv_matrix;
 
 layout (location = 100) uniform int numLobes;
 layout (location = 101) uniform float BPexp;
-layout (location = 102) uniform float MicroFacet;
+layout (location = 102) uniform float MicroSigma;
 
 layout (location = 1000) uniform int renderScene;
 layout (location = 1001) uniform int MipMapped;
@@ -43,12 +43,15 @@ out vec4 color;
 
 vec4 lightIntensity=vec4(0.9f, 0.9f, 0.9f, 1.0f);
 
-vec4 Kd=vec4(0.2f,0.f,0.f,1.0f);
+vec4 Kd=vec4(0.3f,0.f,0.f,1.0f);
 vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
 vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
+float Schlick(float refIndex, float incAngle);
+
 void main(void)
 {
+
 	vec4 effBRDF=vec4(0.0,0.0,0.0,1.0);
 	vec3 v=vec3(0.0, 0.0, 0.0);
 	color=vec4(0.0, 0.0, 0.0, 0.0);
@@ -127,18 +130,37 @@ void main(void)
 			effBRDF+=(alpha*(Ks*Bs+Kd)*LdotMu);
 		}
 		break;
-	}
+	}	
 	//MicroFacet
 	case 1:
 	{
 		for(int i=0; i<numLobes; i++)
-		{
+		{	
+			float fresnel=0.;
+			float refractiveIdx=1.03;		
 			float alpha=0.0;
 			vec3 aux=vec3(0.0,0.0,0.0);
 			float kappa=0.0;
 			vec3 mu=vec3(0.0,0.0,0.0);
 			float r=0.0;
+			float Ms=0.0;
+			alpha=coeffs[i].x;
+			aux=coeffs[i].yzw/max(alpha,0.0001);
+			r=length(aux);
+			kappa=((3*r)-(r*r*r))/max(0.0001, (1.0-(r*r)));	
+			mu=normalize(aux);
+	
+			float sigmaPrime=0.;
+			sigmaPrime=max(sqrt((MicroSigma*MicroSigma)+(1.0/(2.0*kappa))),0.0001);
+			
+			float theta_h=acos(h.z);
+			float theta_i=acos(lightDir.z);
+			float theta_o=acos(eyeDir.z);
+			fresnel=Schlick(refractiveIdx, lightDir.z);
 
+			Ms=(1./(PI*sigmaPrime))*exp(-(theta_h/sigmaPrime)*(theta_h/sigmaPrime));
+			float LdotMu=max(dot(lightDir,mu),0.0);
+			effBRDF+=(alpha*(Kd+(Ks*Ms*fresnel/(4*lightDir.z*(-eyeDir.z))))*LdotMu);
 		}
 		break;
 	}
@@ -153,7 +175,6 @@ void main(void)
 		}
 		case 1:
 		{
-
 			color=vec4(texture2D(vMFmap1, fs_in.texCoord.st))
 			+vec4(texture2D(vMFmap2, fs_in.texCoord.st))
 			+vec4(texture2D(vMFmap3, fs_in.texCoord.st))
@@ -166,11 +187,17 @@ void main(void)
 			vec4 temp=vec4(color.yza, color.x);
 			color=temp;
 			break;
-
 		}
 	}
 //	color.rgb=texture2D(vMFmap1, fs_in.texCoord.xy).gba;
 //	color.a=1;
 //	color.rgb=textureLod(vMFmap1, fs_in.texCoord.xy, 1).gba;
 //	color.a=1;
+}
+
+float Schlick(float n, float cosT)
+{
+	float ret=0.;
+	ret=((n-1)*(n-1)+4*n*(1-cosT)*(1-cosT)*(1-cosT)*(1-cosT)*(1-cosT))/((n+1)*(n+1));
+	return ret;
 }

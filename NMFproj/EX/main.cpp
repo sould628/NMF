@@ -1188,6 +1188,7 @@ void displayvMF()
 	NMFvMF->setUniform1f("BPexp", BPexp);
 	NMFvMF->setUniform1i("renderScene", renderScene);
 	NMFvMF->setUniform1i("MipMapped", MipMapped);
+	NMFvMF->setUniform1f("MicroSigma", MicroSigma);
 	//		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
 	glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
 	glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
@@ -1303,6 +1304,7 @@ void displayCB(){
 		NMFvMF->setUniform1i("renderScene", renderScene);
 		NMFvMF->setUniform1i("MipMapped", MipMapped);
 		NMFvMF->setUniform1i("brdfSelect", brdfSelect);
+		NMFvMF->setUniform1f("MicroSigma", MicroSigma);
 //		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
 		glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
 		glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
@@ -1454,6 +1456,10 @@ void keyboardCB(unsigned char key, int x, int y){
 			printf("New BPexp: ");
 			scanf("%f", &BPexp);
 			break;
+		case 'n':
+			printf("New Micro: ");
+			scanf("%f", &MicroSigma);
+			break;
 		case 's':
 			renderScene == 0 ? (renderScene = 1) : (renderScene = 0);
 			break;
@@ -1471,7 +1477,6 @@ void keyboardCB(unsigned char key, int x, int y){
 		{
 			GLfloat m[16];
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
-
 //			std::ofstream camFile("camPos");
 //			float pos[3], up[3], lookat[3];
 //			cam->getPosition(pos, lookat, up);
