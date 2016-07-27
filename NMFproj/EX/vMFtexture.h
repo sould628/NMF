@@ -171,12 +171,12 @@ private:
 	int mipmapLevel;
 	int *vMFmaps; //glGenerate
 
-	void computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][20][4]);
-
+	void computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][20][4], float alignCtrl);
+	float alignCtrl;
 
 public:
 	vMFtexture();
-	vMFtexture(const char* filename, int numLobes = 4, int mipmapLevel = -1);
+	vMFtexture(const char* filename, int numLobes = 4, float alignCtrl = 0.f, int mipmapLevel = -1);
 	~vMFtexture();
 	void showvMFImage(int level, int lobe, int mode=0) const;
 	void showOriginalImage(int channel = -1) const;

@@ -73,7 +73,7 @@ time_t sysTime, currentTime;
 float* alpha;
 float** aux;
 
-vMFtexture cVMFtex(NMT, numLobes);
+vMFtexture cVMFtex(NMT, numLobes, alignCtrl);
 SHtexture cSHtex(NMT, 4);
 
 static const float exampleData[] =
@@ -1435,12 +1435,12 @@ void keyboardCB(unsigned char key, int x, int y){
 	{
 		switch (key)
 		{
-		case 'r':
+		case 'r':case'R':
 			delete NMFsh;
 			NMFsh = new GLSLProgram("NMF_SH.vert", "NMF_SH.frag");
 			std::cout << "Renewed NMF_SH GLSL\n";
 			break;
-		case 'c':
+		case 'c':case'C':
 			printf("New BPexp: ");
 			scanf("%f", &BPexp);
 			break;
@@ -1449,61 +1449,61 @@ void keyboardCB(unsigned char key, int x, int y){
 	if (renderMode == 3)
 	{
 		switch (key){
-		case 'b':
+		case 'b':case'B':
 			brdfSelect == 0 ? (brdfSelect = 1) : (brdfSelect = 0);
 			break;
-		case 'c':
+		case 'c':case'C':
 			printf("New BPexp: ");
 			scanf("%f", &BPexp);
 			break;
-		case 'n':
+		case 'n':case'N':
 			printf("New Micro: ");
 			scanf("%f", &MicroSigma);
 			break;
-		case 's':
+		case 's':case'S':
 			renderScene == 0 ? (renderScene = 1) : (renderScene = 0);
 			break;
-		case 'm':
+		case 'm':case'M':
 			(MipMapped == 0) ? (MipMapped = 1) : (MipMapped = 0);
 //			if (MipMapped == 0) { std::cout << "NotMipMapped\n"; } else { std::cout << "MipMapped\n"; }
 			(MipMapped == 0) ? (std::cout << "NotMipMapped\n") : (std::cout << "MipMapped\n");
 			break;
-		case 'r':
+		case 'r':case'R':
 			delete NMFvMF;
 			NMFvMF = new GLSLProgram("NMF_vMF.vert", "NMF_vMF.frag");
 			std::cout << "Renewed NMF_vMF Program\n";
 			break;
-		case 'q':
+		case 'q':case'Q':
 		{
 			GLfloat m[16];
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
-//			std::ofstream camFile("camPos");
-//			float pos[3], up[3], lookat[3];
-//			cam->getPosition(pos, lookat, up);
-//			camFile << pos[0] << " " << pos[1] << " " << pos[2]<<"\n";
-//			camFile << lookat[0] << " " << lookat[1] << " " << lookat[2] << "\n";
-//			camFile << up[0] << " " << up[1] << " " << up[2] << "\n";
-//
-//			camFile.close();
-//			std::cout << "Saved Cam Pos\n";
-//			std::cout << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
+			std::ofstream camFile("camPos");
+			float pos[3], up[3], lookat[3];
+			cam->getPosition(pos, lookat, up);
+			camFile << pos[0] << " " << pos[1] << " " << pos[2]<<"\n";
+			camFile << lookat[0] << " " << lookat[1] << " " << lookat[2] << "\n";
+			camFile << up[0] << " " << up[1] << " " << up[2] << "\n";
+
+			camFile.close();
+			std::cout << "Saved Cam Pos\n";
+			std::cout << pos[0] << " " << pos[1] << " " << pos[2] << "\n";
 			break;
 		}
 
 		case 'w':
 		{
-//			GLfloat m[16];
-//			glGetFloatv(GL_MODELVIEW_MATRIX, m);
-//
-//			float pos[3], lookat[3], up[3];
-//			std::ifstream camFile("camPos");
-//			camFile >> pos[0] >> pos[1]  >> pos[2];
-//			camFile >> lookat[0] >> lookat[1] >> lookat[2];
-//			camFile >> up[0] >> up[1] >> up[2];
-//
-//			cam->setPosition(pos, lookat, up);
-//
-//			std::cout << "loaded cam\n";
+			GLfloat m[16];
+			glGetFloatv(GL_MODELVIEW_MATRIX, m);
+
+			float pos[3], lookat[3], up[3];
+			std::ifstream camFile("camPos");
+			camFile >> pos[0] >> pos[1]  >> pos[2];
+			camFile >> lookat[0] >> lookat[1] >> lookat[2];
+			camFile >> up[0] >> up[1] >> up[2];
+
+			cam->setPosition(pos, lookat, up);
+
+			std::cout << "loaded cam\n";
 
 			break;
 		}

@@ -8,8 +8,10 @@ vMFtexture::vMFtexture()
 {
 
 }
-vMFtexture::vMFtexture(const char* filename, int numLobes, int mipmapLevel)
+vMFtexture::vMFtexture(const char* filename, int numLobes, float alignCtrl, int mipmapLevel)
 {
+	this->alignCtrl = alignCtrl;
+
 	this->filename = filename;
 
 	this->numLobes = numLobes;
@@ -121,8 +123,8 @@ void vMFtexture::generatevMFmaps()
 	//Seed Level
 	float seedAlpha = 1.f / numLobes;
 	float seedAlpha2 = 1.f / numLobes;
-	seedAlpha = 1.f;
-	seedAlpha2 = 0.f;
+//	seedAlpha = 1.f;
+//	seedAlpha2 = 0.f;
 	for (int i = 0; i < width; i++)
 	{
 		for (int j = 0; j < height; j++)
@@ -162,29 +164,45 @@ void vMFtexture::generatevMFmaps()
 			for (int h = 0; h < height; h++)
 			{
 				float tKappa = { 0.f };
+				float tAlpha = { 0.f };
 				float tR[3] = { 0.f };
 				float prevData[4][20][4];
-				for (int i = 0; i < 4; i++)
+				if (m != 0)
 				{
-					for (int l = 0; l < numLobes; l++)
+					for (int i = 0; i < 4; i++)
 					{
-
-						cv::Vec4f temp = vMFdata[m - 1][l].at<cv::Vec4f>(h * 2 + (i % 2), w * 2 + (int)(i / 2));
-						if (temp[0] != 0)
+						for (int l = 0; l < numLobes; l++)
 						{
-							temp[1] /= temp[0]; temp[2] /= temp[0]; temp[3] /= temp[0];
-							tR[0] = temp[1]; tR[1] = temp[2]; tR[2] = temp[3];
-							tKappa = vMFfunc::r2kappa(tR);
-							vectorFunc::normalize(tR);
-						}
-						else
-						{
-							tKappa = 0.f;
-							tR[0] = 0.f; tR[1] = 0.f; tR[2] = 0.f;
-						}
 
-						prevData[i][l][0] = tR[0]; prevData[i][l][1] = tR[1]; prevData[i][l][2] = tR[2];
-						prevData[i][l][3] = tKappa;
+							cv::Vec4f temp = vMFdata[m - 1][l].at<cv::Vec4f>(h * 2 + (i % 2), w * 2 + (int)(i / 2));
+							if (temp[0] != 0)
+							{
+								temp[1] /= temp[0]; temp[2] /= temp[0]; temp[3] /= temp[0];
+								tR[0] = temp[1]; tR[1] = temp[2]; tR[2] = temp[3];
+								tKappa = vMFfunc::r2kappa(tR);
+								tAlpha = temp[0];
+								vectorFunc::normalize(tR);
+							}
+							else
+							{
+								tKappa = 0.f;
+								tR[0] = 0.f; tR[1] = 0.f; tR[2] = 0.f;
+							}
+
+							prevData[i][l][0] = tR[0]; prevData[i][l][1] = tR[1]; prevData[i][l][2] = tR[2];
+							prevData[i][l][3] = tAlpha;
+						}
+					}
+				}
+				else
+				{
+					for (int i = 0; i < 4; i++)
+					{
+						for (int l = 0; l < numLobes; l++)
+						{
+							prevData[i][l][0] = 1.f; prevData[i][l][0] = 0.f; prevData[i][l][0] = 0.f;
+							prevData[i][l][0] = 0.f;
+						}
 					}
 				}
 				cv::Rect ROI(w*side, h*side, side, side);
@@ -192,7 +210,7 @@ void vMFtexture::generatevMFmaps()
 				targetRegion = rawData(ROI).clone();
 
 				//prevData for mu initialization
-				this->computeParameters(alpha, aux, targetRegion, prevData);
+				this->computeParameters(alpha, aux, targetRegion, prevData, this->alignCtrl);
 				
 //				if(m>6)
 //				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 0, 0);
@@ -229,7 +247,7 @@ void vMFtexture::generatevMFmaps()
 	delete[] aux; delete[] alpha;
 }
 
-void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][20][4])
+void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][20][4], float alignCtrl)
 {
 	int iteration = 0;
 
@@ -324,6 +342,9 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 				zj[j] = 0.01;
 		}
 		cv::Vec3f Vec3_aux[20];
+		cv::Vec3f Vec3_prev[4];
+		cv::Vec3f alignMu[20];
+		float prevAlpha[4];
 		//Alpha
 		for (int j = 0; j < numLobes; j++)
 		{
@@ -334,16 +355,39 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 			aux[j][0] = Vec3_aux[j][0];
 			aux[j][1] = Vec3_aux[j][1];
 			aux[j][2] = Vec3_aux[j][2];
+
+			alignMu[j] = Vec3_aux[j];
+
+			for (int k = 0; k < 4; k++)
+			{
+				Vec3_prev[k][0] = prevData[k][j][0];
+				Vec3_prev[k][1] = prevData[k][j][1];
+				Vec3_prev[k][2] = prevData[k][j][2];
+				prevAlpha[k] = prevData[k][j][3];
+				Vec3_prev[k]=cv::normalize(Vec3_prev[k]);
+			}
+
+			for (int k = 0; k < 4; k++)
+			{
+				alignMu[j] += alignCtrl*Vec3_prev[k] * prevAlpha[k];
+			}
+
+			mu[j][0] = alignMu[j][0];
+			mu[j][1] = alignMu[j][1];
+			mu[j][2] = alignMu[j][2];
+			vectorFunc::normalize(mu[j]);
+
 			float lenAux = cv::norm(Vec3_aux[j]);
 			kappa[j] = ((3 * lenAux) - (lenAux*lenAux*lenAux)) / (1 - lenAux*lenAux);
 			if (kappa[j] < 0.f)
 				kappa[j] = 700.f;
-			Vec3_aux[j] = cv::normalize(Vec3_aux[j]);
-			mu[j][0] = Vec3_aux[j][0];
-			mu[j][1] = Vec3_aux[j][1];
-			mu[j][2] = Vec3_aux[j][2];
-			vectorFunc::normalize(mu[j]);
-			float musqr = sqrt(mu[j][0] * mu[j][0] + mu[j][1] * mu[j][1] + mu[j][2] * mu[j][2]);
+//			Vec3_aux[j] = cv::normalize(Vec3_aux[j]);
+//			mu[j][0] = Vec3_aux[j][0];
+//			mu[j][1] = Vec3_aux[j][1];
+//			mu[j][2] = Vec3_aux[j][2];
+
+//			vectorFunc::normalize(mu[j]);
+
 
 		}
 		if (iteration++ == 100)
@@ -358,25 +402,34 @@ void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegi
 //	std::cout << "zj: " << zj[0] << std::endl;
 
 	//Alignment
+//	for (int i = 0; i < numLobes; i++)
+//	{
+//		float val[20] = { 0.f };
+//		for (int j = i; j < numLobes; j++)
+//		{
+//			val[j] = vectorFunc::dotProd(align[i], aux[j]);
+//		}
+//		float highestVal = 0.f;
+//		int ind;
+//		for (int k = 0; k < numLobes; k++)
+//		{
+//			if (highestVal < val[k])
+//				highestVal = val[k];
+//			ind = k;
+//		}
+//		float temp[3] = { aux[ind][0], aux[ind][1], aux[ind][2] };
+//		aux[ind][0] = aux[i][0]; aux[ind][1] = aux[i][1]; aux[ind][2] = aux[i][2];
+//		aux[i][0] = temp[0]; aux[i][1] = temp[1]; aux[i][2] = temp[2];
+//	}
 	for (int i = 0; i < numLobes; i++)
 	{
 		float val[20] = { 0.f };
 		for (int j = i; j < numLobes; j++)
 		{
-			val[j] = vectorFunc::dotProd(align[i], aux[j]);
+
 		}
-		float highestVal = 0.f;
-		int ind;
-		for (int k = 0; k < numLobes; k++)
-		{
-			if (highestVal < val[k])
-				highestVal = val[k];
-			ind = k;
-		}
-		float temp[3] = { aux[ind][0], aux[ind][1], aux[ind][2] };
-		aux[ind][0] = aux[i][0]; aux[ind][1] = aux[i][1]; aux[ind][2] = aux[i][2];
-		aux[i][0] = temp[0]; aux[i][1] = temp[1]; aux[i][2] = temp[2];
 	}
+
 	for (int i = 0; i < numLobes; i++)
 	{
 		delete[] z[i];

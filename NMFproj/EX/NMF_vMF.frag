@@ -169,20 +169,22 @@ void main(void)
 	switch(renderScene){
 		case 0:
 		{
+			color=vec4(0., 0., 0., 0.);
 			color=(lightIntensity*effBRDF);
 //			color=vec4(1.0, 1.0, 1.0, 1.0);
 			break;
 		}
 		case 1:
 		{
+			color=vec4(0., 0., 0., 0.);
 			color=vec4(texture2D(vMFmap1, fs_in.texCoord.st))
 			+vec4(texture2D(vMFmap2, fs_in.texCoord.st))
 			+vec4(texture2D(vMFmap3, fs_in.texCoord.st))
 			+vec4(texture2D(vMFmap4, fs_in.texCoord.st))
 			+vec4(texture2D(vMFmap5, fs_in.texCoord.st))
 			+vec4(texture2D(vMFmap6, fs_in.texCoord.st))
-			+vec4(texture2D(vMFmap7, fs_in.texCoord.st))
-			+vec4(texture2D(vMFmap8, fs_in.texCoord.st))
+//			+vec4(texture2D(vMFmap7, fs_in.texCoord.st))
+//			+vec4(texture2D(vMFmap8, fs_in.texCoord.st))
 			;
 			vec4 temp=vec4(color.yza, color.x);
 			color=temp;
