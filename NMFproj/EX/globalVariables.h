@@ -7,11 +7,11 @@
 std::string inputObj = "./cube.obj";
 
 
-extern const char* NMT = "./1.jpg";
+extern const char* NMT = "./3.jpg";
 extern const int numLobes = 6;
 extern const int textLobes = 4;
 extern int MipMapLevel = 3;
-extern float alignCtrl = 0.2f;
+extern float alignCtrl = 10.f;
 
 
 Camera *cam;
