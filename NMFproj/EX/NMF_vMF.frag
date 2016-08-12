@@ -43,7 +43,7 @@ out vec4 color;
 
 vec4 lightIntensity=vec4(0.9f, 0.9f, 0.9f, 1.0f);
 
-vec4 Kd=vec4(0.3f,0.f,0.f,1.0f);
+vec4 Kd=vec4(0.2f,0.f,0.f,1.0f);
 vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
 vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
@@ -188,6 +188,7 @@ void main(void)
 			;
 			vec4 temp=vec4(color.yza, color.x);
 			color=temp;
+//			color=vec4(fract(fs_in.texCoord.x), fract(fs_in.texCoord.y), 0., 1.);
 			break;
 		}
 	}

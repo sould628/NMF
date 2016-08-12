@@ -1652,7 +1652,7 @@ int main(int argc, char** argv){
 	float *testA1 = testAux;
 	float **testAuxptr = &testA1;
 
-//	vMFfunc::displayvMF(1, testaptr, testAuxptr, 512, 512);
+	vMFfunc::displayvMF(1, testaptr, testAuxptr, 512, 512);
 
 
 //	cVMFtex.showOriginalImage(0);
