@@ -18,7 +18,7 @@ layout (location = 10) uniform mat4 mv_matrix;
 
 layout (location = 100) uniform int numLobes;
 layout (location = 101) uniform float BPexp;
-layout (location = 102) uniform float MicroSigma;
+//layout (location = 102) uniform float MicroSigma;
 
 layout (location = 1000) uniform int renderScene;
 layout (location = 1001) uniform int MipMapped;
@@ -134,10 +134,11 @@ void main(void)
 	//MicroFacet
 	case 1:
 	{
+		float MicroSigma=0.000000000001f;
 		for(int i=0; i<numLobes; i++)
 		{	
 			float fresnel=0.;
-			float refractiveIdx=1.03;		
+			float refractiveIdx=1.557;		
 			float alpha=0.0;
 			vec3 aux=vec3(0.0,0.0,0.0);
 			float kappa=0.0;
@@ -151,7 +152,7 @@ void main(void)
 			mu=normalize(aux);
 	
 			float sigmaPrime=0.;
-			sigmaPrime=max(sqrt((MicroSigma*MicroSigma)+(1.0/(2.0*kappa))),0.0001);
+			sigmaPrime=sqrt((MicroSigma*MicroSigma)+(1.0/(2.0*kappa)));
 			
 			float theta_h=acos(h.z);
 			float theta_i=acos(lightDir.z);
@@ -183,8 +184,8 @@ void main(void)
 			+vec4(texture2D(vMFmap4, fs_in.texCoord.st))
 			+vec4(texture2D(vMFmap5, fs_in.texCoord.st))
 			+vec4(texture2D(vMFmap6, fs_in.texCoord.st))
-//			+vec4(texture2D(vMFmap7, fs_in.texCoord.st))
-//			+vec4(texture2D(vMFmap8, fs_in.texCoord.st))
+			+vec4(texture2D(vMFmap7, fs_in.texCoord.st))
+			+vec4(texture2D(vMFmap8, fs_in.texCoord.st))
 			;
 			vec4 temp=vec4(color.yza, color.x);
 			color=temp;

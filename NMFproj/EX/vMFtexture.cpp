@@ -153,7 +153,7 @@ void vMFtexture::generatevMFmaps()
 		}
 	}
 
-	for (int m = 1; m < mipmapLevel; m++)
+	for (int m = mipmapLevel-1; m > 0; m--)
 	{
 		width = this->vWidth[m]; height = this->vHeight[m];
 		std::cout << "Proceeding mipmap level " << m << " generation (" << width << ", " << height << ")\n";
@@ -167,14 +167,14 @@ void vMFtexture::generatevMFmaps()
 				float tAlpha = { 0.f };
 				float tR[3] = { 0.f };
 				float prevData[4][20][4];
-				if (m != 0)
+				if (m != mipmapLevel-1)
 				{
 					for (int i = 0; i < 4; i++)
 					{
 						for (int l = 0; l < numLobes; l++)
 						{
 
-							cv::Vec4f temp = vMFdata[m - 1][l].at<cv::Vec4f>(h * 2 + (i % 2), w * 2 + (int)(i / 2));
+							cv::Vec4f temp = vMFdata[m + 1][l].at<cv::Vec4f>(h / 2 + (i % 2), w * 2 + (int)(i / 2));
 							if (temp[0] != 0)
 							{
 								temp[1] /= temp[0]; temp[2] /= temp[0]; temp[3] /= temp[0];
@@ -200,8 +200,8 @@ void vMFtexture::generatevMFmaps()
 					{
 						for (int l = 0; l < numLobes; l++)
 						{
-							prevData[i][l][0] = 1.f; prevData[i][l][0] = 0.f; prevData[i][l][0] = 0.f;
-							prevData[i][l][0] = 0.f;
+							prevData[i][l][0] = 1.f; prevData[i][l][1] = 0.f; prevData[i][l][2] = 0.f;
+							prevData[i][l][3] = 0.f;
 						}
 					}
 				}

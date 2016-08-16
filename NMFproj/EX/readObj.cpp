@@ -35,7 +35,7 @@ bool objReader::readObj(std::string inputFile)
 			for (size_t f = 0; f < ngon; f++)
 			{
 				unsigned int v = shapes[i].mesh.indices[indexOffset + f];
-				printf("face [%ld] v[%ld] = (%f, %f, %f)\n", n,
+				printf("face [%ld] v[%ld] = (%f, %f, %f)\n", n, f,
 					shapes[i].mesh.positions[3 * v + 0],
 					shapes[i].mesh.positions[3 * v + 1],
 					shapes[i].mesh.positions[3 * v + 2]);

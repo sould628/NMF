@@ -49,7 +49,7 @@ GLfloat click_pos[2];
 
 float t;
 
-GLuint VAO, TexCoordArray;
+GLuint VAO, VBO[4], TexCoordArray;
 GLuint NMbuffer, vMFvertex, vMFtex, vMFnormal, vMFtangent;
 GLuint NormalMap, NormalMipMap, normalizedNMT;
 
@@ -1024,38 +1024,38 @@ void drawCube2(){
 
 #pragma region fbostatusfunction
 
-bool checkFrameBufferObjectStatus(){
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	switch (status){
-	case GL_FRAMEBUFFER_COMPLETE:
-		std::cout << "Framebuffer complete." << std::endl;
-		return true;
-
-	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-		std::cout << "[ERROR] Framebuffer incomplete: Attachment is NOT complete." << std::endl;
-		return false;
-
-	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-		std::cout << "[ERROR] Framebuffer incomplete: No image is attached to FBO." << std::endl;
-		return false;
-	case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-		std::cout << "[ERROR] Framebuffer incomplete: Draw buffer." << std::endl;
-		return false;
-
-	case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-		std::cout << "[ERROR] Framebuffer incomplete: Read buffer." << std::endl;
-		return false;
-
-	case GL_FRAMEBUFFER_UNSUPPORTED:
-		std::cout << "[ERROR] Framebuffer incomplete: Unsupported by FBO implementation." << std::endl;
-		return false;
-
-	default:
-		std::cout << "[ERROR] Framebuffer incomplete: Unknown error." << std::endl;
-		return false;
-	}
-}
-
+//bool checkFrameBufferObjectStatus(){
+//	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+//	switch (status){
+//	case GL_FRAMEBUFFER_COMPLETE:
+//		std::cout << "Framebuffer complete." << std::endl;
+//		return true;
+//
+//	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+//		std::cout << "[ERROR] Framebuffer incomplete: Attachment is NOT complete." << std::endl;
+//		return false;
+//
+//	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+//		std::cout << "[ERROR] Framebuffer incomplete: No image is attached to FBO." << std::endl;
+//		return false;
+//	case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+//		std::cout << "[ERROR] Framebuffer incomplete: Draw buffer." << std::endl;
+//		return false;
+//
+//	case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+//		std::cout << "[ERROR] Framebuffer incomplete: Read buffer." << std::endl;
+//		return false;
+//
+//	case GL_FRAMEBUFFER_UNSUPPORTED:
+//		std::cout << "[ERROR] Framebuffer incomplete: Unsupported by FBO implementation." << std::endl;
+//		return false;
+//
+//	default:
+//		std::cout << "[ERROR] Framebuffer incomplete: Unknown error." << std::endl;
+//		return false;
+//	}
+//}
+//
 #pragma endregion
 
 void checkTextureError(GLenum glError){
@@ -1305,19 +1305,25 @@ void displayCB(){
 		NMFvMF->setUniform1i("MipMapped", MipMapped);
 		NMFvMF->setUniform1i("brdfSelect", brdfSelect);
 		NMFvMF->setUniform1f("MicroSigma", MicroSigma);
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+		glGenBuffers(4, VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+
 //		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
-		glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
-		glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
-		glVertexArrayVertexBuffer(VAO, 2, vMFnormal, 0, (GLsizei)(sizeof(float) * 4));
-		glVertexArrayVertexBuffer(VAO, 3, vMFtangent, 0, (GLsizei)(sizeof(float) * 4));
-		glVertexArrayAttribFormat(VAO, 0, 4, GL_FLOAT, GL_FALSE, 0);
-		glVertexArrayAttribFormat(VAO, 1, 4, GL_FLOAT, GL_FALSE, 0);
-		glVertexArrayAttribFormat(VAO, 2, 4, GL_FLOAT, GL_TRUE, 0);
-		glVertexArrayAttribFormat(VAO, 3, 4, GL_FLOAT, GL_TRUE, 0);
-		glEnableVertexArrayAttrib(VAO, 0);
-		glEnableVertexArrayAttrib(VAO, 1);
-		glEnableVertexArrayAttrib(VAO, 2);
-		glEnableVertexArrayAttrib(VAO, 3);
+//		glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
+//		glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
+//		glVertexArrayVertexBuffer(VAO, 2, vMFnormal, 0, (GLsizei)(sizeof(float) * 4));
+//		glVertexArrayVertexBuffer(VAO, 3, vMFtangent, 0, (GLsizei)(sizeof(float) * 4));
+//		
+//		glVertexArrayAttribFormat(VAO, 0, 4, GL_FLOAT, GL_FALSE, 0);
+//		glVertexArrayAttribFormat(VAO, 1, 4, GL_FLOAT, GL_FALSE, 0);
+//		glVertexArrayAttribFormat(VAO, 2, 4, GL_FLOAT, GL_TRUE, 0);
+//		glVertexArrayAttribFormat(VAO, 3, 4, GL_FLOAT, GL_TRUE, 0);
+//		glEnableVertexArrayAttrib(VAO, 0);
+//		glEnableVertexArrayAttrib(VAO, 1);
+//		glEnableVertexArrayAttrib(VAO, 2);
+//		glEnableVertexArrayAttrib(VAO, 3);
 
 //		glVertexArrayVertexBuffer(TexCoordArray, 0, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
 //		glVertexArrayAttribFormat(TexCoordArray, 0, 4, GL_FLOAT, GL_FALSE, 0);
