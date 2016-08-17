@@ -122,6 +122,7 @@ private:
 
 public:
 	Camera();
+	bool trans;
 	void glRender();
 	void getPosition(float* pos, float* lookat, float* up);
 	void setPosition(float* pos, float* lookat, float* up);
@@ -133,6 +134,7 @@ public:
 	void trackball(GLfloat src[2], GLfloat dst[2]);
 	void dollyin();
 	void dollyout();
+	void translate(GLfloat src[2], GLfloat dst[2], GLfloat projMatrix[16]);
 private:
 	float ori_vec[3];
 	float position[3];
@@ -153,6 +155,7 @@ void Camera::getPosition(float* pos, float* lookat, float*up){
 	up[2] = this->up[2];
 }
 Camera::Camera(){
+	trans = false;
 	ori_vec[0] = 0;
 	ori_vec[1] = 0;
 	ori_vec[2] = 3;
@@ -161,7 +164,7 @@ Camera::Camera(){
 	up[1] = 1;
 	viewAngle = 60;
 	zNear = 0.001;
-	zFar = 100;
+	zFar = 1000;
 }
 void Camera::setPosition(float* pos, float* lookat, float* up){
 	ori_vec[0] = pos[0];
@@ -260,4 +263,27 @@ void Camera::dollyout(){
 		ori_vec[i] *= 1.1;
 	}
 
+}
+
+inline void Camera::translate(GLfloat src[2], GLfloat dst[2], GLfloat projMatrix[16])
+{
+	float mov[4];
+	mov[0] = dst[0] - src[0];
+	mov[1] = dst[1] - src[1];
+	mov[2] = 0;
+	mov[3] = 0;
+
+	mov[0] *= 2;
+	mov[1] *= 2;
+	float projMov[3];
+	projMov[0] = mov[0] * projMatrix[0] + mov[1] * projMatrix[1];
+	projMov[1] = mov[0] * projMatrix[4] + mov[1] * projMatrix[5];
+	projMov[2] = mov[0] * projMatrix[8] + mov[1] * projMatrix[9];
+
+	lookat[0] += projMov[0];
+	lookat[1] += projMov[1];
+	lookat[2] += projMov[2];
+	ori_vec[0] += projMov[0];
+	ori_vec[1] += projMov[1];
+	ori_vec[2] += projMov[2];
 }

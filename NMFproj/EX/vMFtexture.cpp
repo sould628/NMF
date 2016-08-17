@@ -174,7 +174,7 @@ void vMFtexture::generatevMFmaps()
 						for (int l = 0; l < numLobes; l++)
 						{
 
-							cv::Vec4f temp = vMFdata[m + 1][l].at<cv::Vec4f>(h / 2 + (i % 2), w * 2 + (int)(i / 2));
+							cv::Vec4f temp = vMFdata[m + 1][l].at<cv::Vec4f>(h / 2, w / 2);
 							if (temp[0] != 0)
 							{
 								temp[1] /= temp[0]; temp[2] /= temp[0]; temp[3] /= temp[0];

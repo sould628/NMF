@@ -38,6 +38,13 @@ int width = 800, height = 800;
 int NMwidth, NMheight;
 
 
+//Mesh Data
+int numVertices, numTexcoord, numNormals, numIndices, numFaces;
+float *vertPos, *normals, *texCoord, *tangent;
+int *indices;
+
+
+
 //const char* NMT = "./bricks_normal_map.jpg";
 
 FIBITMAP* NMTdata;
@@ -63,7 +70,7 @@ GLuint vMFTexMap[10];
 GLuint Ylmmaps[10];
 
 
-GLSLProgram *NMFsh, *NMFvMF, *NMForiginal;
+GLSLProgram *NMFsh, *NMFvMF, *NMForiginal, *NMFvMFobj;
 
 GLuint windowSH, windowvMF;
 
@@ -1091,6 +1098,7 @@ void createProgram() {
 	NMFsh = new GLSLProgram("NMF_SH.vert", "NMF_SH.frag");
 	NMFvMF = new GLSLProgram("NMF_vMF.vert", "NMF_vMF.frag");
 	NMForiginal = new GLSLProgram("NMF_original.vert", "NMF_original.frag");
+	NMFvMFobj = new GLSLProgram("NMF_vMF_OBJ.vert", "NMF_vMF_OBJ.frag");
 }
 void initBuffers() {
 	glEnable(GL_TEXTURE_2D);
@@ -1169,51 +1177,6 @@ void initBuffers() {
 
 
 
-void displayvMF()
-{
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.f, 0.f, 0.0f, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	GLfloat color[] = { (float)sin(t)*0.5f, (float)cos(t)*0.5f, 0.3f, 1.0f };
-
-	cam->glRender();
-
-	//GLSLvMF
-	NMFvMF->enable();
-	NMFvMF->SetUniformMatrix4fv("mv_matrix", modelviewMatrix, false);
-	NMFvMF->SetUniformMatrix4fv("proj_matrix", projectionMatrix, false);
-	NMFvMF->SetUniformMatrix3fv("normal_matrix", normalMatrix, false);
-	NMFvMF->setUniform1i("numLobes", numLobes);
-	NMFvMF->setUniform1f("BPexp", BPexp);
-	NMFvMF->setUniform1i("renderScene", renderScene);
-	NMFvMF->setUniform1i("MipMapped", MipMapped);
-	NMFvMF->setUniform1f("MicroSigma", MicroSigma);
-	//		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
-	glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
-	glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
-	glVertexArrayVertexBuffer(VAO, 2, vMFnormal, 0, (GLsizei)(sizeof(float) * 4));
-	glVertexArrayVertexBuffer(VAO, 3, vMFtangent, 0, (GLsizei)(sizeof(float) * 4));
-	glVertexArrayAttribFormat(VAO, 0, 4, GL_FLOAT, GL_FALSE, 0);
-	glVertexArrayAttribFormat(VAO, 1, 4, GL_FLOAT, GL_FALSE, 0);
-	glVertexArrayAttribFormat(VAO, 2, 4, GL_FLOAT, GL_TRUE, 0);
-	glVertexArrayAttribFormat(VAO, 3, 4, GL_FLOAT, GL_TRUE, 0);
-	glEnableVertexArrayAttrib(VAO, 0);
-	glEnableVertexArrayAttrib(VAO, 1);
-	glEnableVertexArrayAttrib(VAO, 2);
-	glEnableVertexArrayAttrib(VAO, 3);
-
-	//		glVertexArrayVertexBuffer(TexCoordArray, 0, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
-	//		glVertexArrayAttribFormat(TexCoordArray, 0, 4, GL_FLOAT, GL_FALSE, 0);
-	//		glEnableVertexArrayAttrib(TexCoordArray, 0);
-
-	glDrawArrays(GL_QUADS, 0, 4);
-
-	NMFvMF->disable();
-
-	glFlush();
-}
-
 
 void displayCB(){
 	glEnable(GL_DEPTH_TEST);
@@ -1281,9 +1244,48 @@ void displayCB(){
 		NMFsh->disable();
 		break;
 	}
-	case 1:
+	case 1://drawObj
 	{
-		drawCube2();
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+		glGenBuffers(4, VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+		glBufferData(GL_ARRAY_BUFFER, 4*numVertices*sizeof(GLfloat), vertPos, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+		glBufferData(GL_ARRAY_BUFFER, 3 * numNormals*sizeof(GLfloat), normals, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+		glBufferData(GL_ARRAY_BUFFER, 2 * numTexcoord*sizeof(GLfloat), texCoord, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glEnableVertexAttribArray(2);
+
+		glBindAttribLocation(NMFvMFobj->getProgram(), 0, "in_position");
+		glBindAttribLocation(NMFvMFobj->getProgram(), 1, "in_normalVector");
+		glBindAttribLocation(NMFvMFobj->getProgram(), 2, "in_texCoord");
+
+		NMFvMFobj->enable();
+		NMFvMFobj->disable();
+//		drawCube2();
+		int indexOffset = 0;
+		for (int f = 0; f < numFaces; f++)
+		{
+			int ngon = objreader.shapes[0].mesh.num_vertices[f];
+			glBegin(GL_TRIANGLES);
+			for (int ind = 0; ind < ngon; ind++)
+			{
+				int v = indices[indexOffset + ind];
+				glVertex3f(objreader.shapes[0].mesh.positions[4 * v + 0],
+					objreader.shapes[0].mesh.positions[4 * v + 1],
+					objreader.shapes[0].mesh.positions[4 * v + 2]);
+			}
+			glEnd();
+			indexOffset += ngon;
+		}
+
+
 		break;
 	}
 	case 2://vMF
@@ -1294,6 +1296,7 @@ void displayCB(){
 	}
 	case 3:
 	{
+
 		//GLSLvMF
 		NMFvMF->enable();
 		NMFvMF->SetUniformMatrix4fv("mv_matrix", modelviewMatrix, false);
@@ -1305,12 +1308,10 @@ void displayCB(){
 		NMFvMF->setUniform1i("MipMapped", MipMapped);
 		NMFvMF->setUniform1i("brdfSelect", brdfSelect);
 		NMFvMF->setUniform1f("MicroSigma", MicroSigma);
-		glGenVertexArrays(1, &VAO);
-		glBindVertexArray(VAO);
-		glGenBuffers(4, VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 
-//		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
+//		glBufferData(GL_ARRAY_BUFFER, 3 * numVertices*sizeof(GLfloat), objreader.shapes[0].mesh.positions);
+
+		//		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
 //		glVertexArrayVertexBuffer(VAO, 0, vMFvertex, 0, (GLsizei)(sizeof(float) * 4));
 //		glVertexArrayVertexBuffer(VAO, 1, vMFtex, 0, (GLsizei)(sizeof(float) * 4));
 //		glVertexArrayVertexBuffer(VAO, 2, vMFnormal, 0, (GLsizei)(sizeof(float) * 4));
@@ -1419,23 +1420,7 @@ void idleCB(){
 
 //	glutPostRedisplay();
 }
-void mouseCB(int button, int state, int x, int y){
-	if ((renderMode == 2) || (renderMode == 4)){}
-	else
-	{
-		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-			click_pos[0] = (x - width / 2.0f) / (width / 2.0f);
-			click_pos[1] = (y - height / 2.0f) / (height / 2.0f);
-		}
-		else if (button == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN){
-			click_pos[0] = (x - width / 2.0f) / (width / 2.0f);
-			click_pos[1] = (y - height / 2.0f) / (height / 2.0f);
-		}
-		button_id = button;
-	}
-	glutSetWindow(windowSH);
-	glutPostRedisplay();
-}
+
 void keyboardCB(unsigned char key, int x, int y){
 	if (renderMode == 0)
 	{
@@ -1452,7 +1437,7 @@ void keyboardCB(unsigned char key, int x, int y){
 			break;
 		}
 	}
-	if (renderMode == 3)
+	if ((renderMode == 3)||(renderMode==1))
 	{
 		switch (key){
 		case 'b':case'B':
@@ -1478,6 +1463,9 @@ void keyboardCB(unsigned char key, int x, int y){
 			delete NMFvMF;
 			NMFvMF = new GLSLProgram("NMF_vMF.vert", "NMF_vMF.frag");
 			std::cout << "Renewed NMF_vMF Program\n";
+			delete NMFvMFobj;
+			NMFvMFobj = new GLSLProgram("NMF_vMF_OBJ.vert", "NMF_vMF_OBJ.frag");
+			std::cout << "Renewed NMF_vMF_obj Program\n";
 			break;
 		case 'q':case'Q':
 		{
@@ -1520,12 +1508,37 @@ void keyboardCB(unsigned char key, int x, int y){
 	glutSetWindow(windowSH);
 	glutPostRedisplay();
 }
+void mouseCB(int button, int state, int x, int y) {
+	if ((renderMode == 2) || (renderMode == 4)) {}
+	else
+	{
+		if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+			click_pos[0] = (x - width / 2.0f) / (width / 2.0f);
+			click_pos[1] = (y - height / 2.0f) / (height / 2.0f);
+		}
+		else if (button == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN) {
+			click_pos[0] = (x - width / 2.0f) / (width / 2.0f);
+			click_pos[1] = (y - height / 2.0f) / (height / 2.0f);
+			if (glutGetModifiers() == GLUT_ACTIVE_CTRL)
+			{
+				cam->trans = true;
+			}
+			else
+			{
+				cam->trans = false;
+			}
+		}
+		button_id = button;
+	}
+	glutSetWindow(windowSH);
+	glutPostRedisplay();
+}
 void motionCB(int x, int y){
 	GLfloat present[2];
 	if ((renderMode == 2) || (renderMode == 4)){}
 	else
 	{
-		switch (button_id){
+		switch (button_id) {
 		case GLUT_LEFT_BUTTON:
 			present[0] = (GLfloat)(x - width / 2.0f) / (GLfloat)(width / 2.0f);
 			present[1] = (GLfloat)(y - height / 2.0f) / (GLfloat)(height / 2.0f);
@@ -1538,13 +1551,23 @@ void motionCB(int x, int y){
 		case GLUT_MIDDLE_BUTTON:
 			present[0] = (GLfloat)(x - width / 2.0f) / (GLfloat)(width / 2.0f);
 			present[1] = (GLfloat)(y - height / 2.0f) / (GLfloat)(height / 2.0f);
-			if (present[1] - click_pos[1] < 0)
-				cam->dollyin();
-			else if (present[1] - click_pos[1] > 0)
-				cam->dollyout();
+			if (!cam->trans)
+			{
+				if (present[1] - click_pos[1] < 0)
+					cam->dollyin();
+				else if (present[1] - click_pos[1] > 0)
+					cam->dollyout();
 
-			click_pos[0] = present[0];
-			click_pos[1] = present[1];
+				click_pos[0] = present[0];
+				click_pos[1] = present[1];
+			}
+			else
+			{
+				glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix);
+				cam->translate(click_pos, present, projectionMatrix);
+				click_pos[0] = present[0];
+				click_pos[1] = present[1];
+			}
 			break;
 		}
 	}
@@ -1603,7 +1626,7 @@ void initGLUT(int argc, char** argv){
 	int RenderMenu = glutCreateMenu(renderMenu);
 	glutAddMenuEntry("GLSL", 0);
 	glutAddMenuEntry("Render Scene(vMF)", 3);
-	glutAddMenuEntry("Texture", 1);
+	glutAddMenuEntry("drawOBJ", 1);
 	glutAddMenuEntry("vMF", 2);
 	glutAddMenuEntry("Original NDF", 4);
 	int MainMenu = glutCreateMenu(mainMenu);
@@ -1639,29 +1662,68 @@ void initGL(int argc, char** argv){
 
 }
 
-
+void setMesh()
+{
+	if (objreader.shapes.size() > 1)
+	{
+		std::cout << "More than 1 shape exists: " << objreader.shapes.size() << std::endl;
+		sysPause;
+	}
+	numFaces = objreader.shapes[0].mesh.num_vertices.size();
+	numVertices = objreader.shapes[0].mesh.positions.size()/3;
+	numNormals = objreader.shapes[0].mesh.normals.size()/3;
+	numTexcoord = objreader.shapes[0].mesh.texcoords.size()/2;
+	numIndices = objreader.shapes[0].mesh.indices.size();
+	vertPos = new float[numVertices * 4];
+	normals = new float[numNormals * 3];
+	texCoord = new float[numTexcoord * 2];
+	indices = new int[numIndices];
+	tangent = new float[numFaces * 3];
+	for (int i = 0; i < numVertices; i++)
+	{
+		vertPos[i * 4 + 0] = objreader.shapes[0].mesh.positions[3 * i + 0];
+		vertPos[i * 4 + 1] = objreader.shapes[0].mesh.positions[3 * i + 1];
+		vertPos[i * 4 + 2] = objreader.shapes[0].mesh.positions[3 * i + 2];
+		vertPos[i * 4 + 3] = 1.f;
+	}
+	for (int i = 0; i < numNormals; i++)
+	{
+		normals[i * 3 + 0] = objreader.shapes[0].mesh.normals[3 * i + 0];
+		normals[i * 3 + 1] = objreader.shapes[0].mesh.normals[3 * i + 1];
+		normals[i * 3 + 2] = objreader.shapes[0].mesh.normals[3 * i + 2];
+	}
+	for (int i = 0; i < numTexcoord; i++)
+	{
+		texCoord[i * 2 + 0] = objreader.shapes[0].mesh.texcoords[2 * i + 0];
+		texCoord[i * 2 + 1] = objreader.shapes[0].mesh.texcoords[2 * i + 1];
+	}
+	for (int i = 0; i < numIndices; i++)
+	{
+		indices[i] = objreader.shapes[0].mesh.indices[i];
+	}
+}
 
 int main(int argc, char** argv){
 	srand(time(NULL));
 
 	initSharedMem();
 
-	cSHtex.displayMap(4);
+//	cSHtex.displayMap(4);
 
 	objreader.readObj(inputObj);
+	setMesh();
+	//float testa = 1.f;
+	//float *testaptr = &testa;
+	//float testAux[3] = { 0.f, 0.f, 1.f };
+	//float *testA1 = testAux;
+	//float **testAuxptr = &testA1;
 
-
-
-	float testa = 1.f;
-	float *testaptr = &testa;
-	float testAux[3] = { 0.f, 0.f, 1.f };
-	float *testA1 = testAux;
-	float **testAuxptr = &testA1;
-
-	vMFfunc::displayvMF(1, testaptr, testAuxptr, 512, 512);
+	//vMFfunc::displayvMF(1, testaptr, testAuxptr, 512, 512);
 
 
 //	cVMFtex.showOriginalImage(0);
+
+
 	cVMFtex.generatevMFmaps();
 
 //	cVMFtex.showvMFImage(0, 0, 0);

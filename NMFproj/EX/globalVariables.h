@@ -4,7 +4,7 @@
 
 #define MAXITERATION 10
 
-std::string inputObj = "./cube.obj";
+std::string inputObj = "./cylinder_cloth_0070.obj";
 
 
 extern const char* NMT = "./3.jpg";

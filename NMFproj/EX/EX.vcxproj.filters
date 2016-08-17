@@ -63,6 +63,12 @@
     <None Include="NMF_vMF.vert">
       <Filter>GLSL</Filter>
     </None>
+    <None Include="NMF_vMF_OBJ.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="NMF_vMF_OBJ.frag">
+      <Filter>GLSL</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
