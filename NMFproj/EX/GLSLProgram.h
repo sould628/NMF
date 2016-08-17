@@ -80,9 +80,29 @@ public:
 		free(vert);
 		free(frag);
 	}
+	void GLSLCreateShader(char *vertfileName, char*fragfileName)
+	{
+		char* vert = readFromFile(vertfileName);
+		char* frag = readFromFile(fragfileName);
 
+		vertShader = createShader(vert, GL_VERTEX_SHADER);
+		fragShader = createShader(frag, GL_FRAGMENT_SHADER);
+
+		program = glCreateProgram();
+		glAttachShader(program, vertShader);
+		glAttachShader(program, fragShader);
+		free(vert);
+		free(frag);
+	}
+	void GLSLLinkShader()
+	{
+		glLinkProgram(program);
+		printProgramInfoLog(program);
+	}
 public:
 	GLuint getProgram() { return program; }
+	GLuint getVertShader() { return vertShader; }
+	GLuint getFragShader() { return fragShader; }
 	void enable() { glUseProgram(program); }
 	void disable() { glUseProgram(0); }
 	void setUniform1i(const GLchar *name, GLint x) {

@@ -212,8 +212,12 @@ void vMFtexture::generatevMFmaps()
 				//prevData for mu initialization
 				this->computeParameters(alpha, aux, targetRegion, prevData, this->alignCtrl);
 				
-//				if(m>6)
-//				vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 0, 0);
+				if ((m > 5))
+					// && (w == width / 2) && (h == height / 2)
+				{
+					std::cout << "Displayed " << w << ", " << h << std::endl;
+//					vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 0, 0);
+				}
 				//alignment between neighboring pixels of same mipmap level
 
 				for (int l = 0; l < numLobes; l++)
@@ -583,6 +587,7 @@ void vMFfunc::displayvMF(int numLobes, float *alpha, float **aux, int width, int
 					curPos[2] = sqrt(1 - ((curPos[0] * curPos[0]) + (curPos[1] * curPos[1])));
 					val+= alpha[i] * vMFfunc::vMF(curPos, mu, kappa);
 					value = cv::Vec3f(val, val, val);
+
 				}
 			}
 			NMFdisplay.at<cv::Vec3f>(h, w) = value;

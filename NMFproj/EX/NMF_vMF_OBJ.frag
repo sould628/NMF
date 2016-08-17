@@ -173,6 +173,8 @@ void main(void)
 			color=vec4(0., 0., 0., 0.);
 			color=(lightIntensity*effBRDF);
 //			color=vec4(1.0, 1.0, 1.0, 1.0);
+//			color=vec4(fs_in.n, 1.0);
+//			color=vec4(fs_in.texCoord, 0.0, 0.0);
 			break;
 		}
 		case 1:
