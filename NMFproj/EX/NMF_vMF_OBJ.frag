@@ -36,6 +36,7 @@ in VS_OUT{
 	vec3 b;
 	vec4 p;
 	vec2 texCoord;
+	vec3 origNormals;
 }fs_in;
 //output into color buffer frame
 out vec4 color;
@@ -174,7 +175,8 @@ void main(void)
 			color=(lightIntensity*effBRDF);
 //			color=vec4(1.0, 1.0, 1.0, 1.0);
 //			color=vec4(fs_in.n, 1.0);
-//			color=vec4(fs_in.texCoord, 0.0, 0.0);
+			color=vec4(fract(fs_in.texCoord.s),fract(fs_in.texCoord.t), 0.0, 0.0);
+//			color=vec4(fs_in.origNormals, 0.0);
 			break;
 		}
 		case 1:

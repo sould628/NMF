@@ -41,7 +41,7 @@ int NMwidth, NMheight;
 bool renewOBJshader = true;
 //Mesh Data
 int numVertices, numTexcoord, numNormals, numIndices, numFaces;
-float *vertPos, *normals, *texCoord, *tangent;
+float *vertPos, *normals, *texCoord, *tangent, *bitangent;
 unsigned int *indices;
 float **data;
 GLsizeiptr *dataSize;
@@ -60,7 +60,7 @@ GLfloat click_pos[2];
 
 float t;
 
-GLuint VAO, VBO[4], TexCoordArray;
+GLuint VAO, VBO[5], TexCoordArray;
 GLuint NMbuffer, vMFvertex, vMFtex, vMFnormal, vMFtangent;
 GLuint NormalMap, NormalMipMap, normalizedNMT;
 
@@ -1227,6 +1227,7 @@ void displayCB(){
 			glBindAttribLocation(NMFvMFobj->getProgram(), 1, "in_normalVector");
 			glBindAttribLocation(NMFvMFobj->getProgram(), 2, "in_texCoord");
 			glBindAttribLocation(NMFvMFobj->getProgram(), 3, "in_tangent");
+			glBindAttribLocation(NMFvMFobj->getProgram(), 4, "in_bitangent");
 			NMFvMFobj->GLSLLinkShader();
 			std::cout << "renewed NMF_vMF_OBJ\n";
 			renewOBJshader = false;
@@ -1651,6 +1652,68 @@ void initGL(int argc, char** argv){
 
 }
 
+void computeTangentBasis(float* vertices, float* uvs, float* normals, float* tangent, float* bitangent, unsigned int* indices, int numVertices, int numFaces)
+{
+	std::vector< std::vector<float> > tIndexing;
+	std::vector< std::vector<float> > bIndexing;
+	tIndexing.resize(numVertices);
+	bIndexing.resize(numVertices);
+	int idx[3];
+	for (int f = 0; f < numFaces; f++)
+	{
+		idx[0] = indices[3 * f + 0];
+		idx[1] = indices[3 * f + 1];
+		idx[2] = indices[3 * f + 2];
+
+		float v0[3] = { vertices[idx[0] * 3 + 0], vertices[idx[0] * 3 + 1], vertices[idx[0] * 3 + 2] };
+		float v1[3] = { vertices[idx[1] * 3 + 0], vertices[idx[1] * 3 + 1], vertices[idx[1] * 3 + 2] }; 
+		float v2[3] = { vertices[idx[2] * 3 + 0], vertices[idx[2] * 3 + 1], vertices[idx[2] * 3 + 2] };
+													   
+		float uv0[2] = { uvs[idx[0] * 2 + 0], uvs[idx[0] * 2 + 1] };
+		float uv1[2] = { uvs[idx[1] * 2 + 0], uvs[idx[1] * 2 + 1] };
+		float uv2[2] = { uvs[idx[2] * 2 + 0], uvs[idx[2] * 2 + 1] };
+
+		float dv1[3] = { v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2] };
+		float dv2[3] = { v2[0] - v0[0], v2[1] - v0[1], v2[2] - v0[2] };
+
+		float deltaUV1[2] = { uv1[0] - uv0[0], uv1[1] - uv0[1] };
+		float deltaUV2[2] = { uv2[0] - uv0[0], uv2[1] - uv0[1] };
+
+		float r = 1.0f / (deltaUV1[0] * deltaUV2[1] - deltaUV1[1] * deltaUV2[0]);
+		
+		float t[3] = { 0 }, b[3] = { 0 };
+		t[0] = (dv1[0] * deltaUV2[1] - dv2[0] * deltaUV2[1])*r;
+		t[1] = (dv1[1] * deltaUV2[1] - dv2[1] * deltaUV2[1])*r;
+		t[2] = (dv1[2] * deltaUV2[1] - dv2[2] * deltaUV2[1])*r;
+
+		b[0] = (dv2[0] * deltaUV2[0] - dv1[0] * deltaUV2[0])*r;
+		b[1] = (dv2[1] * deltaUV2[0] - dv1[1] * deltaUV2[0])*r;
+		b[2] = (dv2[2] * deltaUV2[0] - dv1[2] * deltaUV2[0])*r;
+		
+		tIndexing[idx[0]].push_back(t[0]); tIndexing[idx[0]].push_back(t[1]); tIndexing[idx[0]].push_back(t[2]);
+	//	tIndexing[idx[1]].push_back(t[0]); tIndexing[idx[1]].push_back(t[1]); tIndexing[idx[1]].push_back(t[2]);
+	//	tIndexing[idx[2]].push_back(t[0]); tIndexing[idx[2]].push_back(t[1]); tIndexing[idx[2]].push_back(t[2]);
+
+		bIndexing[idx[0]].push_back(b[0]); bIndexing[idx[0]].push_back(b[1]); bIndexing[idx[0]].push_back(b[2]);
+	//	bIndexing[idx[1]].push_back(b[0]); bIndexing[idx[1]].push_back(b[1]); bIndexing[idx[1]].push_back(b[2]);
+	//	bIndexing[idx[2]].push_back(b[0]); bIndexing[idx[2]].push_back(b[1]); bIndexing[idx[2]].push_back(b[2]);
+	}
+	for (int i = 0; i < numVertices; i++)
+	{
+		float t[3] = { 0 };
+		float b[3] = { 0 };
+		int sizei = tIndexing[i].size() / 3;
+		for (int j = 0; j < sizei; j++)
+		{
+			t[0] += tIndexing[i][3 * j + 0]; t[1] += tIndexing[i][3 * j + 1]; t[2] += tIndexing[i][3 * j + 2];
+			b[0] += tIndexing[i][3 * j + 0]; b[1] += tIndexing[i][3 * j + 1]; t[2] += tIndexing[i][3 * j + 2];
+		}
+		tangent[i * 3 + 0] = t[0]; tangent[i * 3 + 1] = t[1]; tangent[i * 3 + 2] = t[2];
+		bitangent[i * 3 + 0] = b[0]; bitangent[i * 3 + 1] = b[1]; bitangent[i * 3 + 2] = b[2];
+	}
+
+}
+
 void setMesh()
 {
 	if (objreader.shapes.size() > 1)
@@ -1668,14 +1731,9 @@ void setMesh()
 	texCoord = new float[numTexcoord * 2];
 	indices = new unsigned int[numIndices];
 	tangent = new float[numVertices * 3];
-	//tangent
-	for (int i = 0; i < numVertices; i++)
-	{
-		float tan[3] = { 0, 0, 0 };
-		tangent[i * 3 + 0] = tan[0];
-		tangent[i * 3 + 1] = tan[1];
-		tangent[i * 3 + 2] = tan[2];
-	}
+	bitangent = new float[numVertices * 3];
+
+
 	for (int i = 0; i < numVertices; i++)
 	{
 		vertPos[i * 4 + 0] = objreader.shapes[0].mesh.positions[3 * i + 0];
@@ -1698,25 +1756,16 @@ void setMesh()
 	{
 		indices[i] = objreader.shapes[0].mesh.indices[i];
 	}
-	//data = new float*[4];
-	//data[0] = vertPos;
-	//data[1] = normals;
-	//data[2] = texCoord;
-	//data[3] = tangent;
-	//dataSize = new int[4];
-	//dataSize[0] = numVertices;
-	//dataSize[1] = numNormals;
-	//dataSize[2] = numTexcoord;
-	//dataSize[3] = numFaces;
-	//vecSize = new int[4];
-	//vecSize[0] = 4;
-	//vecSize[1] = 3;
-	//vecSize[2] = 2;
-	//vecSize[3] = 3;
+
+	computeTangentBasis(vertPos, texCoord, normals, tangent, bitangent, indices, numVertices, numFaces);
+
+
+	//compute tangents
+	
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
-	glGenBuffers(4, VBO);
+	glGenBuffers(5, VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, 4 * numVertices * sizeof(GLfloat), vertPos, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
@@ -1729,10 +1778,15 @@ void setMesh()
 	glBufferData(GL_ARRAY_BUFFER, 2 * numTexcoord * sizeof(GLfloat), texCoord, GL_STATIC_DRAW);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
-	glBufferData(GL_ARRAY_BUFFER, 2 * numTexcoord * sizeof(GLfloat), texCoord, GL_STATIC_DRAW);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
+	glBufferData(GL_ARRAY_BUFFER, 3 * numVertices * sizeof(GLfloat), tangent, GL_STATIC_DRAW);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(3);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[4]);
+	glBufferData(GL_ARRAY_BUFFER, 3 * numVertices * sizeof(GLfloat), bitangent, GL_STATIC_DRAW);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(4);
+
 
 	//indices
 	glGenBuffers(1, &elementBuffer);

@@ -52,7 +52,10 @@ bool objReader::readObj(std::string inputFile)
 	}
 
 	printf("numVertices = %d\n", nV);
+	printf("numNormals = %d\n", numNormals);
+	printf("numTexcoords = %d\n", numTex);
 	printf("numFaces = %d\n", nF);
+	printf("numIndices = %d\n", numIndices);
 
 	return ret;
 }
