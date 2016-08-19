@@ -190,6 +190,21 @@ void main(void)
 			vec4 temp=vec4(color.yza, color.x);
 			color=temp;
 //			color=vec4(fract(fs_in.texCoord.x), fract(fs_in.texCoord.y), 0., 1.);
+			float mipmapLevel=textureQueryLod(vMFmap1,fs_in.texCoord).x;
+			switch(int(mipmapLevel))
+			{
+			case 0: color=vec4(1., 0., 0., 1.); break;
+			case 1: color=vec4(0., 1., 0., 1.); break;
+			case 2: color=vec4(0., 0., 1., 1.); break;
+			case 3: color=vec4(1., 1., 0., 1.); break;
+			case 4: color=vec4(1., 0., 1., 1.); break;
+			case 5: color=vec4(0., 1., 1., 1.); break;
+			case 6: color=vec4(1., 0.5, 1., 1.); break;
+			case 7: color=vec4(1., 1., 1., 1.); break;
+			case 8: color=vec4(0.5, 0.5, 1., 1.); break;
+
+			}
+
 			break;
 		}
 	}

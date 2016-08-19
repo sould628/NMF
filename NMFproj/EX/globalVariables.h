@@ -7,7 +7,8 @@
 std::string inputObj = "./cylinder_cloth_0070.obj";
 
 
-extern const char* NMT = "./1.jpg";
+//extern const char* NMT = "Velvet_N.jpg";
+extern const char* NMT = "1.jpg";
 extern const int numLobes = 8;
 extern const int textLobes = 4;
 extern int MipMapLevel = 3;

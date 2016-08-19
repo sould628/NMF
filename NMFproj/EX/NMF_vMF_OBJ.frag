@@ -176,6 +176,7 @@ void main(void)
 //			color=vec4(1.0, 1.0, 1.0, 1.0);
 //			color=vec4(fs_in.n, 1.0);
 			color=vec4(fract(fs_in.texCoord.s),fract(fs_in.texCoord.t), 0.0, 0.0);
+			color=texture2D(original, fs_in.texCoord);
 //			color=vec4(fs_in.origNormals, 0.0);
 			break;
 		}

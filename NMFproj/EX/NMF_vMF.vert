@@ -27,11 +27,18 @@ out VS_OUT{
 void main(void)
 {
 	
-	double texSize=100.0;
+	double sizeFactor=10.;
+	double texSize=10.0;
 
-	double modelSize=0.5;
-	vec4 lightPos=vec4(0.0, 0.0f, 10.0f, 1.0f);
-	const vec4 vertices[4] = vec4[](vec4(modelSize, modelSize, 0.0, 1.0), vec4(-modelSize, modelSize, 0.0, 1.0), vec4(-modelSize, -modelSize, 0.0, 1.0), vec4(modelSize, -modelSize, 0.0, 1.0));
+	double modelSize=sizeFactor*5.;
+
+
+
+	vec4 lightPos=vec4(100.0, 0.0f, 10.0f, 1.0f);
+	const vec4 vertices[4] = vec4[](vec4(modelSize, modelSize, 0.0, 1.0), 
+	vec4(-modelSize, modelSize, 0.0, 1.0), 
+	vec4(-modelSize, -modelSize, 0.0, 1.0), 
+	vec4(modelSize, -modelSize, 0.0, 1.0));
 
 	const vec3 normalVector[4] = vec3[](vec3(0.0, 0.0, 1.0), vec3(0.0, 0.0, 1.0),vec3(0.0, 0.0, 1.0),vec3(0.0, 0.0, 1.0)); 
 	const vec2 texCoord[4] = vec2[](vec2(0.0, 0.0), vec2(0.0, texSize), vec2(texSize, texSize), vec2(texSize, 0.0));

@@ -714,6 +714,17 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 	int nLobes = cVMFtex.getNumLobes();
 	int mmlevel = cVMFtex.getMipmapLevel();
 	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, NormalMap);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cWidth, cHeight, 0, GL_RGBA, GL_FLOAT, vMFtextureData);
+	GLenum glError = glGetError();
+	checkTextureError(glError);
+
+
+
 	for (int l = 0; l < nLobes; l++)
 	{
 		std::cout << "binding texture of lobe " << l << std::endl;

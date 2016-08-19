@@ -153,7 +153,8 @@ void vMFtexture::generatevMFmaps()
 		}
 	}
 
-	for (int m = mipmapLevel-1; m > 0; m--)
+	for (int m = mipmapLevel - 1; m > 0; m--)
+//	for (int m = 1; m < mipmapLevel; m++)
 	{
 		width = this->vWidth[m]; height = this->vHeight[m];
 		std::cout << "Proceeding mipmap level " << m << " generation (" << width << ", " << height << ")\n";
@@ -173,8 +174,8 @@ void vMFtexture::generatevMFmaps()
 					{
 						for (int l = 0; l < numLobes; l++)
 						{
-
 							cv::Vec4f temp = vMFdata[m + 1][l].at<cv::Vec4f>(h / 2, w / 2);
+							//cv::Vec4f temp = vMFdata[m - 1][l].at<cv::Vec4f>(h * 2 + (i % 2), w * 2 + (int)(i / 2));
 							if (temp[0] != 0)
 							{
 								temp[1] /= temp[0]; temp[2] /= temp[0]; temp[3] /= temp[0];
@@ -212,11 +213,11 @@ void vMFtexture::generatevMFmaps()
 				//prevData for mu initialization
 				this->computeParameters(alpha, aux, targetRegion, prevData, this->alignCtrl);
 				
-				if ((m > 5))
+				if ((m == 3)/*||(m==4)||(m==2)*/)
 					// && (w == width / 2) && (h == height / 2)
 				{
-					std::cout << "Displayed " << w << ", " << h << std::endl;
-//					vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 0, 0);
+//					std::cout << "Displayed " << w << ", " << h << std::endl;
+//					vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 1, 0);
 				}
 				//alignment between neighboring pixels of same mipmap level
 
@@ -614,7 +615,7 @@ float vMFfunc::r2kappa(float r[3])
 	float normR = vectorFunc::norm(r);
 	result = ((3 * normR) - (normR*normR*normR)) / (1 - (normR*normR));
 	if (normR == 1)
-		result = 707;
+		result = 700;
 	return result;
 }
 cv::Mat vMFfunc::cvLoadImage(const char* filename, int &imageWidth, int &imageHeight)
@@ -630,6 +631,10 @@ double vMFfunc::vMF(float normal[3], float mu[3], float kappa) {
 	if ((normalNorm > 1.f) || (normalNorm < 0.99999f))
 		vectorFunc::normalize(normal);
 	double NdotMu = (mu[0] * normal[0]) + (mu[1] * normal[1]) + (mu[2] * normal[2]);
+	if (NdotMu < 0.0001)
+	{
+		NdotMu = 0.;
+	}
 	double Kappa = kappa;
 	if (Kappa == 0)
 		Kappa = 0.0001;
@@ -643,7 +648,13 @@ double vMFfunc::vMF(float normal[3], float mu[3], float kappa) {
 
 	}
 	if (isnan<double>(result))
+	{
 		std::cout << "wrong vMF value\n";
+		std::cout << "kappa: " << kappa << std::endl;
+		std::cout << "Kappa(in Function): " << Kappa << std::endl;
+		std::cout << "NdotMu: " << NdotMu << std::endl;
+		system("pause>nul");
+	}
 
 	return result;
 }
