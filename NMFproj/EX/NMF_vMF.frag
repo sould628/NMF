@@ -1,6 +1,7 @@
 #version 450 core
 
 layout (binding=0) uniform sampler2D original;
+layout (binding=9) uniform sampler2D vMFmap9;
 layout (binding=8) uniform sampler2D vMFmap8;
 layout (binding=7) uniform sampler2D vMFmap7;
 layout (binding=6) uniform sampler2D vMFmap6;
@@ -9,7 +10,7 @@ layout (binding=4) uniform sampler2D vMFmap4;
 layout (binding=3) uniform sampler2D vMFmap3;
 layout (binding=2) uniform sampler2D vMFmap2;
 layout (binding=1) uniform sampler2D vMFmap1;
-layout (binding=9) uniform sampler2D originalMipMap;
+layout (binding=19) uniform sampler2D originalMipMap;
 
 
 
@@ -98,6 +99,9 @@ void main(void)
 	coeffs[5]=texture2D(vMFmap6, fs_in.texCoord.xy);
 	coeffs[6]=texture2D(vMFmap7, fs_in.texCoord.xy);
 	coeffs[7]=texture2D(vMFmap8, fs_in.texCoord.xy);
+
+	vec4 orig;
+	orig=texture2D(originalMipMap, fs_in.texCoord.xy);
 
 	switch(brdfSelect)
 	{

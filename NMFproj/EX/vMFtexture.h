@@ -197,6 +197,10 @@ public:
 	{
 		return vMFdata[level][lobe].at<cv::Vec4f>(h, w)[c];
 	}	
+	float getvMForiginal(int w, int h, int ind) const
+	{
+		return originalNormals[0].at<cv::Vec3f>(h, w)[ind];
+	}
 };
 
 

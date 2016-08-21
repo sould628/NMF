@@ -714,16 +714,33 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 	int nLobes = cVMFtex.getNumLobes();
 	int mmlevel = cVMFtex.getMipmapLevel();
 	
-	glActiveTexture(GL_TEXTURE0);
+	int oriWidth, oriHeight;
+	oriWidth = cVMFtex.getWidth(0);
+	oriHeight = cVMFtex.getHeight(0);
+
+	float *vMFOriginalData = new float[4 * oriWidth*oriHeight];
+	for (int j = 0; j < oriHeight; j++)
+	{
+		for (int i = 0; i < oriWidth; i++)
+		{
+			vMFOriginalData[4 * (j*oriWidth + i) + 0] = cVMFtex.getvMForiginal(j, i, 0);
+			vMFOriginalData[4 * (j*oriWidth + i) + 1] = cVMFtex.getvMForiginal(j, i, 0);
+			vMFOriginalData[4 * (j*oriWidth + i) + 2] = cVMFtex.getvMForiginal(j, i, 0);
+			vMFOriginalData[4 * (j*oriWidth + i) + 3] = 0.f;
+		}
+	}
+
+
+	glActiveTexture(GL_TEXTURE9);
 	glBindTexture(GL_TEXTURE_2D, NormalMap);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cWidth, cHeight, 0, GL_RGBA, GL_FLOAT, vMFtextureData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, oriWidth, oriHeight, 0, GL_RGBA, GL_FLOAT, vMFOriginalData);
 	GLenum glError = glGetError();
 	checkTextureError(glError);
 
-
+	delete vMFOriginalData;
 
 	for (int l = 0; l < nLobes; l++)
 	{
@@ -753,7 +770,7 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 			case 5: glActiveTexture(GL_TEXTURE6); break;
 			case 6: glActiveTexture(GL_TEXTURE7); break;
 			case 7: glActiveTexture(GL_TEXTURE8); break;
-			case 8: glActiveTexture(GL_TEXTURE9); break;
+			case 8: glActiveTexture(GL_TEXTURE19); break;
 			}
 
 			if (m == 0)
@@ -769,7 +786,7 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 
 
 
-			delete vMFtextureData;
+			delete[] vMFtextureData;
 		}
 	}
 	glActiveTexture(GL_TEXTURE10);

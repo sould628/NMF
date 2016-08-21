@@ -252,6 +252,7 @@ void vMFtexture::generatevMFmaps()
 	delete[] aux; delete[] alpha;
 }
 
+
 void vMFtexture::computeParameters(float *alpha, float **aux, cv::Mat targetRegion, float prevData[4][20][4], float alignCtrl)
 {
 	int iteration = 0;
