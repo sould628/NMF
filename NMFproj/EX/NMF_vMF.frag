@@ -48,7 +48,8 @@ vec4 Kd=vec4(0.2f,0.f,0.f,1.0f);
 vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
 vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
-float Schlick(float refIndex, float incAngle);
+float _Schlick(float refIndex, float incAngle);
+float Schlick(float refIndex, float LdotH);
 
 void main(void)
 {
@@ -100,8 +101,15 @@ void main(void)
 	coeffs[6]=texture2D(vMFmap7, fs_in.texCoord.xy);
 	coeffs[7]=texture2D(vMFmap8, fs_in.texCoord.xy);
 
-	vec4 orig;
-	orig=texture2D(originalMipMap, fs_in.texCoord.xy);
+	vec4 orig_n;
+	orig_n=texture2D(originalMipMap, fs_in.texCoord.xy);
+
+	vec4 effBRDF_orig=vec4(0., 0., 0., 0.);
+	float LdotN=max(dot(lightDir, orig_n.xyz), 0.0);
+	float HdotN=max(dot(h, orig_n.xyz), 0.0);
+	float Bspec=(BPexp+1.0)/(2.0*PI)*pow(HdotN, BPexp);
+	effBRDF_orig=Kd*LdotN+Ks*Bspec;
+
 
 	switch(brdfSelect)
 	{
@@ -161,7 +169,10 @@ void main(void)
 			float theta_h=acos(h.z);
 			float theta_i=acos(lightDir.z);
 			float theta_o=acos(eyeDir.z);
-			fresnel=Schlick(refractiveIdx, lightDir.z);
+
+			float LdotH=max(dot(lightDir, h),0.0);
+			fresnel=_Schlick(refractiveIdx, lightDir.z);
+			fresnel=Schlick(refractiveIdx, LdotH);
 
 			Ms=(1./(PI*sigmaPrime))*exp(-(theta_h/sigmaPrime)*(theta_h/sigmaPrime));
 			float LdotMu=max(dot(lightDir,mu),0.0);
@@ -208,7 +219,8 @@ void main(void)
 			case 8: color=vec4(0.5, 0.5, 1., 1.); break;
 
 			}
-
+			color=orig_n;
+			color=effBRDF_orig*lightIntensity;
 			break;
 		}
 	}
@@ -218,9 +230,20 @@ void main(void)
 //	color.a=1;
 }
 
-float Schlick(float n, float cosT)
+float _Schlick(float n, float cosT)
 {
 	float ret=0.;
 	ret=((n-1)*(n-1)+4*n*(1-cosT)*(1-cosT)*(1-cosT)*(1-cosT)*(1-cosT))/((n+1)*(n+1));
 	return ret;
 }
+float Schlick(float refIndex, float LdotH)
+{
+//f0=((1-n)/(1+n))^2
+//F(f0)=f0+(1-f0)(1-LdotH)^5
+	float ret=0.;
+	float f0=(((1-refIndex)*(1-refIndex))/((1+refIndex)*(1+refIndex)));
+	ret = f0+(1-f0)*pow(1-LdotH, 5);
+
+	return ret;
+}
+

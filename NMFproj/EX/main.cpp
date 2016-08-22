@@ -724,14 +724,14 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 		for (int i = 0; i < oriWidth; i++)
 		{
 			vMFOriginalData[4 * (j*oriWidth + i) + 0] = cVMFtex.getvMForiginal(j, i, 0);
-			vMFOriginalData[4 * (j*oriWidth + i) + 1] = cVMFtex.getvMForiginal(j, i, 0);
-			vMFOriginalData[4 * (j*oriWidth + i) + 2] = cVMFtex.getvMForiginal(j, i, 0);
+			vMFOriginalData[4 * (j*oriWidth + i) + 1] = cVMFtex.getvMForiginal(j, i, 1);
+			vMFOriginalData[4 * (j*oriWidth + i) + 2] = cVMFtex.getvMForiginal(j, i, 2);
 			vMFOriginalData[4 * (j*oriWidth + i) + 3] = 0.f;
 		}
 	}
 
 
-	glActiveTexture(GL_TEXTURE9);
+	glActiveTexture(GL_TEXTURE19);
 	glBindTexture(GL_TEXTURE_2D, NormalMap);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -740,7 +740,7 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 	GLenum glError = glGetError();
 	checkTextureError(glError);
 
-	delete vMFOriginalData;
+	delete[] vMFOriginalData;
 
 	for (int l = 0; l < nLobes; l++)
 	{
@@ -770,7 +770,7 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 			case 5: glActiveTexture(GL_TEXTURE6); break;
 			case 6: glActiveTexture(GL_TEXTURE7); break;
 			case 7: glActiveTexture(GL_TEXTURE8); break;
-			case 8: glActiveTexture(GL_TEXTURE19); break;
+			case 8: glActiveTexture(GL_TEXTURE9); break;
 			}
 
 			if (m == 0)
@@ -1140,26 +1140,26 @@ void initBuffers() {
 	cSHtex.bindTexture(normalizedNMT, SHmaps);
 	cSHtex.bindYlm(Ylmmaps);
 
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0);
-
-	glBindTexture(GL_TEXTURE_2D, NormalMap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+//	glEnable(GL_TEXTURE_2D);
+//	glActiveTexture(GL_TEXTURE0);
+//
+//	glBindTexture(GL_TEXTURE_2D, NormalMap);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
 //	gluBuild2DMipmaps(GL_TEXTURE_2D, 4, NMwidth, NMheight, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
 
-	glActiveTexture(GL_TEXTURE10);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_TEXTURE_2D);
-
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE10);
-	glBindTexture(GL_TEXTURE_2D, NormalMipMap);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
+//	glActiveTexture(GL_TEXTURE10);
+//	glBindTexture(GL_TEXTURE_2D, 0);
+//	glDisable(GL_TEXTURE_2D);
+//
+//	glEnable(GL_TEXTURE_2D);
+//	glActiveTexture(GL_TEXTURE10);
+//	glBindTexture(GL_TEXTURE_2D, NormalMipMap);
+//	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, NMwidth, NMheight, 0, GL_BGRA, GL_UNSIGNED_BYTE, textureData);
 
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, 0);
