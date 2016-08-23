@@ -110,7 +110,6 @@ void main(void)
 	float Bspec=(BPexp+1.0)/(2.0*PI)*pow(HdotN, BPexp);
 	effBRDF_orig=Kd*LdotN+Ks*Bspec;
 
-
 	switch(brdfSelect)
 	{
 	//BlinnPhong
@@ -131,7 +130,7 @@ void main(void)
 			alpha=coeffs[i].x;
 			aux=coeffs[i].yzw/max(alpha,0.01);
 			r=length(aux);
-			kappa=((3*r)-(r*r*r))/max(0.001, (1.0-(r*r)));
+			kappa=min(700., ((3*r)-(r*r*r))/max(0.001, (1.0-(r*r))));
 	
 			mu=normalize(aux);
 	
@@ -146,37 +145,71 @@ void main(void)
 	//MicroFacet
 	case 1:
 	{
-		float MicroSigma=0.000000000001f;
+		float MicroSigma=0.000001f;
+		float fresnel=0.;
+		float refractiveIdx=23.557;		
+		float alpha=0.0;
+		vec3 aux=vec3(0.0,0.0,0.0);
+		float kappa=0.0;
+		vec3 mu=vec3(0.0,0.0,0.0);
+		float r=0.0;
+		float Ms=0.0;
+		float mPrime=0.;
+		float HdotMu=0.;
+
 		for(int i=0; i<numLobes; i++)
 		{	
-			float fresnel=0.;
-			float refractiveIdx=1.557;		
-			float alpha=0.0;
-			vec3 aux=vec3(0.0,0.0,0.0);
-			float kappa=0.0;
-			vec3 mu=vec3(0.0,0.0,0.0);
-			float r=0.0;
-			float Ms=0.0;
 			alpha=coeffs[i].x;
 			aux=coeffs[i].yzw/max(alpha,0.0001);
 			r=length(aux);
-			kappa=((3*r)-(r*r*r))/max(0.0001, (1.0-(r*r)));	
+			kappa=min(700., ((3*r)-(r*r*r))/max(0.0001, (1.0-(r*r))));	
 			mu=normalize(aux);
-	
+
 			float sigmaPrime=0.;
 			sigmaPrime=sqrt((MicroSigma*MicroSigma)+(1.0/(2.0*kappa)));
 			
+			vec3 localh=vec3(dot(h, fs_in.t), dot(h, fs_in.b), dot(h, fs_in.n));
+			localh=normalize(localh);
+
 			float theta_h=acos(h.z);
+			HdotMu=max(dot(mu, h), 0.0);
+			theta_h=acos(HdotMu);
 			float theta_i=acos(lightDir.z);
-			float theta_o=acos(eyeDir.z);
+			float theta_o=acos(-eyeDir.z);
+
+//			theta_h=acos(localh.z);
+			theta_i=acos(lightDir.z);
+			theta_o=acos(eyeDir.z);
 
 			float LdotH=max(dot(lightDir, h),0.0);
 			fresnel=_Schlick(refractiveIdx, lightDir.z);
-			fresnel=Schlick(refractiveIdx, LdotH);
+//			fresnel=Schlick(refractiveIdx, LdotH);
 
-			Ms=(1./(PI*sigmaPrime))*exp(-(theta_h/sigmaPrime)*(theta_h/sigmaPrime));
+			Ms=(1./(PI*sigmaPrime*sigmaPrime))*exp(-(theta_h/sigmaPrime)*(theta_h/sigmaPrime));
 			float LdotMu=max(dot(lightDir,mu),0.0);
 			effBRDF+=(alpha*(Kd+(Ks*Ms*fresnel/(4*lightDir.z*(-eyeDir.z))))*LdotMu);
+//			effBRDF+=(alpha*(Kd+(Ks*fresnel/(4*lightDir.z*(-eyeDir.z))))*LdotMu);
+//			effBRDF=vec4(theta_h/sigmaPrime, 0., 0., 0.);
+		}
+
+		for(int i=0; i<numLobes; i++)
+		{
+			//m, beta
+
+			alpha=coeffs[i].x;
+			aux=coeffs[i].yzw/max(alpha,0.0001);
+			r=length(aux);
+			kappa=min(700., ((3*r)-(r*r*r))/max(0.001, (1.0-(r*r))));	
+			mu=normalize(aux);
+
+
+			HdotMu=max(dot(mu, h), 0.0);
+			float rmsM=sqrt(MicroSigma);
+			float DistFunc=0.;
+			mPrime=sqrt((MicroSigma*MicroSigma)+(1.0/(2.0*kappa)));
+			DistFunc=exp(-(HdotMu*HdotMu/(4*mPrime))*(HdotMu*HdotMu/(4*mPrime)))/(4*PI*rmsM*rmsM*pow(cos(HdotMu), 4));
+
+
 		}
 		break;
 	}
@@ -188,6 +221,7 @@ void main(void)
 			color=vec4(0., 0., 0., 0.);
 			color=(lightIntensity*effBRDF);
 //			color=vec4(1.0, 1.0, 1.0, 1.0);
+//			color=vec4(HdotMu, HdotMu, HdotMu,1.0);
 			break;
 		}
 		case 1:

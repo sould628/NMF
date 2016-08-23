@@ -34,7 +34,7 @@ void main(void)
 
 
 
-	vec4 lightPos=vec4(100.0, 0.0f, 10.0f, 1.0f);
+	vec4 lightPos=vec4(0.0f, 0.0f, 10.0f, 1.0f);
 	const vec4 vertices[4] = vec4[](vec4(modelSize, modelSize, 0.0, 1.0), 
 	vec4(-modelSize, modelSize, 0.0, 1.0), 
 	vec4(-modelSize, -modelSize, 0.0, 1.0), 
