@@ -91,6 +91,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObjLoader.cpp" />
     <ClCompile Include="readObj.cpp" />
     <ClCompile Include="SHtexture.cpp" />
     <ClCompile Include="vMFtexture.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="include\cvCtrl.h" />
     <ClInclude Include="include\FreeImage.h" />
     <ClInclude Include="include\tiny_obj_loader.h" />
+    <ClInclude Include="ObjLoader.h" />
     <ClInclude Include="readObj.h" />
     <ClInclude Include="SHtexture.h" />
     <ClInclude Include="vMFtexture.h" />

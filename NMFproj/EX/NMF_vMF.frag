@@ -18,7 +18,7 @@ layout (location = 10) uniform mat4 mv_matrix;
 
 
 layout (location = 100) uniform int numLobes;
-layout (location = 101) uniform float BPexp;
+//layout (location = 101) uniform float BPexp;
 //layout (location = 102) uniform float MicroSigma;
 
 layout (location = 1000) uniform int renderScene;
@@ -42,7 +42,7 @@ in VS_OUT{
 out vec4 color;
 
 
-vec4 lightIntensity=vec4(0.9f, 0.9f, 0.9f, 1.0f);
+vec4 lightIntensity=vec4(1.f, 1.f, 1.f, 1.0f);
 
 vec4 Kd=vec4(0.2f,0.f,0.f,1.0f);
 vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
@@ -51,12 +51,19 @@ vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 float _Schlick(float refIndex, float incAngle);
 float Schlick(float refIndex, float LdotH);
 
+float BPexp=300.f;
+float MicroSigma=0.0000001;
+float refractiveIdx=1.557;	
+
+//1.557
+
+
 void main(void)
 {
 
 	vec4 effBRDF=vec4(0.0,0.0,0.0,1.0);
 	vec3 v=vec3(0.0, 0.0, 0.0);
-	color=vec4(0.0, 0.0, 0.0, 0.0);
+	color=vec4(0.0, 1.0, 0.0, 0.0);
 	
 	vec3 lightDir=vec3(0.0, 0.0, 0.0);
 	vec3 eyeDir=vec3(0.0, 0.0, 0.0);
@@ -82,12 +89,13 @@ void main(void)
 	v.z=dot(fs_in.lightPos.xyz-fs_in.p.xyz, fs_in.n);
 
 	lightDir=normalize(v);
+
 	vec3 h=normalize(-eyeDir+lightDir);
 	
 
 //	lightDir=normalize((mv_matrix*vec4(fs_in.lightPos,1)).xyz-fs_in.p.xyz);
 //	lightDir=normalize((vec4(fs_in.lightPos,1)).xyz-fs_in.p.xyz);
-	vec3 toeye=normalize(-fs_in.p.xyz);
+//	vec3 toeye=normalize(-fs_in.p.xyz);
 //	h=normalize((toeye+lightDir)/2);
 
 
@@ -109,7 +117,7 @@ void main(void)
 	float HdotN=max(dot(h, orig_n.xyz), 0.0);
 	float Bspec=(BPexp+1.0)/(2.0*PI)*pow(HdotN, BPexp);
 	effBRDF_orig=Kd*LdotN+Ks*Bspec;
-
+	float HdotMu=0.f;
 	switch(brdfSelect)
 	{
 	//BlinnPhong
@@ -130,12 +138,12 @@ void main(void)
 			alpha=coeffs[i].x;
 			aux=coeffs[i].yzw/max(alpha,0.01);
 			r=length(aux);
-			kappa=min(700., ((3*r)-(r*r*r))/max(0.001, (1.0-(r*r))));
+			kappa=((3*r)-(r*r*r))/max(0.001, (1.0-(r*r)));
 	
 			mu=normalize(aux);
 	
 			sPrime=(kappa*BPexp)/(kappa+BPexp);
-			float HdotMu=max(dot(h,mu),0.0);
+			HdotMu=max(dot(h,mu),0.0);
 			Bs=((sPrime+1.0)/(2.0*PI))*pow(HdotMu, sPrime);
 			float LdotMu=max(dot(lightDir,mu),0.0);
 			effBRDF+=(alpha*(Ks*Bs+Kd)*LdotMu);
@@ -145,9 +153,7 @@ void main(void)
 	//MicroFacet
 	case 1:
 	{
-		float MicroSigma=0.000001f;
 		float fresnel=0.;
-		float refractiveIdx=23.557;		
 		float alpha=0.0;
 		vec3 aux=vec3(0.0,0.0,0.0);
 		float kappa=0.0;
@@ -155,7 +161,7 @@ void main(void)
 		float r=0.0;
 		float Ms=0.0;
 		float mPrime=0.;
-		float HdotMu=0.;
+		HdotMu=0.;
 
 		for(int i=0; i<numLobes; i++)
 		{	
@@ -192,25 +198,7 @@ void main(void)
 //			effBRDF=vec4(theta_h/sigmaPrime, 0., 0., 0.);
 		}
 
-		for(int i=0; i<numLobes; i++)
-		{
-			//m, beta
 
-			alpha=coeffs[i].x;
-			aux=coeffs[i].yzw/max(alpha,0.0001);
-			r=length(aux);
-			kappa=min(700., ((3*r)-(r*r*r))/max(0.001, (1.0-(r*r))));	
-			mu=normalize(aux);
-
-
-			HdotMu=max(dot(mu, h), 0.0);
-			float rmsM=sqrt(MicroSigma);
-			float DistFunc=0.;
-			mPrime=sqrt((MicroSigma*MicroSigma)+(1.0/(2.0*kappa)));
-			DistFunc=exp(-(HdotMu*HdotMu/(4*mPrime))*(HdotMu*HdotMu/(4*mPrime)))/(4*PI*rmsM*rmsM*pow(cos(HdotMu), 4));
-
-
-		}
 		break;
 	}
 
@@ -220,8 +208,11 @@ void main(void)
 		{
 			color=vec4(0., 0., 0., 0.);
 			color=(lightIntensity*effBRDF);
+//			color.xyz=fs_in.t;
 //			color=vec4(1.0, 1.0, 1.0, 1.0);
 //			color=vec4(HdotMu, HdotMu, HdotMu,1.0);
+//			color=vec4(HdotMu, 0.f, 0.f, 0.f);
+//			color=vec4(-eyeDir, 0.f);
 			break;
 		}
 		case 1:

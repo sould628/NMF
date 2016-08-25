@@ -13,6 +13,9 @@
     <ClCompile Include="SHtexture.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="ObjLoader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Camera.h">
@@ -40,6 +43,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="readObj.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjLoader.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

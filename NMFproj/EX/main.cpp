@@ -25,12 +25,15 @@
 #include "Camera.h"
 #include "vMFtexture.h"
 #include "SHtexture.h"
+
+#include "ObjLoader.h"
 #include "readObj.h"
 
 
 #define sysPause system("pause>nul");
 
 objReader objreader;
+ObjLoader objloader;
 
 const int l_index = 4;
 
@@ -799,6 +802,10 @@ void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux
 void initSharedMem(){
 	NMwidth = 0; NMheight = 0;
 	time(&sysTime);
+	lightPos[0] = 0.f;
+	lightPos[1] = 0.f;
+	lightPos[2] = 300.f;
+	lightPos[3] = 1.f;
 }
 
 float calculateSHcoeffDelta(int l, int m, float x, float y, float z){
@@ -1271,11 +1278,16 @@ void displayCB(){
 		NMFvMFobj->setUniform1i("MipMapped", MipMapped);
 		NMFvMFobj->setUniform1i("brdfSelect", brdfSelect);
 		NMFvMFobj->setUniform1f("MicroSigma", MicroSigma);
+		NMFvMFobj->setUniform1f("texModifier", texModifier);
+		NMFvMF->setUniform1f("lightPosX", lightPos[0]);
+		NMFvMF->setUniform1f("lightPosY", lightPos[1]);
+		NMFvMF->setUniform1f("lightPosZ", lightPos[2]);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-		glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, (void*)0);
-
-
+//		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+//		glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, (void*)0);
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, numFaces*3);
+		glBindVertexArray(0);
 
 		NMFvMFobj->disable();
 //		drawCube2();
@@ -1318,7 +1330,9 @@ void displayCB(){
 		NMFvMF->setUniform1i("MipMapped", MipMapped);
 		NMFvMF->setUniform1i("brdfSelect", brdfSelect);
 		NMFvMF->setUniform1f("MicroSigma", MicroSigma);
-
+		NMFvMF->setUniform1f("lightPosX", lightPos[0]);
+		NMFvMF->setUniform1f("lightPosY", lightPos[1]);
+		NMFvMF->setUniform1f("lightPosZ", lightPos[2]);
 //		glBufferData(GL_ARRAY_BUFFER, 3 * numVertices*sizeof(GLfloat), objreader.shapes[0].mesh.positions);
 
 		//		NMFvMF->setUniform3f("eyePos", eyePos[0], eyePos[1], eyePos[2]);
@@ -1499,7 +1513,7 @@ void keyboardCB(unsigned char key, int x, int y){
 			break;
 		}
 
-		case 'w':
+		case 'w':case'W':
 		{
 			GLfloat m[16];
 			glGetFloatv(GL_MODELVIEW_MATRIX, m);
@@ -1514,6 +1528,76 @@ void keyboardCB(unsigned char key, int x, int y){
 
 			std::cout << "loaded cam\n";
 
+			break;
+		}
+
+		case 'z':case'Z':
+		{
+			delete cam;
+			cam = new Camera();
+			lightPos[0] = 100.f;
+			lightPos[1] = 0.f;
+			lightPos[2] = 300.f;
+			break;
+		}
+		case 'o':
+		{
+			texModifier -= 0.0001;
+			std::cout << "texModifier: " << texModifier << std::endl;
+			break;
+		}
+		case'O':
+		{
+			texModifier -= 0.1;
+			std::cout << "texModifier: " << texModifier << std::endl;
+			break;
+		}
+		case 'p':
+		{
+			texModifier += 0.0001;
+			std::cout << "texModifier: " << texModifier << std::endl;
+			break;
+		}
+		case 'P':
+		{
+			texModifier += 0.1;
+			std::cout << "texModifier: " << texModifier << std::endl;
+			break;
+		}
+		case 'u':
+		{
+			lightPos[1] += 1.5;
+			std::cout << "currentLightPos: " << lightPos[0] << ", " << lightPos[1] << ", " << lightPos[2] << std::endl;
+			break;
+		}
+		case 'j':
+		{
+			lightPos[1] -= 1.5;
+			std::cout << "currentLightPos: " << lightPos[0] << ", " << lightPos[1] << ", " << lightPos[2] << std::endl;
+			break;
+		}
+		case 'h':
+		{
+			lightPos[0] -= 1.5;
+			std::cout << "currentLightPos: " << lightPos[0] << ", " << lightPos[1] << ", " << lightPos[2] << std::endl;
+			break;
+		}
+		case 'k':
+		{
+			lightPos[0] += 1.5;
+			std::cout << "currentLightPos: " << lightPos[0] << ", " << lightPos[1] << ", " << lightPos[2] << std::endl;
+			break;
+		}
+		case 'y':
+		{
+			lightPos[2] -= 1.5;
+			std::cout << "currentLightPos: " << lightPos[0] << ", " << lightPos[1] << ", " << lightPos[2] << std::endl;
+			break;
+		}
+		case 'i':
+		{
+			lightPos[2] += 1.5;
+			std::cout << "currentLightPos: " << lightPos[0] << ", " << lightPos[1] << ", " << lightPos[2] << std::endl;
 			break;
 		}
 
@@ -1680,26 +1764,20 @@ void initGL(int argc, char** argv){
 
 }
 
-void computeTangentBasis(float* vertices, float* uvs, float* normals, float* tangent, float* bitangent, unsigned int* indices, int numVertices, int numFaces)
+void computeTangentBasis(float* vertices, float* uvs, float* normals, float* tangent, float* bitangent, int numFaces)
 {
-	std::vector< std::vector<float> > tIndexing;
-	std::vector< std::vector<float> > bIndexing;
-	tIndexing.resize(numVertices);
-	bIndexing.resize(numVertices);
-	int idx[3];
+
 	for (int f = 0; f < numFaces; f++)
 	{
-		idx[0] = indices[3 * f + 0];
-		idx[1] = indices[3 * f + 1];
-		idx[2] = indices[3 * f + 2];
 
-		float v0[3] = { vertices[idx[0] * 3 + 0], vertices[idx[0] * 3 + 1], vertices[idx[0] * 3 + 2] };
-		float v1[3] = { vertices[idx[1] * 3 + 0], vertices[idx[1] * 3 + 1], vertices[idx[1] * 3 + 2] }; 
-		float v2[3] = { vertices[idx[2] * 3 + 0], vertices[idx[2] * 3 + 1], vertices[idx[2] * 3 + 2] };
+
+		float v0[3] = { vertices[f * 12 + 0], vertices[f * 12 + 1], vertices[f * 12 + 2] };
+		float v1[3] = { vertices[f * 12 + 4], vertices[f * 12 + 5], vertices[f * 12 + 6] }; 
+		float v2[3] = { vertices[f * 12 + 8], vertices[f * 12 + 9], vertices[f * 12 + 10] };
 													   
-		float uv0[2] = { uvs[idx[0] * 2 + 0], uvs[idx[0] * 2 + 1] };
-		float uv1[2] = { uvs[idx[1] * 2 + 0], uvs[idx[1] * 2 + 1] };
-		float uv2[2] = { uvs[idx[2] * 2 + 0], uvs[idx[2] * 2 + 1] };
+		float uv0[2] = { uvs[f * 6 + 0], uvs[f * 6 + 1] };
+		float uv1[2] = { uvs[f * 6 + 2], uvs[f * 6 + 3] };
+		float uv2[2] = { uvs[f * 6 + 4], uvs[f * 6 + 5] };
 
 		float dv1[3] = { v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2] };
 		float dv2[3] = { v2[0] - v0[0], v2[1] - v0[1], v2[2] - v0[2] };
@@ -1709,38 +1787,42 @@ void computeTangentBasis(float* vertices, float* uvs, float* normals, float* tan
 
 		float r = 1.0f / (deltaUV1[0] * deltaUV2[1] - deltaUV1[1] * deltaUV2[0]);
 		
-		float t[3] = { 0 }, b[3] = { 0 };
-		t[0] = (dv1[0] * deltaUV2[1] - dv2[0] * deltaUV2[1])*r;
-		t[1] = (dv1[1] * deltaUV2[1] - dv2[1] * deltaUV2[1])*r;
-		t[2] = (dv1[2] * deltaUV2[1] - dv2[2] * deltaUV2[1])*r;
-
-		b[0] = (dv2[0] * deltaUV2[0] - dv1[0] * deltaUV2[0])*r;
-		b[1] = (dv2[1] * deltaUV2[0] - dv1[1] * deltaUV2[0])*r;
-		b[2] = (dv2[2] * deltaUV2[0] - dv1[2] * deltaUV2[0])*r;
-		
-		tIndexing[idx[0]].push_back(t[0]); tIndexing[idx[0]].push_back(t[1]); tIndexing[idx[0]].push_back(t[2]);
-	//	tIndexing[idx[1]].push_back(t[0]); tIndexing[idx[1]].push_back(t[1]); tIndexing[idx[1]].push_back(t[2]);
-	//	tIndexing[idx[2]].push_back(t[0]); tIndexing[idx[2]].push_back(t[1]); tIndexing[idx[2]].push_back(t[2]);
-
-		bIndexing[idx[0]].push_back(b[0]); bIndexing[idx[0]].push_back(b[1]); bIndexing[idx[0]].push_back(b[2]);
-	//	bIndexing[idx[1]].push_back(b[0]); bIndexing[idx[1]].push_back(b[1]); bIndexing[idx[1]].push_back(b[2]);
-	//	bIndexing[idx[2]].push_back(b[0]); bIndexing[idx[2]].push_back(b[1]); bIndexing[idx[2]].push_back(b[2]);
-	}
-	for (int i = 0; i < numVertices; i++)
-	{
-		float t[3] = { 0 };
-		float b[3] = { 0 };
-		int sizei = tIndexing[i].size() / 3;
-		for (int j = 0; j < sizei; j++)
+		if (isinf<float>(r))
 		{
-			t[0] += tIndexing[i][3 * j + 0]; t[1] += tIndexing[i][3 * j + 1]; t[2] += tIndexing[i][3 * j + 2];
-			b[0] += tIndexing[i][3 * j + 0]; b[1] += tIndexing[i][3 * j + 1]; t[2] += tIndexing[i][3 * j + 2];
+			std::cout << "inf value of r detected\n";
 		}
-		tangent[i * 3 + 0] = t[0]; tangent[i * 3 + 1] = t[1]; tangent[i * 3 + 2] = t[2];
-		bitangent[i * 3 + 0] = b[0]; bitangent[i * 3 + 1] = b[1]; bitangent[i * 3 + 2] = b[2];
+		else if (isnan<float>(r))
+		{
+			std::cout << "undefined value of r detected\n";
+		}
+
+		float t[3] = { 0 }, b[3] = { 0 }, n[3]={ 3 };
+		t[0] = (dv1[0] * deltaUV2[1] - dv2[0] * deltaUV1[1])*r;
+		t[1] = (dv1[1] * deltaUV2[1] - dv2[1] * deltaUV1[1])*r;
+		t[2] = (dv1[2] * deltaUV2[1] - dv2[2] * deltaUV1[1])*r;
+
+		b[0] = (dv2[0] * deltaUV1[0] - dv1[0] * deltaUV2[0])*r;
+		b[1] = (dv2[1] * deltaUV1[0] - dv1[1] * deltaUV2[0])*r;
+		b[2] = (dv2[2] * deltaUV1[0] - dv1[2] * deltaUV2[0])*r;
+
+		n[0] = t[1] * b[2] - t[2] * b[1];
+		n[1] = t[2] * b[0] - t[0] * b[2];
+		n[2] = t[0] * b[1] - t[1] * b[0];
+
+		tangent[f * 9 + 0] = t[0]; tangent[f * 9 + 1] = t[1]; tangent[f * 9 + 2] = t[2];
+		tangent[f * 9 + 3] = t[0]; tangent[f * 9 + 4] = t[1]; tangent[f * 9 + 5] = t[2];
+		tangent[f * 9 + 6] = t[0]; tangent[f * 9 + 7] = t[1]; tangent[f * 9 + 8] = t[2];
+		bitangent[f * 9 + 0] = b[0]; bitangent[f * 9 + 1] = b[1]; bitangent[f * 9 + 2] = b[2];
+		bitangent[f * 9 + 3] = b[0]; bitangent[f * 9 + 4] = b[1]; bitangent[f * 9 + 5] = b[2];
+		bitangent[f * 9 + 6] = b[0]; bitangent[f * 9 + 7] = b[1]; bitangent[f * 9 + 8] = b[2];
+		normals[f * 9 + 0] = n[0]; normals[f * 9 + 1] = n[1]; normals[f * 9 + 2] = n[2];
+		normals[f * 9 + 3] = n[0]; normals[f * 9 + 4] = n[1]; normals[f * 9 + 5] = n[2];
+		normals[f * 9 + 6] = n[0]; normals[f * 9 + 7] = n[1]; normals[f * 9 + 8] = n[2];
 	}
+
 
 }
+
 
 void setMesh()
 {
@@ -1754,38 +1836,63 @@ void setMesh()
 	numNormals = objreader.shapes[0].mesh.normals.size()/3;
 	numTexcoord = objreader.shapes[0].mesh.texcoords.size()/2;
 	numIndices = objreader.shapes[0].mesh.indices.size();
-	vertPos = new float[numVertices * 4];
-	normals = new float[numNormals * 3];
-	texCoord = new float[numTexcoord * 2];
+
+	numFaces = objloader.tri.size();
+	numVertices = objloader.vert.size();
+	numTexcoord = objloader.tc.size();
+	numNormals = objloader.norm.size();
+
+	vertPos = new float[numFaces * 3 * 4];
+	normals = new float[numFaces * 3 * 3];
+	texCoord = new float[numFaces * 3 * 2];
 	indices = new unsigned int[numIndices];
-	tangent = new float[numVertices * 3];
-	bitangent = new float[numVertices * 3];
+	tangent = new float[numFaces * 3 * 3];
+	bitangent = new float[numFaces * 3 * 3];
 
+	Triangle* triangle;
+	for (int i = 0; i < numFaces; i++)
+	{
+		triangle = &objloader.tri[i];
+		for (int j = 0; j < 3; j++)
+		{
+			vertPos[i * 12 + j * 4 + 0] = objloader.vert[triangle->v[j]].x;
+			vertPos[i * 12 + j * 4 + 1] = objloader.vert[triangle->v[j]].y;
+			vertPos[i * 12 + j * 4 + 2] = objloader.vert[triangle->v[j]].z;
+			vertPos[i * 12 + j * 4 + 3] = 1.f;
 
-	for (int i = 0; i < numVertices; i++)
-	{
-		vertPos[i * 4 + 0] = objreader.shapes[0].mesh.positions[3 * i + 0];
-		vertPos[i * 4 + 1] = objreader.shapes[0].mesh.positions[3 * i + 1];
-		vertPos[i * 4 + 2] = objreader.shapes[0].mesh.positions[3 * i + 2];
-		vertPos[i * 4 + 3] = 1.f;
+			normals[i * 9 + j * 3 + 0] = objloader.norm[triangle->vn[j]].x;
+			normals[i * 9 + j * 3 + 1] = objloader.norm[triangle->vn[j]].y;
+			normals[i * 9 + j * 3 + 2] = objloader.norm[triangle->vn[j]].z;
+
+			texCoord[i * 6 + j * 2 + 0] = objloader.tc[triangle->vt[j]].s;
+			texCoord[i * 6 + j * 2 + 1] = objloader.tc[triangle->vt[j]].t;
+		}
 	}
-	for (int i = 0; i < numNormals; i++)
-	{
-		normals[i * 3 + 0] = objreader.shapes[0].mesh.normals[3 * i + 0];
-		normals[i * 3 + 1] = objreader.shapes[0].mesh.normals[3 * i + 1];
-		normals[i * 3 + 2] = objreader.shapes[0].mesh.normals[3 * i + 2];
-	}
-	for (int i = 0; i < numTexcoord; i++)
-	{
-		texCoord[i * 2 + 0] = objreader.shapes[0].mesh.texcoords[2 * i + 0];
-		texCoord[i * 2 + 1] = objreader.shapes[0].mesh.texcoords[2 * i + 1];
-	}
+
+//	for (int i = 0; i < numVertices; i++)
+//	{
+//		vertPos[i * 4 + 0] = objreader.shapes[0].mesh.positions[3 * i + 0];
+//		vertPos[i * 4 + 1] = objreader.shapes[0].mesh.positions[3 * i + 1];
+//		vertPos[i * 4 + 2] = objreader.shapes[0].mesh.positions[3 * i + 2];
+//		vertPos[i * 4 + 3] = 1.f;
+//	}
+//	for (int i = 0; i < numNormals; i++)
+//	{
+//		normals[i * 3 + 0] = objreader.shapes[0].mesh.normals[3 * i + 0];
+//		normals[i * 3 + 1] = objreader.shapes[0].mesh.normals[3 * i + 1];
+//		normals[i * 3 + 2] = objreader.shapes[0].mesh.normals[3 * i + 2];
+//	}
+//	for (int i = 0; i < numTexcoord; i++)
+//	{
+//		texCoord[i * 2 + 0] = objreader.shapes[0].mesh.texcoords[2 * i + 0];
+//		texCoord[i * 2 + 1] = objreader.shapes[0].mesh.texcoords[2 * i + 1];
+//	}
 	for (int i = 0; i < numIndices; i++)
 	{
 		indices[i] = objreader.shapes[0].mesh.indices[i];
 	}
 
-	computeTangentBasis(vertPos, texCoord, normals, tangent, bitangent, indices, numVertices, numFaces);
+	computeTangentBasis(vertPos, texCoord, normals, tangent, bitangent, numFaces);
 
 
 	//compute tangents
@@ -1794,26 +1901,32 @@ void setMesh()
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 	glGenBuffers(5, VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, 4 * numVertices * sizeof(GLfloat), vertPos, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, 3 * numNormals * sizeof(GLfloat), normals, GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+	glBufferData(GL_ARRAY_BUFFER, numFaces * 3 * 4 * sizeof(GLfloat), vertPos, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
-	glBufferData(GL_ARRAY_BUFFER, 2 * numTexcoord * sizeof(GLfloat), texCoord, GL_STATIC_DRAW);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, numFaces * 3 * 3 * sizeof(GLfloat), normals, GL_STATIC_DRAW);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
 	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
-	glBufferData(GL_ARRAY_BUFFER, 3 * numVertices * sizeof(GLfloat), tangent, GL_STATIC_DRAW);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+	glBufferData(GL_ARRAY_BUFFER, numFaces * 3 * 2 * sizeof(GLfloat), texCoord, GL_STATIC_DRAW);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
 	glEnableVertexAttribArray(3);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[4]);
-	glBufferData(GL_ARRAY_BUFFER, 3 * numVertices * sizeof(GLfloat), bitangent, GL_STATIC_DRAW);
-	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
+	glBufferData(GL_ARRAY_BUFFER, 3 * 3 * numFaces * sizeof(GLfloat), tangent, GL_STATIC_DRAW);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
 	glEnableVertexAttribArray(4);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[4]);
+	glBufferData(GL_ARRAY_BUFFER, 3 * 3 * numFaces * sizeof(GLfloat), bitangent, GL_STATIC_DRAW);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
 
 
 	//indices
@@ -1829,7 +1942,7 @@ int main(int argc, char** argv){
 	initSharedMem();
 
 //	cSHtex.displayMap(4);
-
+	objloader.loadObjModel(c_inputObj);
 	objreader.readObj(inputObj);
 
 	//float testa = 1.f;
