@@ -12,8 +12,8 @@ layout (location = 14) uniform float lightPosY;
 layout (location = 15) uniform float lightPosZ;
 
 layout (location = 0) in vec4 in_vertices;
-layout (location = 1) in vec2 in_texCoord;
-layout (location = 2) in vec3 in_normalVector;
+layout (location = 1) in vec3 in_normalVector;
+layout (location = 2) in vec2 in_texCoord;
 layout (location = 3) in vec3 in_tangent;
 layout (location = 4) in vec3 in_bitangent;
 
@@ -53,11 +53,12 @@ void main(void)
 
 	vec3 n=normalize(cross(in_bitangent,in_tangent));
 
-	vs_out.n=normalize(mv_matrix*vec4(n, 0.)).xyz;
-	vs_out.t=normalize(mv_matrix*vec4(in_tangent,0.)).xyz;
-	vs_out.b=normalize(mv_matrix*vec4(in_bitangent,0)).xyz;
+	vs_out.n=normalize(mv_matrix*vec4(normalize(in_normalVector), 0.)).xyz;
+	vs_out.t=normalize(mv_matrix*vec4(normalize(in_tangent),0.)).xyz;
+	vs_out.b=normalize(mv_matrix*vec4(normalize(in_bitangent),0)).xyz;
+	vs_out.b=normalize(mv_matrix*vec4(cross(vs_out.n, vs_out.t),0.)).xyz;
 	vs_out.texCoord=in_texCoord*texModifier;
-	vs_out.origNormals=normalize(vec3(in_texCoord,0.f));
+	vs_out.origNormals=normalize(vec3(in_texCoord, 0.0));
 
 	vs_out.eyePos=vec3((mv_matrix*in_vertices).xyz);
 	vs_out.lightPos=vec3(mv_matrix*lightPos);

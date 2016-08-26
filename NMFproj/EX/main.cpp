@@ -1535,9 +1535,9 @@ void keyboardCB(unsigned char key, int x, int y){
 		{
 			delete cam;
 			cam = new Camera();
-			lightPos[0] = 100.f;
-			lightPos[1] = 0.f;
-			lightPos[2] = 300.f;
+			lightPos[0] = 301.f;
+			lightPos[1] = 300.f;
+			lightPos[2] = 24.f;
 			break;
 		}
 		case 'o':
@@ -1764,12 +1764,19 @@ void initGL(int argc, char** argv){
 
 }
 
-void computeTangentBasis(float* vertices, float* uvs, float* normals, float* tangent, float* bitangent, int numFaces)
+void computeTangentBasis(float* vertices, float* uvs, float* normals, uint numVertices, uint* indices, float* tangent, float* bitangent, int numFaces)
 {
-
+	float* tList;
+	tList = new float[numVertices*3];
+	float* bList;
+	bList = new float[numVertices * 3];
+	for (int i = 0; i < numVertices * 3; i++)
+	{
+		tList[i] = 0.f;
+		bList[i] = 0.f;
+	}
 	for (int f = 0; f < numFaces; f++)
 	{
-
 
 		float v0[3] = { vertices[f * 12 + 0], vertices[f * 12 + 1], vertices[f * 12 + 2] };
 		float v1[3] = { vertices[f * 12 + 4], vertices[f * 12 + 5], vertices[f * 12 + 6] }; 
@@ -1805,9 +1812,14 @@ void computeTangentBasis(float* vertices, float* uvs, float* normals, float* tan
 		b[1] = (dv2[1] * deltaUV1[0] - dv1[1] * deltaUV2[0])*r;
 		b[2] = (dv2[2] * deltaUV1[0] - dv1[2] * deltaUV2[0])*r;
 
-		n[0] = t[1] * b[2] - t[2] * b[1];
-		n[1] = t[2] * b[0] - t[0] * b[2];
-		n[2] = t[0] * b[1] - t[1] * b[0];
+
+		tList[indices[f * 3 + 0] + 0] += t[0]; tList[indices[f * 3 + 0] + 1] += t[1]; tList[indices[f * 3 + 0] + 2] += t[2];
+		tList[indices[f * 3 + 1] + 0] += t[0]; tList[indices[f * 3 + 1] + 1] += t[1]; tList[indices[f * 3 + 1] + 2] += t[2];
+		tList[indices[f * 3 + 2] + 0] += t[0]; tList[indices[f * 3 + 2] + 1] += t[1]; tList[indices[f * 3 + 2] + 2] += t[2];
+
+		bList[indices[f * 3 + 0] + 0] += b[0]; bList[indices[f * 3 + 0] + 1] += b[1]; tList[indices[f * 3 + 0] + 2] += t[2];
+		bList[indices[f * 3 + 1] + 0] += b[0]; bList[indices[f * 3 + 1] + 1] += b[1]; tList[indices[f * 3 + 1] + 2] += t[2];
+		bList[indices[f * 3 + 2] + 0] += b[0]; bList[indices[f * 3 + 2] + 1] += b[1]; tList[indices[f * 3 + 2] + 2] += t[2];
 
 		tangent[f * 9 + 0] = t[0]; tangent[f * 9 + 1] = t[1]; tangent[f * 9 + 2] = t[2];
 		tangent[f * 9 + 3] = t[0]; tangent[f * 9 + 4] = t[1]; tangent[f * 9 + 5] = t[2];
@@ -1815,11 +1827,27 @@ void computeTangentBasis(float* vertices, float* uvs, float* normals, float* tan
 		bitangent[f * 9 + 0] = b[0]; bitangent[f * 9 + 1] = b[1]; bitangent[f * 9 + 2] = b[2];
 		bitangent[f * 9 + 3] = b[0]; bitangent[f * 9 + 4] = b[1]; bitangent[f * 9 + 5] = b[2];
 		bitangent[f * 9 + 6] = b[0]; bitangent[f * 9 + 7] = b[1]; bitangent[f * 9 + 8] = b[2];
-		normals[f * 9 + 0] = n[0]; normals[f * 9 + 1] = n[1]; normals[f * 9 + 2] = n[2];
-		normals[f * 9 + 3] = n[0]; normals[f * 9 + 4] = n[1]; normals[f * 9 + 5] = n[2];
-		normals[f * 9 + 6] = n[0]; normals[f * 9 + 7] = n[1]; normals[f * 9 + 8] = n[2];
-	}
 
+
+
+		n[0] = t[1] * b[2] - t[2] * b[1];
+		n[1] = t[2] * b[0] - t[0] * b[2];
+		n[2] = t[0] * b[1] - t[1] * b[0];
+
+		//normals[f * 9 + 0] = n[0]; normals[f * 9 + 1] = n[1]; normals[f * 9 + 2] = n[2];
+		//normals[f * 9 + 3] = n[0]; normals[f * 9 + 4] = n[1]; normals[f * 9 + 5] = n[2];
+		//normals[f * 9 + 6] = n[0]; normals[f * 9 + 7] = n[1]; normals[f * 9 + 8] = n[2];
+	}
+//	for (int f = 0; f < numFaces; f++)
+//	{
+//
+//		tangent[f * 9 + 0] = tList[indices[f * 3 + 0] + 0]; tangent[f * 9 + 1] = tList[indices[f * 3 + 0] + 1]; tangent[f * 9 + 2] = tList[indices[f * 3 + 0] + 2];
+//		tangent[f * 9 + 3] = tList[indices[f * 3 + 1] + 0]; tangent[f * 9 + 4] = tList[indices[f * 3 + 1] + 1]; tangent[f * 9 + 5] = tList[indices[f * 3 + 1] + 2];
+//		tangent[f * 9 + 6] = tList[indices[f * 3 + 2] + 0]; tangent[f * 9 + 7] = tList[indices[f * 3 + 2] + 1]; tangent[f * 9 + 8] = tList[indices[f * 3 + 2] + 2];
+//		bitangent[f * 9 + 0] = bList[indices[f * 3 + 0] + 0]; bitangent[f * 9 + 1] = bList[indices[f * 3 + 0] + 1]; bitangent[f * 9 + 2] = bList[indices[f * 3 + 0] + 2];
+//		bitangent[f * 9 + 3] = bList[indices[f * 3 + 1] + 0]; bitangent[f * 9 + 4] = bList[indices[f * 3 + 1] + 1]; bitangent[f * 9 + 5] = bList[indices[f * 3 + 1] + 2];
+//		bitangent[f * 9 + 6] = bList[indices[f * 3 + 2] + 0]; bitangent[f * 9 + 7] = bList[indices[f * 3 + 2] + 1]; bitangent[f * 9 + 8] = bList[indices[f * 3 + 2] + 2];
+//	}
 
 }
 
@@ -1845,7 +1873,7 @@ void setMesh()
 	vertPos = new float[numFaces * 3 * 4];
 	normals = new float[numFaces * 3 * 3];
 	texCoord = new float[numFaces * 3 * 2];
-	indices = new unsigned int[numIndices];
+	indices = new unsigned int[numFaces*3];
 	tangent = new float[numFaces * 3 * 3];
 	bitangent = new float[numFaces * 3 * 3];
 
@@ -1859,6 +1887,8 @@ void setMesh()
 			vertPos[i * 12 + j * 4 + 1] = objloader.vert[triangle->v[j]].y;
 			vertPos[i * 12 + j * 4 + 2] = objloader.vert[triangle->v[j]].z;
 			vertPos[i * 12 + j * 4 + 3] = 1.f;
+
+			indices[i * 3 + j] = triangle->v[j];
 
 			normals[i * 9 + j * 3 + 0] = objloader.norm[triangle->vn[j]].x;
 			normals[i * 9 + j * 3 + 1] = objloader.norm[triangle->vn[j]].y;
@@ -1892,7 +1922,7 @@ void setMesh()
 		indices[i] = objreader.shapes[0].mesh.indices[i];
 	}
 
-	computeTangentBasis(vertPos, texCoord, normals, tangent, bitangent, numFaces);
+	computeTangentBasis(vertPos, texCoord, normals, numVertices, indices, tangent, bitangent, numFaces);
 
 
 	//compute tangents
@@ -1930,9 +1960,9 @@ void setMesh()
 
 
 	//indices
-	glGenBuffers(1, &elementBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+//	glGenBuffers(1, &elementBuffer);
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 }
 

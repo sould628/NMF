@@ -51,7 +51,7 @@ vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 float _Schlick(float refIndex, float incAngle);
 float Schlick(float refIndex, float LdotH);
 
-float BPexp=300.f;
+float BPexp=100.f;
 float MicroSigma=0.0000001;
 float refractiveIdx=1.557;	
 

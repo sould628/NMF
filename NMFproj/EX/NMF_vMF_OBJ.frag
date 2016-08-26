@@ -47,12 +47,12 @@ out vec4 color;
 vec4 lightIntensity=vec4(1.f, 1.f, 1.f, 1.0f);
 
 vec4 Kd=vec4(0.7f,0.f,0.f,1.0f);
-vec4 Ks=vec4(0.4f,0.4f,0.4f,1.0f);
+vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
 vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
 float BPexp=10.f;
-float MicroSigma=0.000011;
-float refractiveIdx=2.557;	
+float MicroSigma=0.000001;
+float refractiveIdx=1.557;	
 
 vec4 lPos=vec4(10.0, 50.0, 5.0, 0.0f);
 
@@ -219,8 +219,9 @@ void main(void)
 		{
 			color=vec4(0., 0., 0., 0.);
 			color=(lightIntensity*effBRDF);
-			color=vec4(fs_in.origNormals, 1.0);
-			color=vec4(texture2D(originalMipMap, fs_in.texCoord));
+//			color=vec4(fs_in.origNormals, 1.0);
+//			color=vec4(texture2D(originalMipMap, fs_in.texCoord));
+//			color=vec4(fs_in.texCoord, 0.0, 0.0);
 //			color=orig_n;
 
 			break;
