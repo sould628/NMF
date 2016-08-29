@@ -118,6 +118,8 @@
     <None Include="NMF_original.vert" />
     <None Include="NMF_vMF_OBJ.frag" />
     <None Include="NMF_vMF_OBJ.vert" />
+    <None Include="Shadow.frag" />
+    <None Include="Shadow.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

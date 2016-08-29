@@ -163,7 +163,7 @@ Camera::Camera(){
 	up[0] = up[2] = 0;
 	up[1] = 1;
 	viewAngle = 60;
-	zNear = 0.001;
+	zNear = 0.1;
 	zFar = 1000;
 }
 void Camera::setPosition(float* pos, float* lookat, float* up){

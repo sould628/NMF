@@ -1202,6 +1202,9 @@ void displayCB(){
 	normalMatrix[1] = modelviewMatrix[1]; normalMatrix[4] = modelviewMatrix[5]; normalMatrix[7] = modelviewMatrix[9];
 	normalMatrix[2] = modelviewMatrix[2]; normalMatrix[5] = modelviewMatrix[6]; normalMatrix[8] = modelviewMatrix[10];
 
+	//Handle Shadow Map
+	
+
 	switch (renderMode){
 	case 0:
 	{
@@ -1535,9 +1538,9 @@ void keyboardCB(unsigned char key, int x, int y){
 		{
 			delete cam;
 			cam = new Camera();
-			lightPos[0] = 301.f;
-			lightPos[1] = 300.f;
-			lightPos[2] = 24.f;
+			lightPos[0] = 0.f;
+			lightPos[1] = 150.f;
+			lightPos[2] = 300.f;
 			break;
 		}
 		case 'o':

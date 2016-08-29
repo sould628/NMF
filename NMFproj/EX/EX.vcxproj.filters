@@ -75,6 +75,12 @@
     <None Include="NMF_vMF_OBJ.frag">
       <Filter>GLSL</Filter>
     </None>
+    <None Include="Shadow.vert">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="Shadow.frag">
+      <Filter>GLSL</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

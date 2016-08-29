@@ -46,17 +46,18 @@ out vec4 color;
 
 vec4 lightIntensity=vec4(1.f, 1.f, 1.f, 1.0f);
 
-vec4 Kd=vec4(0.7f,0.f,0.f,1.0f);
+vec4 Kd=vec4(0.9f,0.f,0.f,1.0f);
 vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
 vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
-float BPexp=10.f;
+float BPexp=30.f;
 float MicroSigma=0.000001;
 float refractiveIdx=1.557;	
 
 vec4 lPos=vec4(10.0, 50.0, 5.0, 0.0f);
 
 float _Schlick(float refIndex, float incAngle);
+float Schlick(float refIndex, float LdotH);
 
 void main(void)
 {
@@ -158,7 +159,7 @@ void main(void)
 			float HdotMu=max(dot(h,mu),0.0);
 			Bs=((sPrime+1.0)/(2.0*PI))*pow(HdotMu, sPrime);
 			float LdotMu=max(dot(lightDir,mu),0.0);
-			effBRDF+=(alpha*(Ks*Bs+Kd)*LdotMu);
+			effBRDF+=(alpha*(Kd+Ks*Bs)*LdotMu);
 		}
 		break;
 	}	
@@ -180,7 +181,7 @@ void main(void)
 			alpha=coeffs[i].x;
 			aux=coeffs[i].yzw/max(alpha,0.0001);
 			r=length(aux);
-			kappa=min(700., ((3*r)-(r*r*r))/max(0.0001, (1.0-(r*r))));	
+			kappa=((3*r)-(r*r*r))/max(0.0001, (1.0-(r*r)));	
 			mu=normalize(aux);
 
 			float sigmaPrime=0.;
@@ -190,7 +191,7 @@ void main(void)
 			localh=normalize(localh);
 
 			float theta_h=acos(h.z);
-			HdotMu=max(dot(mu, h), 0.0);
+			HdotMu=max(dot(h, mu), 0.0);
 			theta_h=acos(HdotMu);
 			float theta_i=acos(lightDir.z);
 			float theta_o=acos(-eyeDir.z);
@@ -201,6 +202,7 @@ void main(void)
 
 			float LdotH=max(dot(lightDir, h),0.0);
 			fresnel=_Schlick(refractiveIdx, lightDir.z);
+			fresnel=Schlick(refractiveIdx, LdotH);
 
 			Ms=(1./(PI*sigmaPrime*sigmaPrime))*exp(-(theta_h/sigmaPrime)*(theta_h/sigmaPrime));
 			float LdotMu=max(dot(lightDir,mu),0.0);
@@ -223,7 +225,7 @@ void main(void)
 //			color=vec4(texture2D(originalMipMap, fs_in.texCoord));
 //			color=vec4(fs_in.texCoord, 0.0, 0.0);
 //			color=orig_n;
-
+//			color=vec4(fs_in.b, 1.0);
 			break;
 		}
 		case 1:
@@ -251,5 +253,15 @@ float _Schlick(float n, float cosT)
 {
 	float ret=0.;
 	ret=((n-1)*(n-1)+4*n*(1-cosT)*(1-cosT)*(1-cosT)*(1-cosT)*(1-cosT))/((n+1)*(n+1));
+	return ret;
+}
+float Schlick(float refIndex, float LdotH)
+{
+//f0=((1-n)/(1+n))^2
+//F(f0)=f0+(1-f0)(1-LdotH)^5
+	float ret=0.;
+	float f0=(((1-refIndex)*(1-refIndex))/((1+refIndex)*(1+refIndex)));
+	ret = f0+(1-f0)*pow(1-LdotH, 5);
+
 	return ret;
 }

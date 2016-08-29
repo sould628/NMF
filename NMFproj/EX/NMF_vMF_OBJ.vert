@@ -57,6 +57,7 @@ void main(void)
 	vs_out.t=normalize(mv_matrix*vec4(normalize(in_tangent),0.)).xyz;
 	vs_out.b=normalize(mv_matrix*vec4(normalize(in_bitangent),0)).xyz;
 	vs_out.b=normalize(mv_matrix*vec4(cross(vs_out.n, vs_out.t),0.)).xyz;
+	vs_out.t=normalize(mv_matrix*vec4(cross(vs_out.b, vs_out.n), 0.)).xyz;
 	vs_out.texCoord=in_texCoord*texModifier;
 	vs_out.origNormals=normalize(vec3(in_texCoord, 0.0));
 
