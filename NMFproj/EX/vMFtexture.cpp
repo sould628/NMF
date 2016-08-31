@@ -235,13 +235,18 @@ void vMFtexture::generatevMFmaps()
 		}
 	}
 
-	char* outName="./fit_data";
+	std::string outName;
 	for (int m = 0; m < mipmapLevel; m++)
 	{
 		for (int l = 0; l < numLobes; l++)
 		{
-
-	
+			outName = "./fit_data/";
+			outName += filename;
+			outName += "_";
+			outName += std::to_string(l);
+			outName += "_";
+			outName += std::to_string(m);
+			cv::imwrite(outName, vMFdata[m][l]);
 		}
 	}
 
