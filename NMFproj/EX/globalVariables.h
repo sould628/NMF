@@ -9,7 +9,7 @@ char* c_inputObj = "./cylinder_cloth_0070.obj";
 
 //extern const char* NMT = "Velvet_N.jpg";
 
-extern const char* NMT = "2.jpg";
+extern const char* NMT = "1.jpg";
 extern const int numLobes = 8;
 extern const int textLobes = 4;
 extern int MipMapLevel = 3;
@@ -17,6 +17,8 @@ extern float alignCtrl = 0.1f;
 float texModifier = 1.f;
 
 float lightPos[4];
+
+int useSaved = 0;
 
 Camera *cam;
 extern int renderMode = 3;

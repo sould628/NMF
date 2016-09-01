@@ -5,7 +5,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <fstream>
 #include <opencv2/opencv.hpp>
+
 #include "FreeImage.h"
 #include "cvCtrl.h"
 
@@ -180,7 +182,8 @@ public:
 	~vMFtexture();
 	void showvMFImage(int level, int lobe, int mode=0) const;
 	void showOriginalImage(int channel = -1) const;
-	void generatevMFmaps();
+	void generatevMFmaps(int useSaved);
+	void manualLoad(int m, int l, int h, int w, cv::Vec4f data);
 
 public:
 	int getWidth(int level) const {

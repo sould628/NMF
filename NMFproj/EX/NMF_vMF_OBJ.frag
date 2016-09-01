@@ -46,13 +46,13 @@ out vec4 color;
 
 vec4 lightIntensity=vec4(1.f, 1.f, 1.f, 1.0f);
 
-vec4 Kd=vec4(0.5f,0.9f,0.5f,1.0f);
+vec4 Kd=vec4(0.9f,0.9f,0.f,1.0f);
 vec4 Ks=vec4(0.5f,0.5f,0.5f,1.0f);
 vec4 Ka=vec4(0.0f,0.0f,0.0f,1.0f);
 
 float BPexp=30.f;
 float MicroSigma=0.000001;
-float refractiveIdx=1.557;	
+float refractiveIdx=1.53;	
 
 vec4 lPos=vec4(10.0, 50.0, 5.0, 0.0f);
 

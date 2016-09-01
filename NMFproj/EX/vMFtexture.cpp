@@ -92,169 +92,223 @@ vMFtexture::~vMFtexture()
 
 
 //Parameter Functions
-void vMFtexture::generatevMFmaps()
+void vMFtexture::generatevMFmaps(int useSaved)
 {
-	cv::Mat rawData = this->originalNormals[0].clone();
-	cv::Mat **vMFdata = this->vMFdata;
-	int mipmapLevel = this->mipmapLevel;
-	int numLobes = this->numLobes;
-	int width = this->oWidth; int height = this->oHeight;
+	if (useSaved==0) {
+		cv::Mat rawData = this->originalNormals[0].clone();
+		cv::Mat **vMFdata = this->vMFdata;
+		int mipmapLevel = this->mipmapLevel;
+		int numLobes = this->numLobes;
+		int width = this->oWidth; int height = this->oHeight;
 
-	float **aux= new float*[numLobes];
-	float *alpha = new float[numLobes];
-	for (int l = 0; l < numLobes; l++)
-	{
-		aux[l] = new float[3];
-	}
-
-	for (int i = 0; i < rawData.rows; i++)
-	{
-		for (int j = 0; j < rawData.cols; j++)
+		float **aux = new float*[numLobes];
+		float *alpha = new float[numLobes];
+		for (int l = 0; l < numLobes; l++)
 		{
-			cv::Vec3f ntemp = rawData.at<cv::Vec3f>(i, j);
-			float nftemp[3] = { ntemp[0], ntemp[1], ntemp[2] };
-			vectorFunc::normalize(nftemp);
-			rawData.at<cv::Vec3f>(i, j) = cv::Vec3f(nftemp[0], nftemp[1], nftemp[2]);
-
+			aux[l] = new float[3];
 		}
-	}
 
-
-	//Seed Level
-	float seedAlpha = 1.f / numLobes;
-	float seedAlpha2 = 1.f / numLobes;
-//	seedAlpha = 1.f;
-//	seedAlpha2 = 0.f;
-	for (int i = 0; i < width; i++)
-	{
-		for (int j = 0; j < height; j++)
+		for (int i = 0; i < rawData.rows; i++)
 		{
-			cv::Vec4f temp;
-			temp[0] = seedAlpha;
-			temp[1] = seedAlpha*rawData.at<cv::Vec3f>(j, i)[0];
-			temp[2] = seedAlpha*rawData.at<cv::Vec3f>(j, i)[1];
-			temp[3] = seedAlpha*rawData.at<cv::Vec3f>(j, i)[2];
-			vMFdata[0][0].at<cv::Vec4f>(j, i) = temp;
+			for (int j = 0; j < rawData.cols; j++)
+			{
+				cv::Vec3f ntemp = rawData.at<cv::Vec3f>(i, j);
+				float nftemp[3] = { ntemp[0], ntemp[1], ntemp[2] };
+				vectorFunc::normalize(nftemp);
+				rawData.at<cv::Vec3f>(i, j) = cv::Vec3f(nftemp[0], nftemp[1], nftemp[2]);
+
+			}
 		}
-	}
-	for (int l = 1; l < numLobes; l++)
-	{
+
+
+		//Seed Level
+		float seedAlpha = 1.f / numLobes;
+		float seedAlpha2 = 1.f / numLobes;
+		//	seedAlpha = 1.f;
+		//	seedAlpha2 = 0.f;
 		for (int i = 0; i < width; i++)
 		{
 			for (int j = 0; j < height; j++)
 			{
 				cv::Vec4f temp;
-				temp[0] = seedAlpha2;
-				temp[1] = seedAlpha2*rawData.at<cv::Vec3f>(j, i)[0];
-				temp[2] = seedAlpha2*rawData.at<cv::Vec3f>(j, i)[1];
-				temp[3] = seedAlpha2*rawData.at<cv::Vec3f>(j, i)[2];
-				vMFdata[0][l].at<cv::Vec4f>(j, i) = temp;
+				temp[0] = seedAlpha;
+				temp[1] = seedAlpha*rawData.at<cv::Vec3f>(j, i)[0];
+				temp[2] = seedAlpha*rawData.at<cv::Vec3f>(j, i)[1];
+				temp[3] = seedAlpha*rawData.at<cv::Vec3f>(j, i)[2];
+				vMFdata[0][0].at<cv::Vec4f>(j, i) = temp;
 			}
 		}
-	}
-
-	for (int m = mipmapLevel - 1; m > 0; m--)
-//	for (int m = 1; m < mipmapLevel; m++)
-	{
-		width = this->vWidth[m]; height = this->vHeight[m];
-		std::cout << "Proceeding mipmap level " << m << " generation (" << width << ", " << height << ")\n";
-		int side = pow(2, m);
-
-		for (int w = 0; w < width; w++)
+		for (int l = 1; l < numLobes; l++)
 		{
-			for (int h = 0; h < height; h++)
+			for (int i = 0; i < width; i++)
 			{
-				float tKappa = { 0.f };
-				float tAlpha = { 0.f };
-				float tR[3] = { 0.f };
-				float prevData[4][20][4];
-				if (m != mipmapLevel-1)
+				for (int j = 0; j < height; j++)
 				{
-					for (int i = 0; i < 4; i++)
-					{
-						for (int l = 0; l < numLobes; l++)
-						{
-							cv::Vec4f temp = vMFdata[m + 1][l].at<cv::Vec4f>(h / 2, w / 2);
-							//cv::Vec4f temp = vMFdata[m - 1][l].at<cv::Vec4f>(h * 2 + (i % 2), w * 2 + (int)(i / 2));
-							if (temp[0] != 0)
-							{
-								temp[1] /= temp[0]; temp[2] /= temp[0]; temp[3] /= temp[0];
-								tR[0] = temp[1]; tR[1] = temp[2]; tR[2] = temp[3];
-								tKappa = vMFfunc::r2kappa(tR);
-								tAlpha = temp[0];
-								vectorFunc::normalize(tR);
-							}
-							else
-							{
-								tKappa = 0.f;
-								tR[0] = 0.f; tR[1] = 0.f; tR[2] = 0.f;
-							}
-
-							prevData[i][l][0] = tR[0]; prevData[i][l][1] = tR[1]; prevData[i][l][2] = tR[2];
-							prevData[i][l][3] = tAlpha;
-						}
-					}
-				}
-				else
-				{
-					for (int i = 0; i < 4; i++)
-					{
-						for (int l = 0; l < numLobes; l++)
-						{
-							prevData[i][l][0] = 1.f; prevData[i][l][1] = 0.f; prevData[i][l][2] = 0.f;
-							prevData[i][l][3] = 0.f;
-						}
-					}
-				}
-				cv::Rect ROI(w*side, h*side, side, side);
-				cv::Mat targetRegion; 
-				targetRegion = rawData(ROI).clone();
-
-				//prevData for mu initialization
-				this->computeParameters(alpha, aux, targetRegion, prevData, this->alignCtrl);
-				
-				if ((m == 3)/*||(m==4)||(m==2)*/)
-					// && (w == width / 2) && (h == height / 2)
-				{
-//					std::cout << "Displayed " << w << ", " << h << std::endl;
-//					vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 1, 0);
-				}
-				//alignment between neighboring pixels of same mipmap level
-
-				for (int l = 0; l < numLobes; l++)
-				{
-
-					cv::Vec4f computeData;
-					computeData[0] = alpha[l];
-					computeData[1] = alpha[l] * aux[l][0];
-					computeData[2] = alpha[l] * aux[l][1];
-					computeData[3] = alpha[l] * aux[l][2];
-					vMFdata[m][l].at<cv::Vec4f>(h, w) = computeData;
+					cv::Vec4f temp;
+					temp[0] = seedAlpha2;
+					temp[1] = seedAlpha2*rawData.at<cv::Vec3f>(j, i)[0];
+					temp[2] = seedAlpha2*rawData.at<cv::Vec3f>(j, i)[1];
+					temp[3] = seedAlpha2*rawData.at<cv::Vec3f>(j, i)[2];
+					vMFdata[0][l].at<cv::Vec4f>(j, i) = temp;
 				}
 			}
 		}
-	}
 
-	std::string outName;
-	for (int m = 0; m < mipmapLevel; m++)
-	{
+		for (int m = mipmapLevel - 1; m > 0; m--)
+			//	for (int m = 1; m < mipmapLevel; m++)
+		{
+			width = this->vWidth[m]; height = this->vHeight[m];
+			std::cout << "Proceeding mipmap level " << m << " generation (" << width << ", " << height << ")\n";
+			int side = pow(2, m);
+
+			for (int w = 0; w < width; w++)
+			{
+				for (int h = 0; h < height; h++)
+				{
+					float tKappa = { 0.f };
+					float tAlpha = { 0.f };
+					float tR[3] = { 0.f };
+					float prevData[4][20][4];
+					if (m != mipmapLevel - 1)
+					{
+						for (int i = 0; i < 4; i++)
+						{
+							for (int l = 0; l < numLobes; l++)
+							{
+								cv::Vec4f temp = vMFdata[m + 1][l].at<cv::Vec4f>(h / 2, w / 2);
+								//cv::Vec4f temp = vMFdata[m - 1][l].at<cv::Vec4f>(h * 2 + (i % 2), w * 2 + (int)(i / 2));
+								if (temp[0] != 0)
+								{
+									temp[1] /= temp[0]; temp[2] /= temp[0]; temp[3] /= temp[0];
+									tR[0] = temp[1]; tR[1] = temp[2]; tR[2] = temp[3];
+									tKappa = vMFfunc::r2kappa(tR);
+									tAlpha = temp[0];
+									vectorFunc::normalize(tR);
+								}
+								else
+								{
+									tKappa = 0.f;
+									tR[0] = 0.f; tR[1] = 0.f; tR[2] = 0.f;
+								}
+
+								prevData[i][l][0] = tR[0]; prevData[i][l][1] = tR[1]; prevData[i][l][2] = tR[2];
+								prevData[i][l][3] = tAlpha;
+							}
+						}
+					}
+					else
+					{
+						for (int i = 0; i < 4; i++)
+						{
+							for (int l = 0; l < numLobes; l++)
+							{
+								prevData[i][l][0] = 1.f; prevData[i][l][1] = 0.f; prevData[i][l][2] = 0.f;
+								prevData[i][l][3] = 0.f;
+							}
+						}
+					}
+					cv::Rect ROI(w*side, h*side, side, side);
+					cv::Mat targetRegion;
+					targetRegion = rawData(ROI).clone();
+
+					//prevData for mu initialization
+					this->computeParameters(alpha, aux, targetRegion, prevData, this->alignCtrl);
+
+					if ((m == 3)/*||(m==4)||(m==2)*/)
+						// && (w == width / 2) && (h == height / 2)
+					{
+						//					std::cout << "Displayed " << w << ", " << h << std::endl;
+						//					vMFfunc::displayvMF(numLobes, alpha, aux, 512, 512, 1, 0);
+					}
+					//alignment between neighboring pixels of same mipmap level
+
+					for (int l = 0; l < numLobes; l++)
+					{
+
+						cv::Vec4f computeData;
+						computeData[0] = alpha[l];
+						computeData[1] = alpha[l] * aux[l][0];
+						computeData[2] = alpha[l] * aux[l][1];
+						computeData[3] = alpha[l] * aux[l][2];
+						vMFdata[m][l].at<cv::Vec4f>(h, w) = computeData;
+					}
+				}
+			}
+		}
+		std::vector<int> compression_params;
+		compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+		compression_params.push_back(100);
+		std::string outName;
+		for (int m = 0; m < mipmapLevel; m++)
+		{
+			for (int l = 0; l < numLobes; l++)
+			{
+				outName = "./fit_data/";
+				outName += filename;
+				outName += "_";
+				outName += std::to_string(l);
+				outName += "_";
+				outName += std::to_string(m);
+				std::fstream fs;
+				int width = vMFdata[m][l].cols;
+				int height = vMFdata[m][l].rows;
+				fs.open(outName, std::ios::out);
+				for (int h = 0; h < height; h++)
+				{
+					for (int w = 0; w < width; w++)
+					{
+						cv::Vec4f data = vMFdata[m][l].at<cv::Vec4f>(h, w);
+						fs << data[0] << " " << data[1] << " " << data[2] << " " << data[3]<<"\n";
+					}
+				}
+				fs.close();
+			}
+		}
+
 		for (int l = 0; l < numLobes; l++)
 		{
-			outName = "./fit_data/";
-			outName += filename;
-			outName += "_";
-			outName += std::to_string(l);
-			outName += "_";
-			outName += std::to_string(m);
-			cv::imwrite(outName, vMFdata[m][l]);
+			delete[] aux[l];
+		}
+		delete[] aux; delete[] alpha;
+	}
+	else
+	{
+		std::cout<<"Using Saved Image\n";
+		std::string inName;
+		for (int m = 0; m < mipmapLevel; m++)
+		{
+			for (int l = 0; l < numLobes; l++)
+			{
+				std::cout << m << ", " << l << std::endl;
+				inName = "./fit_data/";
+				inName += filename;
+				inName += "_";
+				inName += std::to_string(l);
+				inName += "_";
+				inName += std::to_string(m);
+				std::fstream fs;
+				int width = vMFdata[m][l].cols;
+				int height = vMFdata[m][l].rows;
+				fs.open(inName, std::ios::in);
+				for (int h = 0; h < height; h++)
+				{
+					for (int w = 0; w < width; w++)
+					{
+
+						cv::Vec4f data;
+						fs >> data[0] >> data[1] >> data[2] >> data[3];
+						vMFdata[m][l].at<cv::Vec4f>(h, w)=data;
+					}
+				}
+				fs.close();
+			}
 		}
 	}
+}
 
-	for (int l = 0; l < numLobes; l++)
-	{
-		delete[] aux[l];
-	}
-	delete[] aux; delete[] alpha;
+void vMFtexture::manualLoad(int m, int l, int h, int w, cv::Vec4f data)
+{
+	this->vMFdata[m][l].at<cv::Vec4f>(h, w) = data;
 }
 
 

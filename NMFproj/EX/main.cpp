@@ -105,7 +105,7 @@ static const float exampleData[] =
 void displayCB();
 void setMesh();
 void generateSHmap(GLubyte* TextureData, int order);
-void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux[3], float alignCtrl);
+void generatevMFmap();
 
 float calculateSHcoeffDelta(int l, int m, float x, float y, float z);
 void checkTextureError(GLenum glError);
@@ -710,7 +710,7 @@ void generatevMFmap2(GLubyte* TextureData, int numLobes, float alignCtrl){
 
 
 
-void generatevMFmap(GLubyte* TextureData, int numLobes, float* alpha, float* aux[3], float alignCtrl){
+void generatevMFmap(){
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glGenTextures(10, vMFmaps);
@@ -1142,7 +1142,7 @@ void initBuffers() {
 	}
 
 	///bind texture
-	generatevMFmap(textureData, numLobes, alpha, aux, alignCtrl);
+	generatevMFmap();
 //	generatevMFmap2(textureData, numLobes, alignCtrl);
 	cSHtex.bindTexture(normalizedNMT, SHmaps);
 	cSHtex.bindYlm(Ylmmaps);
@@ -1468,6 +1468,44 @@ void keyboardCB(unsigned char key, int x, int y){
 	if ((renderMode == 3)||(renderMode==1))
 	{
 		switch (key){
+		case'1':
+		{
+			break;
+			std::string inName;
+			for (int m = 0; m < 9; m++)
+			{
+				for (int l = 0; l < numLobes; l++)
+				{
+					inName = "./fit_data/";
+					inName += "1.jpg";
+					inName += "_";
+					inName += std::to_string(l);
+					inName += "_";
+					inName += std::to_string(m);
+					cv::Vec4f data;
+					std::fstream fs;
+					int he = cVMFtex.getHeight(m);
+					int wi = cVMFtex.getWidth(m);
+					fs.open(inName, std::ios::in);
+					for (int h = 0; h < height; h++)
+					{
+						for (int w = 0; w < width; w++)
+						{
+							fs >> data[0] >> data[1] >> data[2] >> data[3];
+							cVMFtex.manualLoad(m, l, h, w, data);
+						}
+					}
+					generatevMFmap();
+				}
+			}
+
+			break;
+		}
+		case '2':
+			
+
+			break;
+
 		case 'b':case'B':
 			brdfSelect == 0 ? (brdfSelect = 1) : (brdfSelect = 0);
 			break;
@@ -1759,7 +1797,7 @@ void initGL(int argc, char** argv){
 	createProgram();
 	setMesh();
 
-	cVMFtex.generatevMFmaps();
+	cVMFtex.generatevMFmaps(useSaved);
 
 	initBuffers();
 
